@@ -148,32 +148,6 @@ export default function TextToAscii() {
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, rect.width, rect.height);
 
-      // Draw terminal header
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.fillRect(0, 0, rect.width, 50);
-
-      // Draw window controls (red, yellow, green dots)
-      const dotY = 25;
-      ctx.fillStyle = '#ef4444';
-      ctx.beginPath();
-      ctx.arc(20, dotY, 6, 0, 2 * Math.PI);
-      ctx.fill();
-
-      ctx.fillStyle = '#eab308';
-      ctx.beginPath();
-      ctx.arc(40, dotY, 6, 0, 2 * Math.PI);
-      ctx.fill();
-
-      ctx.fillStyle = '#22c55e';
-      ctx.beginPath();
-      ctx.arc(60, dotY, 6, 0, 2 * Math.PI);
-      ctx.fill();
-
-      // Draw the file path
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = '12px monospace';
-      ctx.fillText('~/output/text-art.txt', rect.width - 140, dotY + 3);
-
       // Set up text properties for ASCII art
       ctx.font = 'bold 16px "Courier New", monospace';
       ctx.fillStyle = '#00FF41';
@@ -191,52 +165,56 @@ export default function TextToAscii() {
       const asciiText = asciiElement.textContent || '';
       const asciiLines = asciiText.split('\n').filter(line => line.trim());
       const lineHeight = 20;
-      const startY = (rect.height - (asciiLines.length * lineHeight)) / 2 + 30;
+      const startY = (rect.height - (asciiLines.length * lineHeight)) / 2;
 
       // Draw each line of ASCII art
       asciiLines.forEach((line, index) => {
-        // Remove ANSI color codes
-        const cleanLine = line.replace(/\u001b\[[0-9;]*m/g, '');
+        const y = startY + index * lineHeight;
 
-        // For colored output, we'll use a gradient or specific colors
-        if (colorEffect.value !== 'none') {
-          // Rainbow effect
-          if (colorEffect.value === 'rainbow') {
-            const gradient = ctx.createLinearGradient(0, 0, rect.width, 0);
-            gradient.addColorStop(0, '#ff0000');
-            gradient.addColorStop(0.17, '#ff8800');
-            gradient.addColorStop(0.33, '#ffff00');
-            gradient.addColorStop(0.5, '#00ff00');
-            gradient.addColorStop(0.67, '#0088ff');
-            gradient.addColorStop(0.83, '#0000ff');
-            gradient.addColorStop(1, '#ff00ff');
-            ctx.fillStyle = gradient;
-          } else if (colorEffect.value === 'fire') {
-            const gradient = ctx.createLinearGradient(0, startY + index * lineHeight, 0, startY + (index + 1) * lineHeight);
-            gradient.addColorStop(0, '#ffff00');
-            gradient.addColorStop(0.5, '#ff8800');
-            gradient.addColorStop(1, '#ff0000');
-            ctx.fillStyle = gradient;
-          } else if (colorEffect.value === 'ocean') {
-            const gradient = ctx.createLinearGradient(0, 0, rect.width, 0);
-            gradient.addColorStop(0, '#0088ff');
-            gradient.addColorStop(0.5, '#00ffff');
-            gradient.addColorStop(1, '#0088ff');
-            ctx.fillStyle = gradient;
-          } else if (colorEffect.value === 'matrix') {
-            ctx.fillStyle = '#00FF41';
-          } else if (colorEffect.value === 'unicorn') {
-            const gradient = ctx.createLinearGradient(0, 0, rect.width, 0);
-            gradient.addColorStop(0, '#ff69b4');
-            gradient.addColorStop(0.25, '#ff88cc');
-            gradient.addColorStop(0.5, '#ffaadd');
-            gradient.addColorStop(0.75, '#ffccee');
-            gradient.addColorStop(1, '#ff69b4');
-            ctx.fillStyle = gradient;
-          }
+        // Apply color based on effect
+        if (colorEffect.value === 'rainbow') {
+          // Create rainbow gradient across the width
+          const gradient = ctx.createLinearGradient(50, 0, rect.width - 50, 0);
+          const colors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+          colors.forEach((color, i) => {
+            gradient.addColorStop(i / (colors.length - 1), color);
+          });
+          ctx.fillStyle = gradient;
+        } else if (colorEffect.value === 'fire') {
+          // Fire gradient from yellow to red
+          const gradient = ctx.createLinearGradient(0, y - 10, 0, y + 10);
+          gradient.addColorStop(0, '#ffff00');
+          gradient.addColorStop(0.5, '#ff7700');
+          gradient.addColorStop(1, '#ff0000');
+          ctx.fillStyle = gradient;
+        } else if (colorEffect.value === 'ocean') {
+          // Ocean gradient blues
+          const gradient = ctx.createLinearGradient(50, 0, rect.width - 50, 0);
+          gradient.addColorStop(0, '#001f3f');
+          gradient.addColorStop(0.25, '#0074D9');
+          gradient.addColorStop(0.5, '#00ffff');
+          gradient.addColorStop(0.75, '#0074D9');
+          gradient.addColorStop(1, '#001f3f');
+          ctx.fillStyle = gradient;
+        } else if (colorEffect.value === 'unicorn') {
+          // Unicorn gradient pastels
+          const gradient = ctx.createLinearGradient(50, 0, rect.width - 50, 0);
+          gradient.addColorStop(0, '#ff69b4');
+          gradient.addColorStop(0.2, '#ff99cc');
+          gradient.addColorStop(0.4, '#ffccff');
+          gradient.addColorStop(0.6, '#ccffff');
+          gradient.addColorStop(0.8, '#99ccff');
+          gradient.addColorStop(1, '#ff69b4');
+          ctx.fillStyle = gradient;
+        } else if (colorEffect.value === 'matrix') {
+          // Matrix green
+          ctx.fillStyle = '#00FF41';
+        } else {
+          // Plain - green terminal color
+          ctx.fillStyle = '#00FF41';
         }
 
-        ctx.fillText(cleanLine, rect.width / 2, startY + index * lineHeight);
+        ctx.fillText(line, rect.width / 2, y);
       });
 
       // Create filename from input text
