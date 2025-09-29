@@ -121,50 +121,135 @@ export default function TextToAscii() {
     URL.revokeObjectURL(url);
   };
 
-  const downloadPNG = async () => {
-    // Find the ASCII display element
-    const asciiElement = document.querySelector('.ascii-display');
-    if (!asciiElement) return;
+  const downloadPNG = () => {
+    try {
+      // Find the ASCII display element and its container
+      const terminalContainer = document.querySelector('.rounded-3xl.border-4.shadow-brutal.overflow-hidden');
+      if (!terminalContainer) {
+        console.error('Terminal container not found');
+        return;
+      }
 
-    // Get the terminal window container
-    const terminalWindow = asciiElement.closest('[style*="background-color: #000000"]');
-    if (!terminalWindow) return;
+      // Create a canvas to render the ASCII art
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
 
-    // Use html2canvas to capture the rendered ASCII art
-    const loadScript = () => {
-      return new Promise((resolve) => {
-        if (window.html2canvas) {
-          resolve();
-          return;
+      // Get dimensions from the terminal window
+      const rect = terminalContainer.getBoundingClientRect();
+      const scale = 2; // For higher quality
+
+      canvas.width = rect.width * scale;
+      canvas.height = rect.height * scale;
+
+      // Scale the context for high DPI
+      ctx.scale(scale, scale);
+
+      // Draw black background
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, rect.width, rect.height);
+
+      // Draw terminal header
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(0, 0, rect.width, 50);
+
+      // Draw window controls (red, yellow, green dots)
+      const dotY = 25;
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(20, dotY, 6, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.fillStyle = '#eab308';
+      ctx.beginPath();
+      ctx.arc(40, dotY, 6, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.arc(60, dotY, 6, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Draw the file path
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '12px monospace';
+      ctx.fillText('~/output/text-art.txt', rect.width - 140, dotY + 3);
+
+      // Set up text properties for ASCII art
+      ctx.font = 'bold 16px "Courier New", monospace';
+      ctx.fillStyle = '#00FF41';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Get the ASCII text content
+      const asciiLines = asciiOutput.split('\n').filter(line => line.trim());
+      const lineHeight = 20;
+      const startY = (rect.height - (asciiLines.length * lineHeight)) / 2 + 30;
+
+      // Draw each line of ASCII art
+      asciiLines.forEach((line, index) => {
+        // Remove ANSI color codes
+        const cleanLine = line.replace(/\u001b\[[0-9;]*m/g, '');
+
+        // For colored output, we'll use a gradient or specific colors
+        if (colorEffect.value !== 'none') {
+          // Rainbow effect
+          if (colorEffect.value === 'rainbow') {
+            const gradient = ctx.createLinearGradient(0, 0, rect.width, 0);
+            gradient.addColorStop(0, '#ff0000');
+            gradient.addColorStop(0.17, '#ff8800');
+            gradient.addColorStop(0.33, '#ffff00');
+            gradient.addColorStop(0.5, '#00ff00');
+            gradient.addColorStop(0.67, '#0088ff');
+            gradient.addColorStop(0.83, '#0000ff');
+            gradient.addColorStop(1, '#ff00ff');
+            ctx.fillStyle = gradient;
+          } else if (colorEffect.value === 'fire') {
+            const gradient = ctx.createLinearGradient(0, startY + index * lineHeight, 0, startY + (index + 1) * lineHeight);
+            gradient.addColorStop(0, '#ffff00');
+            gradient.addColorStop(0.5, '#ff8800');
+            gradient.addColorStop(1, '#ff0000');
+            ctx.fillStyle = gradient;
+          } else if (colorEffect.value === 'ocean') {
+            const gradient = ctx.createLinearGradient(0, 0, rect.width, 0);
+            gradient.addColorStop(0, '#0088ff');
+            gradient.addColorStop(0.5, '#00ffff');
+            gradient.addColorStop(1, '#0088ff');
+            ctx.fillStyle = gradient;
+          } else if (colorEffect.value === 'matrix') {
+            ctx.fillStyle = '#00FF41';
+          } else if (colorEffect.value === 'unicorn') {
+            const gradient = ctx.createLinearGradient(0, 0, rect.width, 0);
+            gradient.addColorStop(0, '#ff69b4');
+            gradient.addColorStop(0.25, '#ff88cc');
+            gradient.addColorStop(0.5, '#ffaadd');
+            gradient.addColorStop(0.75, '#ffccee');
+            gradient.addColorStop(1, '#ff69b4');
+            ctx.fillStyle = gradient;
+          }
         }
-        const script = document.createElement('script');
-        script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
-        script.onload = resolve;
-        document.head.appendChild(script);
+
+        ctx.fillText(cleanLine, rect.width / 2, startY + index * lineHeight);
       });
-    };
 
-    await loadScript();
-
-    // Capture the terminal window
-    window.html2canvas(terminalWindow, {
-      backgroundColor: '#000000',
-      scale: 2, // Higher quality
-      logging: false,
-    }).then(canvas => {
       // Create filename from input text
       const filename = inputText.value.toLowerCase().replace(/[^a-z0-9]/g, '-') || 'ascii-art';
 
-      // Download the image
+      // Convert canvas to blob and download
       canvas.toBlob((blob) => {
+        if (!blob) {
+          console.error('Failed to create blob');
+          return;
+        }
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
         a.download = `${filename}.png`;
         a.click();
         URL.revokeObjectURL(url);
-      }, "image/png");
-    });
+      }, 'image/png');
+    } catch (error) {
+      console.error('Error generating PNG:', error);
+    }
   };
 
   return (
