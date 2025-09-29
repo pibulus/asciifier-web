@@ -82,6 +82,7 @@ export default function TextToAscii() {
   const [htmlOutput, setHtmlOutput] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+  const [copiedFormat, setCopiedFormat] = useState("");
   const [showAdvancedFonts, setShowAdvancedFonts] = useState(false);
 
   const inputText = useSignal("");
@@ -147,29 +148,48 @@ export default function TextToAscii() {
     borderStyle.value,
   ]);
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (format = "email") => {
     try {
-      // Use colorized HTML if available, otherwise wrap plain ASCII in monospace
-      const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, ""); // Strip ANSI codes for plain text
-      const htmlText = htmlOutput.includes("<span")
-        ? `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0; background: black; color: white; padding: 8px; border-radius: 4px;">${htmlOutput}</pre>`
-        : `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${plainText}</pre>`;
+      // Strip ANSI codes for plain text
+      const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, "");
+
+      let textToCopy = plainText;
+      let htmlToCopy = "";
+
+      if (format === "email") {
+        // Rich HTML for email (Gmail, Outlook, etc.)
+        htmlToCopy = htmlOutput.includes("<span")
+          ? `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0; background: black; color: white; padding: 8px; border-radius: 4px;">${htmlOutput}</pre>`
+          : `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${plainText}</pre>`;
+        textToCopy = plainText;
+      } else if (format === "message") {
+        // Wrapped in backticks for messaging apps (Discord, WhatsApp, Slack)
+        textToCopy = `\`\`\`\n${plainText}\n\`\`\``;
+        htmlToCopy = `<pre>${textToCopy}</pre>`;
+      } else {
+        // Plain text
+        textToCopy = plainText;
+      }
 
       // Try modern clipboard API with both formats
-      if (navigator.clipboard && navigator.clipboard.write) {
+      if (navigator.clipboard && navigator.clipboard.write && htmlToCopy) {
         const clipboardItem = new ClipboardItem({
-          "text/plain": new Blob([plainText], { type: "text/plain" }),
-          "text/html": new Blob([htmlText], { type: "text/html" }),
+          "text/plain": new Blob([textToCopy], { type: "text/plain" }),
+          "text/html": new Blob([htmlToCopy], { type: "text/html" }),
         });
         await navigator.clipboard.write([clipboardItem]);
       } else {
         // Fallback for older browsers - just plain text
-        await navigator.clipboard.writeText(plainText);
+        await navigator.clipboard.writeText(textToCopy);
       }
 
       setCopiedToClipboard(true);
+      setCopiedFormat(format);
       sounds.copy();
-      setTimeout(() => setCopiedToClipboard(false), 2000);
+      setTimeout(() => {
+        setCopiedToClipboard(false);
+        setCopiedFormat("");
+      }, 2000);
     } catch (err) {
       sounds.error();
       alert("Copy failed. Try again.");
@@ -594,59 +614,99 @@ export default function TextToAscii() {
       </div>
 
       {/* Export Actions */}
-      <div class="grid grid-cols-3 gap-4">
-        <button
-          onClick={copyToClipboard}
-          disabled={!asciiOutput}
-          class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal-lg transition-all group relative overflow-hidden ${
-            asciiOutput
-              ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
-              : "opacity-50 cursor-not-allowed"
-          } ${copiedToClipboard ? "animate-bounce-once" : ""}`}
-          style={copiedToClipboard
-            ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
-            : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
+      <div class="mb-10">
+        <label
+          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
+          style="color: var(--color-text, #0A0A0A);"
         >
-          <span class="relative z-10 flex items-center justify-center gap-2 text-base">
-            {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
-          </span>
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-          </div>
-        </button>
+          📤 SHARE YOUR ART
+        </label>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          {/* Copy for Email */}
+          <button
+            onClick={() => copyToClipboard("email")}
+            disabled={!asciiOutput}
+            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal-lg transition-all group relative overflow-hidden ${
+              asciiOutput
+                ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                : "opacity-50 cursor-not-allowed"
+            } ${copiedToClipboard && copiedFormat === "email" ? "animate-bounce-once" : ""}`}
+            style={copiedToClipboard && copiedFormat === "email"
+              ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
+              : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
+          >
+            <span class="relative z-10 flex flex-col items-center justify-center gap-1">
+              <span class="text-base">
+                {copiedToClipboard && copiedFormat === "email" ? "✅ COPIED!" : "📧 COPY FOR EMAIL"}
+              </span>
+              <span class="text-xs opacity-80">Rich colors preserved</span>
+            </span>
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+          </button>
 
-        <button
-          onClick={downloadText}
-          disabled={!asciiOutput}
-          class={`px-5 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
-            asciiOutput
-              ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
-              : "opacity-50 cursor-not-allowed"
-          }`}
-          style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-        >
-          <span class="relative z-10 flex items-center justify-center gap-2 text-base">
-            💾 SAVE TXT
-          </span>
-          <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-          </div>
-        </button>
+          {/* Copy for Messages */}
+          <button
+            onClick={() => copyToClipboard("message")}
+            disabled={!asciiOutput}
+            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal-lg transition-all group relative overflow-hidden ${
+              asciiOutput
+                ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                : "opacity-50 cursor-not-allowed"
+            } ${copiedToClipboard && copiedFormat === "message" ? "animate-bounce-once" : ""}`}
+            style={copiedToClipboard && copiedFormat === "message"
+              ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
+              : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
+          >
+            <span class="relative z-10 flex flex-col items-center justify-center gap-1">
+              <span class="text-base">
+                {copiedToClipboard && copiedFormat === "message" ? "✅ COPIED!" : "💬 COPY FOR MESSAGES"}
+              </span>
+              <span class="text-xs opacity-80">Works everywhere</span>
+            </span>
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+          </button>
+        </div>
 
-        <button
-          onClick={downloadPNG}
-          disabled={!asciiOutput}
-          class={`px-5 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
-            asciiOutput
-              ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
-              : "opacity-50 cursor-not-allowed"
-          }`}
-          style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-        >
-          <span class="relative z-10 flex items-center justify-center gap-2 text-base">
-            🖼️ SAVE PNG
-          </span>
-          <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-          </div>
-        </button>
+        {/* Download Options */}
+        <div class="grid grid-cols-2 gap-4">
+          <button
+            onClick={downloadText}
+            disabled={!asciiOutput}
+            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
+              asciiOutput
+                ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
+                : "opacity-50 cursor-not-allowed"
+            }`}
+            style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+          >
+            <span class="relative z-10 flex flex-col items-center justify-center gap-1">
+              <span class="text-base">💾 DOWNLOAD TXT</span>
+              <span class="text-xs opacity-60">Plain text file</span>
+            </span>
+            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+          </button>
+
+          <button
+            onClick={downloadPNG}
+            disabled={!asciiOutput}
+            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
+              asciiOutput
+                ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
+                : "opacity-50 cursor-not-allowed"
+            }`}
+            style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+          >
+            <span class="relative z-10 flex flex-col items-center justify-center gap-1">
+              <span class="text-base">🖼️ DOWNLOAD PNG</span>
+              <span class="text-xs opacity-60">Perfect screenshot</span>
+            </span>
+            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+          </button>
+        </div>
       </div>
 
       <style>
