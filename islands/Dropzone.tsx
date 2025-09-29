@@ -252,10 +252,10 @@ export default function Dropzone() {
           {/* Friendly greeting */}
           <div class="space-y-2">
             <h2 class="text-3xl font-bold" style="color: var(--color-text, #0A0A0A)">
-              Got an image?
+              Turn any image into ASCII art
             </h2>
             <p class="opacity-80 font-mono text-sm" style="color: var(--color-text, #0A0A0A)">
-              Drop it. Paste it. Click for it.
+              Just drop it here. Or paste. Or click. Whatever works.
             </p>
           </div>
 
@@ -284,8 +284,11 @@ export default function Dropzone() {
             />
 
             <div class="space-y-4 pointer-events-none">
+              <div class={`text-6xl transition-all duration-300 ${isDragging ? 'animate-bounce' : 'animate-pulse-soft'}`}>
+                📦
+              </div>
               <h3 class="text-2xl font-bold font-mono" style="color: var(--color-text, #0A0A0A)">
-                {isDragging ? "Drop it" : "Drop zone"}
+                {isDragging ? "Yeah! Drop it!" : "Drop zone"}
               </h3>
               <p class="opacity-60 text-sm font-mono" style="color: var(--color-text, #0A0A0A)">
                 JPG PNG GIF WebP • 10MB max
@@ -333,32 +336,30 @@ export default function Dropzone() {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Controls */}
           <div class="space-y-4">
-            {/* Quick Actions */}
+            {/* Style Controls */}
             <div class="border-4 rounded-lg p-4 shadow-brutal"
               style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)">
-              <h3 class="font-mono font-bold mb-3" style="color: var(--color-text, #0A0A0A)">PRESETS</h3>
-              <div class="grid grid-cols-2 gap-2">
+              <label class="block text-sm font-mono font-bold mb-2" style="color: var(--color-text, #0A0A0A)">CHARACTER STYLE</label>
+              <div class="grid grid-cols-2 gap-2 mb-3">
                 {PRESETS.map((preset, i) => (
                   <button
                     key={preset.name}
                     onClick={() => applyPreset(preset, i)}
-                    class={`px-3 py-2 border-2 border-black rounded text-sm font-bold transition-all duration-200 ${
+                    class={`px-2 py-1.5 border-2 rounded text-xs font-bold transition-all duration-200 ${
                       selectedPreset === i
-                        ? 'bg-hot-pink text-white shadow-brutal-sm animate-pulse-soft'
-                        : 'bg-gradient-to-r from-soft-yellow to-peach hover:animate-spring hover:shadow-brutal-sm active:scale-95'
+                        ? 'shadow-brutal-sm animate-pulse-soft'
+                        : 'hover:animate-spring hover:shadow-brutal-sm active:scale-95'
                     }`}
-                    title={`Keyboard: ${i + 1}`}
+                    style={selectedPreset === i
+                      ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
+                      : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+                    }
+                    title={`Quick preset ${i + 1}`}
                   >
                     {preset.name}
                   </button>
                 ))}
               </div>
-            </div>
-
-            {/* Style Selector with Preview */}
-            <div class="border-4 rounded-lg p-4 shadow-brutal"
-              style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)">
-              <label class="block text-sm font-mono font-bold mb-2" style="color: var(--color-text, #0A0A0A)">STYLE PICKER</label>
               <div class="space-y-2">
                 {Object.keys(CHARACTER_SETS).map(style => (
                   <button
@@ -519,7 +520,7 @@ export default function Dropzone() {
           <div class="lg:col-span-2 space-y-4">
             {/* Output Display - Dynamic sizing */}
             <div class="text-terminal-green rounded-lg border-4 shadow-brutal overflow-hidden"
-              style="background-color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)">
+              style="background-color: #000000; border-color: var(--color-border, #0A0A0A)">
               <div class="px-4 py-2 border-b-2 flex items-center justify-between"
                 style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)">
                 <div class="flex space-x-2">

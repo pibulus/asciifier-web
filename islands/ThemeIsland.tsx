@@ -31,7 +31,7 @@ export default function ThemeIsland() {
   };
 
   return (
-    <div class="fixed top-4 right-4 z-50">
+    <div class="relative">
       {/* Theme Toggle Button */}
       <button
         onClick={() => setShowPicker(!showPicker)}
