@@ -83,16 +83,16 @@ export default function TextToAscii() {
   const copyToClipboard = async () => {
     try {
       // Use colorized HTML if available, otherwise wrap plain ASCII in monospace
-      const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, ''); // Strip ANSI codes for plain text
-      const htmlText = htmlOutput.includes('<span') ?
-        `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0; background: black; color: white; padding: 8px; border-radius: 4px;">${htmlOutput}</pre>` :
-        `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${plainText}</pre>`;
+      const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, ""); // Strip ANSI codes for plain text
+      const htmlText = htmlOutput.includes("<span")
+        ? `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0; background: black; color: white; padding: 8px; border-radius: 4px;">${htmlOutput}</pre>`
+        : `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${plainText}</pre>`;
 
       // Try modern clipboard API with both formats
       if (navigator.clipboard && navigator.clipboard.write) {
         const clipboardItem = new ClipboardItem({
-          'text/plain': new Blob([plainText], { type: 'text/plain' }),
-          'text/html': new Blob([htmlText], { type: 'text/html' })
+          "text/plain": new Blob([plainText], { type: "text/plain" }),
+          "text/html": new Blob([htmlText], { type: "text/html" }),
         });
         await navigator.clipboard.write([clipboardItem]);
       } else {
@@ -105,32 +105,33 @@ export default function TextToAscii() {
       setTimeout(() => setCopiedToClipboard(false), 2000);
     } catch (err) {
       sounds.error();
-      alert('Copy failed. Try again.');
+      alert("Copy failed. Try again.");
     }
   };
 
   const downloadText = () => {
     // Strip ANSI codes for plain text download
-    const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, '');
-    const blob = new Blob([plainText], { type: 'text/plain' });
+    const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, "");
+    const blob = new Blob([plainText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'ascii-text.txt';
+    a.download = "ascii-text.txt";
     a.click();
     URL.revokeObjectURL(url);
   };
 
   return (
-    <div class="space-y-8">
-      {/* Input Section */}
-      <div class="border-4 rounded-2xl p-6 shadow-brutal space-y-6 animate-float transition-spring"
-        style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)">
-
-        <div class="space-y-3">
-          <label class="block text-sm font-mono font-bold tracking-wide" style="color: var(--color-text, #0A0A0A)">
-            ✨ YOUR TEXT
-          </label>
+    <div class="max-w-6xl mx-auto">
+      {/* Text Input Section - Clean and prominent */}
+      <div class="mb-8">
+        <label
+          class="block text-lg font-mono font-black tracking-[0.2em] uppercase mb-6"
+          style="color: var(--color-text, #0A0A0A);"
+        >
+          ✨ YOUR TEXT
+        </label>
+        <div class="relative">
           <input
             type="text"
             value={inputText.value}
@@ -140,160 +141,209 @@ export default function TextToAscii() {
             }}
             placeholder="Type something magical..."
             maxLength={20}
-            class="w-full px-4 py-3 border-3 rounded-xl font-mono text-lg focus:outline-none transition-spring hover:animate-gooey shadow-soft focus:shadow-soft-lg"
+            class="w-full px-8 py-5 border-3 rounded-2xl font-mono text-2xl font-bold focus:outline-none transition-all hover:scale-[1.01] focus:scale-[1.02] shadow-lg"
             style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"
           />
-          <div class="text-xs font-mono opacity-70 flex justify-between items-center">
-            <span style="color: var(--color-text, #0A0A0A)">
-              {inputText.value.length > 0 ? '✨ Looking good!' : '💭 Start typing...'}
-            </span>
-            <span class="font-semibold" style="color: var(--color-accent, #FF69B4)">
+          <div class="absolute right-4 top-1/2 -translate-y-1/2">
+            <span
+              class="font-mono font-bold text-lg"
+              style="color: var(--color-accent, #FF69B4)"
+            >
               {inputText.value.length}/20
             </span>
           </div>
         </div>
+        {inputText.value.length > 0 && (
+          <div class="text-sm font-mono mt-2 text-center animate-fade-in opacity-70" style="color: var(--color-text, #0A0A0A)">
+            ✨ Looking good!
+          </div>
+        )}
+      </div>
 
-        <div class="space-y-4">
-          <label class="block text-sm font-mono font-bold tracking-wide" style="color: var(--color-text, #0A0A0A)">
+      {/* Output Section - Positioned right after input */}
+      {asciiOutput && (
+        <div class="mb-10 animate-slide-up">
+          <div
+            class="rounded-2xl border-4 shadow-brutal overflow-hidden"
+            style="background-color: #000000; border-color: var(--color-border, #0A0A0A)"
+          >
+            <div
+              class="px-4 py-2 border-b-2 flex items-center justify-between"
+              style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)"
+            >
+              <div class="flex space-x-2">
+                <div
+                  class="w-3 h-3 bg-red-500 rounded-full hover:animate-pulse-soft cursor-pointer"
+                  title="Close (jk)"
+                >
+                </div>
+                <div
+                  class="w-3 h-3 bg-yellow-500 rounded-full hover:animate-pulse-soft cursor-pointer"
+                  title="Minimize (nope)"
+                >
+                </div>
+                <div
+                  class="w-3 h-3 bg-green-500 rounded-full hover:animate-pulse-soft cursor-pointer"
+                  title="Full screen (maybe)"
+                >
+                </div>
+              </div>
+              <span class="text-xs font-mono opacity-60">
+                ~/output/text-art.txt
+              </span>
+            </div>
+            <div
+              class="p-6 overflow-auto custom-scrollbar"
+              style="max-height: 30vh"
+            >
+              <pre
+                class="ascii-display leading-tight"
+                style="color: #00FF41; font-size: clamp(0.5rem, 1.4vw, 0.8rem); font-family: monospace;"
+                dangerouslySetInnerHTML={{
+                  __html: colorEffect.value !== "none" && htmlOutput
+                    ? htmlOutput
+                    : asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;"),
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Controls Section - Font & Color in a card */}
+      <div class="space-y-8">
+        {/* Font Style Section */}
+        <div>
+          <label
+            class="block text-lg font-mono font-black tracking-[0.2em] uppercase mb-6"
+            style="color: var(--color-text, #0A0A0A);"
+          >
             🎨 FONT STYLE
           </label>
-          <div class="grid grid-cols-2 gap-3">
-            {FIGLET_FONTS.map(font => (
+          <div class="grid grid-cols-2 gap-4">
+            {FIGLET_FONTS.map((font) => (
               <button
                 key={font.file}
                 onClick={() => {
                   sounds.click();
                   selectedFont.value = font.file;
                 }}
-                class={`px-4 py-3 border-3 rounded-xl text-sm font-bold transition-spring group magnetic-btn relative overflow-hidden ${
+                class={`px-6 py-4 rounded-2xl text-base font-bold transition-all relative overflow-hidden ${
                   selectedFont.value === font.file
-                    ? 'shadow-brutal-sm animate-gentle-pulse scale-105'
-                    : 'hover:animate-spring hover:shadow-brutal-sm active:scale-95 hover:animate-wiggle shadow-soft'
+                    ? "border-3 scale-[1.02] shadow-lg"
+                    : "border-2 hover:scale-[1.02] hover:shadow-md active:scale-95"
                 }`}
                 style={selectedFont.value === font.file
-                  ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-                  : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-                }
+                  ? "background-color: var(--color-secondary, #FFE5B4); color: var(--color-accent, #FF69B4); border-color: var(--color-accent, #FF69B4);"
+                  : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
               >
                 <span class="relative z-10">{font.name}</span>
                 {selectedFont.value === font.file && (
-                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer"></div>
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer">
+                  </div>
                 )}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Color Effects - Always Visible */}
-        <div class="space-y-4">
-          <label class="block text-sm font-mono font-bold tracking-wide" style="color: var(--color-text, #0A0A0A)">
+        {/* Color Effects */}
+        <div>
+          <label
+            class="block text-lg font-mono font-black tracking-[0.2em] uppercase mb-6"
+            style="color: var(--color-text, #0A0A0A);"
+          >
             🌈 COLOR MAGIC
           </label>
-          <div class="grid grid-cols-2 gap-3">
-            {COLOR_EFFECTS.map(effect => (
+          <div class="grid grid-cols-3 gap-4">
+            {COLOR_EFFECTS.map((effect) => (
               <button
                 key={effect.value}
                 onClick={() => {
                   sounds.click();
                   colorEffect.value = effect.value;
                 }}
-                class={`px-4 py-3 border-3 rounded-xl text-sm font-bold transition-spring group magnetic-btn relative overflow-hidden ${
+                class={`px-5 py-4 rounded-2xl text-base font-bold transition-all relative overflow-hidden ${
                   colorEffect.value === effect.value
-                    ? 'shadow-brutal-sm animate-gentle-pulse scale-105'
-                    : 'hover:animate-spring hover:shadow-brutal-sm active:scale-95 hover:animate-wiggle shadow-soft'
+                    ? "border-3 scale-[1.02] shadow-lg"
+                    : "border-2 hover:scale-[1.02] hover:shadow-md active:scale-95"
                 }`}
                 style={colorEffect.value === effect.value
-                  ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-                  : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-                }
+                  ? "background-color: var(--color-secondary, #FFE5B4); color: var(--color-accent, #FF69B4); border-color: var(--color-accent, #FF69B4);"
+                  : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
               >
                 <span class="relative z-10">{effect.name}</span>
                 {colorEffect.value === effect.value && (
-                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer"></div>
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer">
+                  </div>
                 )}
               </button>
             ))}
           </div>
-          <div class="text-xs font-mono opacity-60 text-center" style="color: var(--color-text, #0A0A0A)">
-            {colorEffect.value === 'none' ? '🎭 Simple & clean' : '✨ Adding some color magic!'}
+          <div
+            class="text-sm font-mono opacity-60 text-center mt-4"
+            style="color: var(--color-text, #0A0A0A)"
+          >
+            {colorEffect.value === "none"
+              ? "🎭 Simple & clean"
+              : "✨ Adding some color magic!"}
           </div>
         </div>
       </div>
 
-      {/* Output Section */}
+      {/* Export Actions - At the bottom */}
       {asciiOutput && (
-        <div class="space-y-4">
-          {/* ASCII Preview */}
-          <div class="text-terminal-green rounded-lg border-4 shadow-brutal overflow-hidden"
-            style="background-color: #000000; border-color: var(--color-border, #0A0A0A)">
-            <div class="px-4 py-2 border-b-2 flex items-center justify-between"
-              style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)">
-              <div class="flex space-x-2">
-                <div class="w-3 h-3 bg-red-500 rounded-full hover:animate-pulse-soft cursor-pointer" title="Close (jk)"></div>
-                <div class="w-3 h-3 bg-yellow-500 rounded-full hover:animate-pulse-soft cursor-pointer" title="Minimize (nope)"></div>
-                <div class="w-3 h-3 bg-green-500 rounded-full hover:animate-pulse-soft cursor-pointer" title="Full screen (maybe)"></div>
-              </div>
-              <span class="text-xs font-mono opacity-60">~/output/text-art.txt</span>
-            </div>
-            <div class="p-4 overflow-auto custom-scrollbar" style="max-height: 40vh">
-              <pre
-                class="ascii-display leading-tight"
-                style="color: #00FF41; font-size: clamp(0.4rem, 1.2vw, 0.6rem); font-family: monospace;"
-                dangerouslySetInnerHTML={{
-                  __html: colorEffect.value !== "none" && htmlOutput ? htmlOutput : asciiOutput.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                }}
-              />
-            </div>
-          </div>
+        <div class="flex gap-4 mt-10">
+          <button
+            onClick={downloadText}
+            class="flex-1 px-6 py-4 border-2 rounded-2xl font-mono font-bold transition-all hover:scale-[1.02] hover:shadow-md active:scale-95 group relative overflow-hidden"
+            style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+          >
+            <span class="relative z-10 flex items-center justify-center gap-2">
+              💾 SAVE AS TEXT
+            </span>
+          </button>
 
-          {/* Export Actions */}
-          <div class="flex flex-wrap gap-4">
-            <button
-              onClick={downloadText}
-              class="flex-1 px-6 py-4 border-4 rounded-xl font-mono font-bold shadow-brutal transition-spring magnetic-btn hover:shadow-brutal-lg hover:animate-spring active:scale-95 group relative overflow-hidden"
-              style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-            >
-              <span class="relative z-10 flex items-center justify-center gap-2">
-                💾 SAVE AS TEXT
-              </span>
-              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 animate-shimmer"></div>
-            </button>
-
-            <button
-              onClick={copyToClipboard}
-              class={`flex-1 px-6 py-4 border-4 rounded-xl font-mono font-bold shadow-brutal transition-spring magnetic-btn hover:shadow-brutal-lg active:scale-95 group relative overflow-hidden ${
-                copiedToClipboard ? 'animate-gentle-pulse scale-105' : 'hover:animate-spring hover:animate-wiggle'
-              }`}
-              style={copiedToClipboard
-                ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A)"
-                : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-              }
-            >
-              <span class="relative z-10 flex items-center justify-center gap-2">
-                {copiedToClipboard ? '✅ COPIED!' : '📋 COPY'}
-              </span>
-              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer"></div>
-            </button>
-          </div>
+          <button
+            onClick={copyToClipboard}
+            class={`flex-1 px-6 py-4 border-3 rounded-2xl font-mono font-bold shadow-brutal transition-all hover:shadow-brutal-lg hover:scale-[1.02] active:scale-95 group relative overflow-hidden`}
+            style={copiedToClipboard
+              ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A)"
+              : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"}
+          >
+            <span class="relative z-10 flex items-center justify-center gap-2">
+              {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
+            </span>
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer">
+            </div>
+          </button>
         </div>
       )}
 
       {/* Loading Indicator */}
       {isGenerating && (
         <div class="text-center py-6 animate-float">
-          <div class="inline-flex items-center justify-center space-x-3 px-6 py-4 rounded-xl border-3 shadow-soft transition-spring"
-            style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)">
-            <div class="animate-spin h-6 w-6 border-3 border-transparent rounded-full"
-              style="border-top-color: var(--color-accent, #FF69B4); border-right-color: var(--color-accent, #FF69B4)">
+          <div
+            class="inline-flex items-center justify-center space-x-3 px-6 py-4 rounded-xl border-3 shadow-soft transition-spring"
+            style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
+          >
+            <div
+              class="animate-spin h-6 w-6 border-3 border-transparent rounded-full"
+              style="border-top-color: var(--color-accent, #FF69B4); border-right-color: var(--color-accent, #FF69B4)"
+            >
             </div>
-            <p class="font-mono text-sm font-bold animate-gentle-pulse" style="color: var(--color-text, #0A0A0A)">
+            <p
+              class="font-mono text-sm font-bold animate-gentle-pulse"
+              style="color: var(--color-text, #0A0A0A)"
+            >
               ✨ Crafting your ASCII art...
             </p>
           </div>
         </div>
       )}
 
-      <style>{`
+      <style>
+        {`
         /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
           width: 12px;
@@ -307,6 +357,32 @@ export default function TextToAscii() {
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #00CC33;
+        }
+
+        /* Slide up animation for output */
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-slide-up {
+          animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Fade in animation */
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-in;
         }
 
         /* Whimsical Spring Physics - Real bounce using linear() */
@@ -332,10 +408,10 @@ export default function TextToAscii() {
           ) forwards;
         }
 
-        /* Gentle Pulse for Selected States */
+        /* Gentle Pulse for Selected States - Removed to reduce visual noise */
         @keyframes gentlePulse {
-          0%, 100% { transform: scale(1.05); opacity: 1; }
-          50% { transform: scale(1.08); opacity: 0.95; }
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.95; }
         }
 
         .animate-gentle-pulse {
@@ -409,14 +485,7 @@ export default function TextToAscii() {
           transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        /* Magnetic Button Effect */
-        .magnetic-btn {
-          transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .magnetic-btn:hover {
-          transform: translate(2px, -2px);
-        }
+        /* Removed magnetic button effect to reduce visual clutter */
 
         /* Soft Shadows */
         .shadow-soft {
@@ -426,7 +495,8 @@ export default function TextToAscii() {
         .shadow-soft-lg {
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }
-      `}</style>
+      `}
+      </style>
     </div>
   );
 }
