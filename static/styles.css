@@ -8,6 +8,7 @@
 /* Root variables for theming */
 :root {
   --color-base: #FAF9F6;
+  --color-base-gradient: #FAF9F6;
   --color-secondary: #FFE5B4;
   --color-accent: #FF69B4;
   --color-text: #0A0A0A;

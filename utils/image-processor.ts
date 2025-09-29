@@ -7,6 +7,7 @@ export interface ProcessOptions {
   useColor?: boolean;
   invert?: boolean;
   enhance?: boolean;
+  rainbow?: boolean;
 }
 
 export class ImageProcessor {
@@ -124,7 +125,11 @@ export class ImageProcessor {
         const char = chars[charIndex];
 
         // Store character with optional color info
-        if (options.useColor) {
+        if (options.rainbow) {
+          // Rainbow gradient based on position
+          const hue = ((x + y * 2) * 360 / (targetWidth + targetHeight * 2)) % 360;
+          row.push(`<span style="color: hsl(${hue}, 70%, 50%)">${char}</span>`);
+        } else if (options.useColor) {
           row.push(`<span style="color: rgb(${r}, ${g}, ${b})">${char}</span>`);
         } else {
           row.push(char);

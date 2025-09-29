@@ -5,12 +5,12 @@ import { CHARACTER_SETS, STYLE_DESCRIPTIONS, type CharacterStyle } from "../util
 import { sounds } from "../utils/sounds.ts";
 import { easterEggs } from "../utils/easter-eggs.ts";
 
-// Preset configurations for quick starts - now with color focus
+// Preset configurations for quick starts
 const PRESETS = [
-  { name: "B&W", style: "classic", color: false, width: 80, enhance: false, vibe: "monochrome magic", icon: "⬜" },
-  { name: "COLOR", style: "classic", color: true, width: 80, enhance: true, vibe: "full spectrum", icon: "🎨" },
-  { name: "INVERT", style: "classic", color: false, width: 80, enhance: false, invert: true, vibe: "negative space", icon: "🔄" },
-  { name: "TINY", style: "dense", color: false, width: 120, enhance: false, vibe: "maximum detail", icon: "🔬" },
+  { name: "CLASSIC", style: "classic", color: false, width: 80, enhance: false, vibe: "clean and simple" },
+  { name: "COLOR", style: "classic", color: true, width: 80, enhance: true, vibe: "full spectrum" },
+  { name: "INVERTED", style: "classic", color: false, width: 80, enhance: false, invert: true, vibe: "light on dark" },
+  { name: "DETAILED", style: "retro", color: false, width: 120, enhance: false, vibe: "maximum texture" },
 ];
 
 export default function Dropzone() {
@@ -27,6 +27,7 @@ export default function Dropzone() {
   const selectedStyle = useSignal<CharacterStyle>("classic");
   const charWidth = useSignal(80);
   const useColor = useSignal(false);
+  const useRainbow = useSignal(false);
   const invertBrightness = useSignal(false);
   const enhanceImage = useSignal(false);
   const autoUpdate = useSignal(true);
@@ -122,12 +123,13 @@ export default function Dropzone() {
         width: charWidth.value,
         style: selectedStyle.value,
         useColor: useColor.value,
+        rainbow: useRainbow.value,
         invert: invertBrightness.value,
         enhance: enhanceImage.value,
       };
 
       const ascii = processor.current.processImage(img, options);
-      let formatted = processor.current.formatAscii(ascii, useColor.value);
+      let formatted = processor.current.formatAscii(ascii, useColor.value || useRainbow.value);
 
       // Maybe add secret watermark
       formatted = easterEggs.addSecretWatermark(formatted);
@@ -240,7 +242,7 @@ export default function Dropzone() {
     if (imageLoaded) {
       scheduleReprocess();
     }
-  }, [selectedStyle.value, charWidth.value, useColor.value, invertBrightness.value, enhanceImage.value, imageLoaded]);
+  }, [selectedStyle.value, charWidth.value, useColor.value, useRainbow.value, invertBrightness.value, enhanceImage.value, imageLoaded]);
 
   return (
     <div class="space-y-8">
@@ -249,12 +251,11 @@ export default function Dropzone() {
         <div class="text-center space-y-6">
           {/* Friendly greeting */}
           <div class="space-y-2">
-            <h2 class="text-3xl font-bold animate-bounce-subtle" style="color: var(--color-text, #0A0A0A)">
-              Drop a pic.
-              <span style="color: var(--color-accent, #FF69B4)"> Get art.</span>
+            <h2 class="text-3xl font-bold" style="color: var(--color-text, #0A0A0A)">
+              Got an image?
             </h2>
             <p class="opacity-80 font-mono text-sm" style="color: var(--color-text, #0A0A0A)">
-              Paste works too • <kbd class="px-2 py-1 rounded text-xs" style="background-color: var(--color-secondary, #FFE5B4)">Cmd+V</kbd>
+              Drop it. Paste it. Click for it.
             </p>
           </div>
 
@@ -283,27 +284,19 @@ export default function Dropzone() {
             />
 
             <div class="space-y-4 pointer-events-none">
-              <div class={`text-7xl transition-all duration-300 ${isDragging ? 'animate-spin' : 'group-hover:animate-wiggle'}`}>
-                {isDragging ? "🎯" : "💾"}
-              </div>
               <h3 class="text-2xl font-bold font-mono" style="color: var(--color-text, #0A0A0A)">
-                {isDragging ? "Release to convert" : "Click or drop"}
+                {isDragging ? "Drop it" : "Drop zone"}
               </h3>
               <p class="opacity-60 text-sm font-mono" style="color: var(--color-text, #0A0A0A)">
                 JPG PNG GIF WebP • 10MB max
               </p>
             </div>
 
-            {/* Animated corner decorations */}
-            <div class="absolute top-4 left-4 text-2xl opacity-50 group-hover:opacity-100 group-hover:animate-spring transition-opacity">✨</div>
-            <div class="absolute top-4 right-4 text-2xl opacity-50 group-hover:opacity-100 group-hover:animate-spring transition-opacity animation-delay-100">✨</div>
-            <div class="absolute bottom-4 left-4 text-2xl opacity-50 group-hover:opacity-100 group-hover:animate-spring transition-opacity animation-delay-200">✨</div>
-            <div class="absolute bottom-4 right-4 text-2xl opacity-50 group-hover:opacity-100 group-hover:animate-spring transition-opacity animation-delay-300">✨</div>
           </div>
 
           {/* Quick Start Presets */}
           <div class="space-y-3">
-            <p class="text-sm font-mono opacity-60" style="color: var(--color-text, #0A0A0A)">Pick output style:</p>
+            <p class="text-sm font-mono opacity-60" style="color: var(--color-text, #0A0A0A)">Quick starts:</p>
             <div class="flex flex-wrap gap-3 justify-center">
               {PRESETS.map((preset, i) => (
                 <button
@@ -320,20 +313,14 @@ export default function Dropzone() {
                   }
                   title={imageLoaded ? `Press ${i + 1} to apply` : 'Select preset before uploading'}
                 >
-                  <div class="flex items-center gap-2">
-                    <span class="text-lg">{preset.icon}</span>
-                    <div>
-                      <span class="font-mono font-bold">{preset.name}</span>
-                      <span class="block text-xs opacity-60">{preset.vibe}</span>
-                    </div>
+                  <div>
+                    <span class="font-mono font-bold">{preset.name}</span>
+                    <span class="block text-xs opacity-60">{preset.vibe}</span>
                   </div>
                   <span class="absolute -top-2 -right-2 text-xs px-1.5 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity font-mono"
                     style="background-color: var(--color-text, #0A0A0A); color: var(--color-base, #FAF9F6)">
                     {i + 1}
                   </span>
-                  {selectedPreset === i && (
-                    <span class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 text-xs animate-bounce">✓</span>
-                  )}
                 </button>
               ))}
             </div>
@@ -438,12 +425,30 @@ export default function Dropzone() {
                     onChange={(e) => {
                       sounds.toggle();
                       useColor.value = (e.target as HTMLInputElement).checked;
+                      if (useColor.value) useRainbow.value = false; // Disable rainbow
                       scheduleReprocess();
                     }}
                     class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
                   />
                   <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
-                    <span class="inline-block group-hover:animate-spring">🎨</span> Color mode
+                    Color mode
+                  </span>
+                </label>
+
+                <label class="flex items-center space-x-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={useRainbow.value}
+                    onChange={(e) => {
+                      sounds.toggle();
+                      useRainbow.value = (e.target as HTMLInputElement).checked;
+                      if (useRainbow.value) useColor.value = false; // Disable regular color
+                      scheduleReprocess();
+                    }}
+                    class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
+                  />
+                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                    Rainbow
                   </span>
                 </label>
 
@@ -459,7 +464,7 @@ export default function Dropzone() {
                     class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
                   />
                   <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
-                    <span class="inline-block group-hover:animate-spring">🔄</span> Flip it
+                    Invert
                   </span>
                 </label>
 
@@ -475,7 +480,7 @@ export default function Dropzone() {
                     class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
                   />
                   <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
-                    <span class="inline-block group-hover:animate-spring">✨</span> Juice it
+                    Enhance
                   </span>
                 </label>
 
@@ -493,7 +498,7 @@ export default function Dropzone() {
                     class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
                   />
                   <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
-                    <span class="inline-block group-hover:animate-spring">⚡</span> Auto-refresh
+                    Live update
                   </span>
                 </label>
               </div>
@@ -504,7 +509,7 @@ export default function Dropzone() {
                   onClick={reprocess}
                   class="w-full px-4 py-2 bg-terminal-green text-soft-black border-2 border-soft-black rounded-lg font-mono font-bold hover:animate-jello hover:shadow-brutal-sm transition-all duration-200 active:scale-95"
                 >
-                  🔄 REFRESH
+                  REFRESH
                 </button>
               )}
             </div>
@@ -539,14 +544,14 @@ export default function Dropzone() {
                 onClick={downloadText}
                 class="flex-1 px-4 py-3 bg-white border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
               >
-                <span class="group-hover:animate-bounce-subtle inline-block">💾</span> .TXT
+                SAVE AS TEXT
               </button>
 
               <button
                 onClick={downloadHTML}
                 class="flex-1 px-4 py-3 bg-peach border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
               >
-                <span class="group-hover:animate-bounce-subtle inline-block">🌐</span> .HTML
+                SAVE AS HTML
               </button>
 
               <button
@@ -555,16 +560,14 @@ export default function Dropzone() {
                   copiedToClipboard ? 'bg-terminal-green text-soft-black' : 'bg-soft-mint'
                 }`}
               >
-                <span class="group-hover:animate-bounce-subtle inline-block">
-                  {copiedToClipboard ? '✓' : '✂'}
-                </span> {copiedToClipboard ? 'GOT IT' : 'COPY'}
+                {copiedToClipboard ? 'COPIED' : 'COPY'}
               </button>
 
               <button
                 onClick={handleReset}
                 class="flex-1 px-4 py-3 bg-hot-pink text-white border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
               >
-                <span class="group-hover:animate-spin inline-block">🔁</span> AGAIN
+                NEW IMAGE
               </button>
             </div>
 
@@ -584,8 +587,7 @@ export default function Dropzone() {
       {isProcessing && (
         <div class="fixed inset-0 bg-soft-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
           <div class="bg-paper p-8 rounded-xl border-4 border-soft-black shadow-brutal-lg animate-spring">
-            <div class="text-5xl animate-spin mb-4">💾</div>
-            <p class="font-mono font-bold text-lg text-soft-black">Converting pixels...</p>
+            <p class="font-mono font-bold text-lg text-soft-black">Processing...</p>
             <div class="mt-4 h-2 bg-soft-yellow rounded-full overflow-hidden">
               <div class="h-full bg-gradient-to-r from-hot-pink to-terminal-green animate-slide-right"></div>
             </div>

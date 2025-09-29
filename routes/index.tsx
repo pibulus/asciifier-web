@@ -3,7 +3,7 @@ import ThemeIsland from "../islands/ThemeIsland.tsx";
 
 export default function Home() {
   return (
-    <div class="min-h-screen flex flex-col" style="background-color: var(--color-base, #FAF9F6)">
+    <div class="min-h-screen flex flex-col" style="background: var(--color-base-gradient, var(--color-base, #FAF9F6))">
       {/* Theme Switcher */}
       <ThemeIsland />
 
@@ -14,15 +14,13 @@ export default function Home() {
             <div>
               <a href="/" class="group">
                 <h1 class="text-5xl font-bold flex items-baseline gap-3 cursor-pointer">
-                  <span class="animate-pulse-soft group-hover:animate-spin">💾</span>
                   <span class="tracking-tight" style="color: var(--color-text, #0A0A0A)">ASCIIFIER</span>
-                  <span class="text-xs text-white px-2 py-1 rounded-full font-normal" style="background-color: var(--color-accent, #FF69B4)">v2.0</span>
                 </h1>
               </a>
               <p class="text-lg mt-2 font-mono" style="color: var(--color-text, #0A0A0A)">
-                Pics → Text art.
+                Drop an image.
                 <br/>
-                Zero friction.
+                Get text art.
               </p>
             </div>
             <div class="text-right space-y-1">
@@ -30,7 +28,7 @@ export default function Home() {
                 • LIVE
               </div>
               <p class="text-xs font-mono opacity-60" style="color: var(--color-text, #0A0A0A)">
-                Drop. Convert. Ship.
+                instant
               </p>
             </div>
           </div>
@@ -43,27 +41,18 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer class="border-t-4 py-8" style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)">
-        <div class="max-w-4xl mx-auto text-center space-y-3">
-          <div class="flex items-center justify-center gap-4 text-sm font-mono">
-            <span style="color: var(--color-text, #0A0A0A)">Built with</span>
-            <span class="font-bold animate-bounce-subtle inline-block" style="color: var(--color-accent, #FF69B4)">80/20 energy</span>
-            <span style="color: var(--color-text, #0A0A0A)">by</span>
-            <span class="font-bold" style="color: var(--color-text, #0A0A0A)">Pablo 🎸</span>
-          </div>
-          <div class="text-xs space-y-1 opacity-80" style="color: var(--color-text, #0A0A0A)">
-            <p>No scale. No data harvesting. No complexity theatre.</p>
-            <p>Just text art that slaps. Free forever. • <span style="color: var(--color-accent, #FF69B4)">$0</span></p>
-          </div>
-          <div class="pt-2">
+      <footer class="border-t-4 py-4" style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)">
+        <div class="max-w-4xl mx-auto text-center">
+          <div class="flex items-center justify-center gap-4 text-xs font-mono">
+            <span style="color: var(--color-text, #0A0A0A)">Free forever. No ads. No tracking.</span>
+            <span style="color: var(--color-text, #0A0A0A)">•</span>
             <a
               href="https://github.com/pibulus/asciifier"
-              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono hover:animate-spring hover:shadow-brutal-sm transition-all"
-              style="background-color: var(--color-text, #0A0A0A); color: var(--color-base, #FAF9F6)"
+              class="font-bold hover:animate-spring transition-all"
+              style="color: var(--color-text, #0A0A0A)"
               target="_blank"
             >
-              <span>Source</span>
-              <span class="opacity-60">→</span>
+              Source
             </a>
           </div>
         </div>

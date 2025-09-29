@@ -14,76 +14,40 @@ export interface Theme {
 
 export const themes: Theme[] = [
   {
-    name: "CREAM DREAM",
-    vibe: "soft & warm",
-    base: "#FAF9F6",      // cream
+    name: "WARM",
+    vibe: "soft and friendly",
+    base: "linear-gradient(135deg, #FAF9F6 0%, #FFF8F3 100%)",      // cream with subtle warmth
     secondary: "#FFE5B4",  // peach
     accent: "#FF69B4",     // hot pink
     text: "#0A0A0A",       // soft black
     border: "#0A0A0A",
   },
   {
-    name: "MINT CONDITION",
-    vibe: "fresh & clean",
-    base: "#F0FFF0",       // honeydew
-    secondary: "#98FB98",  // mint
-    accent: "#00CED1",     // turquoise
-    text: "#2F4F4F",       // dark slate
-    border: "#2F4F4F",
-  },
-  {
-    name: "BUTTER YELLOW",
-    vibe: "sunny side up",
-    base: "#FFFACD",       // lemon chiffon
-    secondary: "#F9E79F",  // soft yellow
-    accent: "#FF6347",     // tomato
-    text: "#2C3E50",       // midnight
-    border: "#2C3E50",
-  },
-  {
-    name: "LAVENDER HAZE",
-    vibe: "dreamy & soft",
-    base: "#F8F4FF",       // ghost white
-    secondary: "#DDA0DD",  // plum
-    accent: "#FF1493",     // deep pink
-    text: "#4B0082",       // indigo
-    border: "#4B0082",
-  },
-  {
-    name: "PEACH FUZZ",
-    vibe: "warm & fuzzy",
-    base: "#FFF5EE",       // seashell
-    secondary: "#FFDAB9",  // peach puff
-    accent: "#FF4500",     // orange red
-    text: "#8B4513",       // saddle brown
-    border: "#8B4513",
-  },
-  {
-    name: "SKY HIGH",
-    vibe: "cloud nine",
-    base: "#F0F8FF",       // alice blue
+    name: "COOL",
+    vibe: "fresh and clean",
+    base: "linear-gradient(135deg, #F0F8FF 0%, #E6F7FF 100%)",     // alice blue with subtle gradient
     secondary: "#87CEEB",  // sky blue
-    accent: "#FF69B4",     // hot pink
+    accent: "#00CED1",     // turquoise
     text: "#191970",       // midnight blue
     border: "#191970",
   },
   {
-    name: "SAGE ADVICE",
-    vibe: "calm & wise",
-    base: "#F5FFFA",       // mint cream
+    name: "EARTH",
+    vibe: "grounded and calm",
+    base: "linear-gradient(135deg, #F5FFFA 0%, #F0FFF4 100%)",     // mint cream with subtle sage
     secondary: "#BCE4D8",  // sage
     accent: "#FFB000",     // amber
     text: "#2F4F2F",       // dark green
     border: "#2F4F2F",
   },
   {
-    name: "PINK LEMONADE",
-    vibe: "sweet & tart",
-    base: "#FFF0F5",       // lavender blush
-    secondary: "#FFB6C1",  // light pink
-    accent: "#FFD700",     // gold
-    text: "#8B008B",       // dark magenta
-    border: "#8B008B",
+    name: "DREAM",
+    vibe: "soft and playful",
+    base: "linear-gradient(135deg, #F8F4FF 0%, #FFF0F5 100%)",     // ghost white to lavender blush
+    secondary: "#DDA0DD",  // plum
+    accent: "#FF1493",     // deep pink
+    text: "#4B0082",       // indigo
+    border: "#4B0082",
   },
 ];
 
@@ -102,7 +66,14 @@ export function getNextTheme(): Theme {
 // Apply theme to document
 export function applyTheme(theme: Theme) {
   const root = document.documentElement;
-  root.style.setProperty('--color-base', theme.base);
+  // Handle gradients for base - check if it's a gradient
+  if (theme.base.includes('gradient')) {
+    root.style.setProperty('--color-base-gradient', theme.base);
+    root.style.setProperty('--color-base', '#FAF9F6'); // fallback solid color
+  } else {
+    root.style.setProperty('--color-base', theme.base);
+    root.style.setProperty('--color-base-gradient', theme.base);
+  }
   root.style.setProperty('--color-secondary', theme.secondary);
   root.style.setProperty('--color-accent', theme.accent);
   root.style.setProperty('--color-text', theme.text);
