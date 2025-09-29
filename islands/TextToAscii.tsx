@@ -123,98 +123,141 @@ export default function TextToAscii() {
 
   const downloadPNG = () => {
     try {
-      // Find the ASCII display element and its container
-      const terminalContainer = document.querySelector('.rounded-3xl.border-4.shadow-brutal.overflow-hidden');
-      if (!terminalContainer) {
-        console.error('Terminal container not found');
-        return;
-      }
-
-      // Create a canvas to render the ASCII art
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      // Get dimensions from the terminal window
-      const rect = terminalContainer.getBoundingClientRect();
-      const scale = 2; // For higher quality
-
-      canvas.width = rect.width * scale;
-      canvas.height = rect.height * scale;
-
-      // Scale the context for high DPI
-      ctx.scale(scale, scale);
-
-      // Draw black background
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, rect.width, rect.height);
-
-      // Set up text properties for ASCII art
-      ctx.font = 'bold 16px "Courier New", monospace';
-      ctx.fillStyle = '#00FF41';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      // Get the ASCII text content from the rendered element
+      // Get the ASCII display element
       const asciiElement = document.querySelector('.ascii-display');
       if (!asciiElement) {
         console.error('ASCII display element not found');
         return;
       }
 
-      // Get the text content (not HTML)
-      const asciiText = asciiElement.textContent || '';
-      const asciiLines = asciiText.split('\n').filter(line => line.trim());
-      const lineHeight = 20;
-      const startY = (rect.height - (asciiLines.length * lineHeight)) / 2;
+      // Parse the HTML to extract text and colors character by character
+      const lines: { chars: { char: string; color: string }[] }[] = [];
+      let currentLine: { char: string; color: string }[] = [];
 
-      // Draw each line of ASCII art
-      asciiLines.forEach((line, index) => {
-        const y = startY + index * lineHeight;
-
-        // Apply color based on effect
-        if (colorEffect.value === 'rainbow') {
-          // Create rainbow gradient across the width
-          const gradient = ctx.createLinearGradient(50, 0, rect.width - 50, 0);
-          const colors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
-          colors.forEach((color, i) => {
-            gradient.addColorStop(i / (colors.length - 1), color);
-          });
-          ctx.fillStyle = gradient;
-        } else if (colorEffect.value === 'fire') {
-          // Fire gradient from yellow to red
-          const gradient = ctx.createLinearGradient(0, y - 10, 0, y + 10);
-          gradient.addColorStop(0, '#ffff00');
-          gradient.addColorStop(0.5, '#ff7700');
-          gradient.addColorStop(1, '#ff0000');
-          ctx.fillStyle = gradient;
-        } else if (colorEffect.value === 'ocean') {
-          // Ocean gradient blues
-          const gradient = ctx.createLinearGradient(50, 0, rect.width - 50, 0);
-          gradient.addColorStop(0, '#001f3f');
-          gradient.addColorStop(0.25, '#0074D9');
-          gradient.addColorStop(0.5, '#00ffff');
-          gradient.addColorStop(0.75, '#0074D9');
-          gradient.addColorStop(1, '#001f3f');
-          ctx.fillStyle = gradient;
-        } else if (colorEffect.value === 'unicorn') {
-          // Unicorn gradient pastels
-          const gradient = ctx.createLinearGradient(50, 0, rect.width - 50, 0);
-          gradient.addColorStop(0, '#ff69b4');
-          gradient.addColorStop(0.2, '#ff99cc');
-          gradient.addColorStop(0.4, '#ffccff');
-          gradient.addColorStop(0.6, '#ccffff');
-          gradient.addColorStop(0.8, '#99ccff');
-          gradient.addColorStop(1, '#ff69b4');
-          ctx.fillStyle = gradient;
-        } else if (colorEffect.value === 'matrix') {
-          // Matrix green
-          ctx.fillStyle = '#00FF41';
-        } else {
-          // Plain - green terminal color
-          ctx.fillStyle = '#00FF41';
+      // Function to extract color from a span element
+      const getColorFromElement = (element: Element): string => {
+        if (element.tagName === 'SPAN') {
+          const style = (element as HTMLElement).style.color;
+          if (style) return style;
         }
+        return '#00FF41'; // Default green
+      };
 
-        ctx.fillText(line, rect.width / 2, y);
+      // Process the HTML content
+      const processNode = (node: Node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent || '';
+          const parentColor = node.parentElement ? getColorFromElement(node.parentElement) : '#00FF41';
+
+          for (const char of text) {
+            if (char === '\n') {
+              if (currentLine.length > 0) {
+                lines.push({ chars: currentLine });
+                currentLine = [];
+              }
+            } else {
+              currentLine.push({ char, color: parentColor });
+            }
+          }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const element = node as HTMLElement;
+
+          if (element.tagName === 'BR') {
+            if (currentLine.length > 0) {
+              lines.push({ chars: currentLine });
+              currentLine = [];
+            }
+          } else if (element.tagName === 'SPAN' && element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
+            // Direct span with text
+            const text = element.textContent || '';
+            const color = getColorFromElement(element);
+
+            for (const char of text) {
+              if (char === '\n') {
+                if (currentLine.length > 0) {
+                  lines.push({ chars: currentLine });
+                  currentLine = [];
+                }
+              } else {
+                currentLine.push({ char, color });
+              }
+            }
+          } else {
+            // Recursively process children
+            for (const child of Array.from(node.childNodes)) {
+              processNode(child);
+            }
+          }
+        }
+      };
+
+      // Process all nodes
+      for (const child of Array.from(asciiElement.childNodes)) {
+        processNode(child);
+      }
+
+      // Add the last line if it exists
+      if (currentLine.length > 0) {
+        lines.push({ chars: currentLine });
+      }
+
+      // Filter out empty lines but keep structure
+      const nonEmptyLines = lines.filter(line =>
+        line.chars.some(c => c.char.trim().length > 0)
+      );
+
+      if (nonEmptyLines.length === 0) {
+        console.error('No ASCII text found');
+        return;
+      }
+
+      // Calculate canvas dimensions
+      const fontSize = 12;
+      const charWidth = fontSize * 0.6;
+      const lineHeight = fontSize * 1.2;
+      const padding = 40;
+
+      // Find the maximum line width
+      const maxLineLength = Math.max(...nonEmptyLines.map(line => line.chars.length));
+
+      const canvasWidth = (maxLineLength * charWidth) + (padding * 2);
+      const canvasHeight = (nonEmptyLines.length * lineHeight) + (padding * 2);
+
+      // Create canvas with higher resolution for better quality
+      const canvas = document.createElement('canvas');
+      const scale = 2; // For retina displays
+      canvas.width = canvasWidth * scale;
+      canvas.height = canvasHeight * scale;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Could not get canvas context');
+        return;
+      }
+
+      // Scale for high DPI
+      ctx.scale(scale, scale);
+
+      // Fill black background
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+      // Set font
+      ctx.font = `${fontSize}px monospace`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      // Draw each character with its exact color
+      nonEmptyLines.forEach((line, lineIndex) => {
+        const y = padding + (lineIndex * lineHeight);
+
+        line.chars.forEach((charData, charIndex) => {
+          const x = padding + (charIndex * charWidth);
+
+          // Use the exact color from the HTML
+          ctx.fillStyle = charData.color;
+          ctx.fillText(charData.char, x, y);
+        });
       });
 
       // Create filename from input text
@@ -237,6 +280,7 @@ export default function TextToAscii() {
       console.error('Error generating PNG:', error);
     }
   };
+
 
   return (
     <div class="max-w-4xl mx-auto px-4 py-8">
