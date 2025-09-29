@@ -180,8 +180,16 @@ export default function TextToAscii() {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      // Get the ASCII text content
-      const asciiLines = asciiOutput.split('\n').filter(line => line.trim());
+      // Get the ASCII text content from the rendered element
+      const asciiElement = document.querySelector('.ascii-display');
+      if (!asciiElement) {
+        console.error('ASCII display element not found');
+        return;
+      }
+
+      // Get the text content (not HTML)
+      const asciiText = asciiElement.textContent || '';
+      const asciiLines = asciiText.split('\n').filter(line => line.trim());
       const lineHeight = 20;
       const startY = (rect.height - (asciiLines.length * lineHeight)) / 2 + 30;
 
