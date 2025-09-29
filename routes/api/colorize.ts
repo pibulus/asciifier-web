@@ -1,86 +1,57 @@
 import { FreshContext } from "$fresh/server.ts";
 
-interface FigletRequest {
+interface ColorizeRequest {
   text: string;
-  font?: string;
-  colorize?: boolean;
   effect?: 'rainbow' | 'fire' | 'ocean' | 'unicorn' | 'matrix';
+  speed?: number;
 }
 
 export const handler = async (req: Request, _ctx: FreshContext): Promise<Response> => {
-  // Only allow POST requests
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
 
   try {
-    const { text, font = "standard", colorize = false, effect = "rainbow" } = await req.json() as FigletRequest;
+    const { text, effect = "rainbow", speed = 1 } = await req.json() as ColorizeRequest;
 
-    // Validate input
     if (!text || typeof text !== "string") {
       return new Response("Invalid text input", { status: 400 });
     }
 
-    // Limit text length for performance
-    const limitedText = text.slice(0, 20);
+    // Import lolcatjs for rainbow effects
+    const lolcat = await import("lolcatjs");
 
-    // Import figlet server-side - handle CommonJS module structure
-    const figletModule = await import("figlet");
-    const figlet = figletModule.default || figletModule;
+    // Apply colorization based on effect
+    let colorizedText = "";
 
-    // Generate ASCII art - figlet uses different methods
-    const result = figlet.textSync ?
-      figlet.textSync(limitedText, {
-        font: font as any,
-        horizontalLayout: "fitted",
-        verticalLayout: "fitted",
-      }) :
-      figlet(limitedText, {
-        font: font as any,
-        horizontalLayout: "fitted",
-        verticalLayout: "fitted",
-      });
-
-    let finalResult = result;
-    let htmlResult = result;
-
-    // Apply colorization if requested
-    if (colorize) {
-      try {
-        const lolcat = await import("lolcatjs");
-
-        // Apply colorization based on effect
-        switch (effect) {
-          case 'fire':
-            finalResult = lolcat.default.fromString(result, { seed: 40, spread: 3.0 });
-            break;
-          case 'ocean':
-            finalResult = lolcat.default.fromString(result, { seed: 120, spread: 8.0 });
-            break;
-          case 'unicorn':
-            finalResult = lolcat.default.fromString(result, { seed: 280, spread: 2.0 });
-            break;
-          case 'matrix':
-            finalResult = lolcat.default.fromString(result, { seed: 80, spread: 1.0 });
-            break;
-          default: // rainbow
-            finalResult = lolcat.default.fromString(result);
-        }
-
-        // Convert ANSI to HTML for rich clipboard
-        htmlResult = ansiToHtml(finalResult);
-      } catch (colorError) {
-        console.warn("Colorization failed, returning plain ASCII:", colorError);
-        finalResult = result;
-        htmlResult = result;
-      }
+    switch (effect) {
+      case 'rainbow':
+        colorizedText = lolcat.default.fromString(text);
+        break;
+      case 'fire':
+        colorizedText = lolcat.default.fromString(text, { seed: 40, spread: 3.0 });
+        break;
+      case 'ocean':
+        colorizedText = lolcat.default.fromString(text, { seed: 120, spread: 8.0 });
+        break;
+      case 'unicorn':
+        colorizedText = lolcat.default.fromString(text, { seed: 280, spread: 2.0 });
+        break;
+      case 'matrix':
+        colorizedText = lolcat.default.fromString(text, { seed: 80, spread: 1.0 });
+        break;
+      default:
+        colorizedText = lolcat.default.fromString(text);
     }
+
+    // Convert ANSI colors to HTML for rich paste
+    const htmlColorized = ansiToHtml(colorizedText);
 
     return new Response(JSON.stringify({
       success: true,
-      ascii: finalResult,
-      html: htmlResult,
-      plain: result
+      ansi: colorizedText,
+      html: htmlColorized,
+      plainText: text
     }), {
       status: 200,
       headers: {
@@ -89,9 +60,9 @@ export const handler = async (req: Request, _ctx: FreshContext): Promise<Respons
     });
 
   } catch (error) {
-    console.error("Figlet API error:", error);
+    console.error("Colorize API error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: "Failed to generate ASCII text" }),
+      JSON.stringify({ success: false, error: "Failed to colorize text" }),
       {
         status: 500,
         headers: {
@@ -144,4 +115,4 @@ function ansiColorToHex(colorCode: number): string {
   const gray = 8 + (colorCode - 232) * 10;
   const hex = gray.toString(16).padStart(2, '0');
   return `#${hex}${hex}${hex}`;
-};
+}

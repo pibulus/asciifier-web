@@ -10,17 +10,30 @@ const FIGLET_FONTS = [
   { name: "3D-ASCII", file: "3d-ascii" },
 ];
 
+// Color effects
+const COLOR_EFFECTS = [
+  { name: "🌈 Rainbow", value: "rainbow" },
+  { name: "🔥 Fire", value: "fire" },
+  { name: "🌊 Ocean", value: "ocean" },
+  { name: "🦄 Unicorn", value: "unicorn" },
+  { name: "🔋 Matrix", value: "matrix" },
+];
+
 export default function TextToAscii() {
   const [asciiOutput, setAsciiOutput] = useState<string>("");
+  const [htmlOutput, setHtmlOutput] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
 
   const inputText = useSignal("");
   const selectedFont = useSignal("standard");
+  const colorizeEnabled = useSignal(false);
+  const colorEffect = useSignal("rainbow");
 
   const generateAscii = async () => {
     if (!inputText.value.trim()) {
       setAsciiOutput("");
+      setHtmlOutput("");
       return;
     }
 
@@ -35,6 +48,8 @@ export default function TextToAscii() {
         body: JSON.stringify({
           text: inputText.value.slice(0, 20), // Limit to 20 chars for performance
           font: selectedFont.value,
+          colorize: colorizeEnabled.value,
+          effect: colorEffect.value,
         }),
       });
 
@@ -42,6 +57,7 @@ export default function TextToAscii() {
 
       if (data.success) {
         setAsciiOutput(data.ascii);
+        setHtmlOutput(data.html || data.ascii);
         sounds.success();
       } else {
         throw new Error(data.error || "Failed to generate ASCII text");
@@ -62,23 +78,26 @@ export default function TextToAscii() {
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [inputText.value, selectedFont.value]);
+  }, [inputText.value, selectedFont.value, colorizeEnabled.value, colorEffect.value]);
 
   const copyToClipboard = async () => {
     try {
-      // Create HTML version wrapped in monospace pre tag for rich text editors
-      const htmlText = `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${asciiOutput}</pre>`;
+      // Use colorized HTML if available, otherwise wrap plain ASCII in monospace
+      const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, ''); // Strip ANSI codes for plain text
+      const htmlText = htmlOutput.includes('<span') ?
+        `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0; background: black; color: white; padding: 8px; border-radius: 4px;">${htmlOutput}</pre>` :
+        `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${plainText}</pre>`;
 
       // Try modern clipboard API with both formats
       if (navigator.clipboard && navigator.clipboard.write) {
         const clipboardItem = new ClipboardItem({
-          'text/plain': new Blob([asciiOutput], { type: 'text/plain' }),
+          'text/plain': new Blob([plainText], { type: 'text/plain' }),
           'text/html': new Blob([htmlText], { type: 'text/html' })
         });
         await navigator.clipboard.write([clipboardItem]);
       } else {
         // Fallback for older browsers - just plain text
-        await navigator.clipboard.writeText(asciiOutput);
+        await navigator.clipboard.writeText(plainText);
       }
 
       setCopiedToClipboard(true);
@@ -91,7 +110,9 @@ export default function TextToAscii() {
   };
 
   const downloadText = () => {
-    const blob = new Blob([asciiOutput], { type: 'text/plain' });
+    // Strip ANSI codes for plain text download
+    const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, '');
+    const blob = new Blob([plainText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -153,6 +174,57 @@ export default function TextToAscii() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Color Controls */}
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-sm font-mono font-bold" style="color: var(--color-text, #0A0A0A)">
+              COLOR EFFECTS
+            </label>
+            <button
+              onClick={() => {
+                sounds.click();
+                colorizeEnabled.value = !colorizeEnabled.value;
+              }}
+              class={`px-3 py-1 border-2 rounded text-xs font-bold transition-all duration-200 ${
+                colorizeEnabled.value
+                  ? 'shadow-brutal-sm animate-pulse-soft'
+                  : 'hover:animate-spring hover:shadow-brutal-sm active:scale-95'
+              }`}
+              style={colorizeEnabled.value
+                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
+                : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+              }
+            >
+              {colorizeEnabled.value ? '🌈 ON' : '⚫ OFF'}
+            </button>
+          </div>
+
+          {colorizeEnabled.value && (
+            <div class="grid grid-cols-2 gap-2 animate-slide-down">
+              {COLOR_EFFECTS.map(effect => (
+                <button
+                  key={effect.value}
+                  onClick={() => {
+                    sounds.click();
+                    colorEffect.value = effect.value;
+                  }}
+                  class={`px-3 py-2 border-2 rounded text-xs font-bold transition-all duration-200 ${
+                    colorEffect.value === effect.value
+                      ? 'shadow-brutal-sm animate-pulse-soft'
+                      : 'hover:animate-spring hover:shadow-brutal-sm active:scale-95'
+                  }`}
+                  style={colorEffect.value === effect.value
+                    ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
+                    : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+                  }
+                >
+                  {effect.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
