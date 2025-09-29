@@ -46,34 +46,29 @@ export const handler = async (req: Request, _ctx: FreshContext): Promise<Respons
 
     // Apply colorization if requested
     if (colorize) {
-      try {
-        const lolcat = await import("lolcatjs");
+      const lines = result.split('\n');
+      const colorizedLines: string[] = [];
 
-        // Apply colorization based on effect
-        switch (effect) {
-          case 'fire':
-            finalResult = lolcat.default.fromString(result, { seed: 40, spread: 3.0 });
-            break;
-          case 'ocean':
-            finalResult = lolcat.default.fromString(result, { seed: 120, spread: 8.0 });
-            break;
-          case 'unicorn':
-            finalResult = lolcat.default.fromString(result, { seed: 280, spread: 2.0 });
-            break;
-          case 'matrix':
-            finalResult = lolcat.default.fromString(result, { seed: 80, spread: 1.0 });
-            break;
-          default: // rainbow
-            finalResult = lolcat.default.fromString(result);
+      for (let y = 0; y < lines.length; y++) {
+        const line = lines[y];
+        let colorizedLine = '';
+
+        for (let x = 0; x < line.length; x++) {
+          const char = line[x];
+
+          if (char === ' ' || char === '') {
+            colorizedLine += char; // Keep spaces plain
+          } else {
+            // Generate color based on effect and position
+            const color = getEffectColor(effect, x, y, line.length, lines.length);
+            colorizedLine += `<span style="color: ${color};">${char}</span>`;
+          }
         }
-
-        // Convert ANSI to HTML for rich clipboard
-        htmlResult = ansiToHtml(finalResult);
-      } catch (colorError) {
-        console.warn("Colorization failed, returning plain ASCII:", colorError);
-        finalResult = result;
-        htmlResult = result;
+        colorizedLines.push(colorizedLine);
       }
+
+      htmlResult = colorizedLines.join('\n');
+      finalResult = htmlResult; // Return HTML for display
     }
 
     return new Response(JSON.stringify({
@@ -102,46 +97,34 @@ export const handler = async (req: Request, _ctx: FreshContext): Promise<Respons
   }
 };
 
-// Convert ANSI escape sequences to HTML with colors
-function ansiToHtml(text: string): string {
-  return text
-    .replace(/\u001b\[38;5;(\d+)m/g, (match, colorCode) => {
-      const color = ansiColorToHex(parseInt(colorCode));
-      return `<span style="color: ${color};">`;
-    })
-    .replace(/\u001b\[(\d+)m/g, (match, code) => {
-      switch (code) {
-        case '0': return '</span>'; // Reset
-        case '1': return '<strong>'; // Bold
-        case '22': return '</strong>'; // Bold off
-        default: return '';
-      }
-    })
-    .replace(/\u001b\[[0-9;]*m/g, ''); // Clean up any remaining codes
+// Generate colors for different effects using HSL
+function getEffectColor(effect: string, x: number, y: number, lineWidth: number, totalLines: number): string {
+  switch (effect) {
+    case 'fire':
+      // Red to yellow gradient
+      const fireHue = 60 - (y * 60 / totalLines); // 60 (yellow) to 0 (red)
+      return `hsl(${fireHue}, 100%, 50%)`;
+
+    case 'ocean':
+      // Blue to cyan gradient
+      const oceanHue = 180 + ((x + y) * 60 / (lineWidth + totalLines));
+      return `hsl(${oceanHue % 360}, 70%, 50%)`;
+
+    case 'unicorn':
+      // Pink to purple gradient
+      const unicornHue = 280 + ((x * 2) * 80 / lineWidth);
+      return `hsl(${unicornHue % 360}, 85%, 65%)`;
+
+    case 'matrix':
+      // Green matrix effect
+      const matrixHue = 120; // Pure green
+      const lightness = 30 + ((x + y) * 40 / (lineWidth + totalLines));
+      return `hsl(${matrixHue}, 100%, ${lightness}%)`;
+
+    default: // rainbow
+      // Same algorithm as image processor - consistent rainbow!
+      const hue = ((x + y * 2) * 360 / (lineWidth + totalLines * 2)) % 360;
+      return `hsl(${hue}, 70%, 50%)`;
+  }
 }
 
-// Convert ANSI 256-color codes to hex
-function ansiColorToHex(colorCode: number): string {
-  // Basic colors (0-15)
-  if (colorCode < 16) {
-    const basicColors = [
-      '#000000', '#800000', '#008000', '#808000', '#000080', '#800080', '#008080', '#c0c0c0',
-      '#808080', '#ff0000', '#00ff00', '#ffff00', '#0000ff', '#ff00ff', '#00ffff', '#ffffff'
-    ];
-    return basicColors[colorCode] || '#ffffff';
-  }
-
-  // 216-color cube (16-231)
-  if (colorCode < 232) {
-    const index = colorCode - 16;
-    const r = Math.floor(index / 36) * 51;
-    const g = Math.floor((index % 36) / 6) * 51;
-    const b = (index % 6) * 51;
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-  }
-
-  // Grayscale (232-255)
-  const gray = 8 + (colorCode - 232) * 10;
-  const hex = gray.toString(16).padStart(2, '0');
-  return `#${hex}${hex}${hex}`;
-};
