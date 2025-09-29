@@ -219,7 +219,24 @@ export default function Dropzone() {
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(asciiOutput.replace(/<[^>]*>/g, ''));
+      // Strip HTML tags for plain text version
+      const plainText = asciiOutput.replace(/<[^>]*>/g, '');
+
+      // Create HTML version wrapped in monospace pre tag for rich text editors
+      const htmlText = `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${asciiOutput}</pre>`;
+
+      // Try modern clipboard API with both formats
+      if (navigator.clipboard && navigator.clipboard.write) {
+        const clipboardItem = new ClipboardItem({
+          'text/plain': new Blob([plainText], { type: 'text/plain' }),
+          'text/html': new Blob([htmlText], { type: 'text/html' })
+        });
+        await navigator.clipboard.write([clipboardItem]);
+      } else {
+        // Fallback for older browsers - just plain text
+        await navigator.clipboard.writeText(plainText);
+      }
+
       setCopiedToClipboard(true);
       sounds.copy();
       setTimeout(() => setCopiedToClipboard(false), 2000);
@@ -255,13 +272,13 @@ export default function Dropzone() {
               Turn any image into ASCII art
             </h2>
             <p class="opacity-80 font-mono text-sm" style="color: var(--color-text, #0A0A0A)">
-              Just drop it here. Or paste. Or click. Whatever works.
+              Works with memes, selfies, and bad screenshots
             </p>
           </div>
 
           {/* Drop Zone */}
           <div
-            class={`relative border-4 border-dashed transition-all duration-300 rounded-xl p-20 cursor-pointer group ${
+            class={`relative border-8 border-dashed transition-all duration-300 rounded-xl p-20 cursor-pointer group ${
               isDragging
                 ? 'scale-105 shadow-brutal-lg rotate-1'
                 : 'hover:scale-102 shadow-brutal hover:shadow-brutal-lg'
@@ -402,7 +419,8 @@ export default function Dropzone() {
                   min="20"
                   max="200"
                   value={charWidth.value}
-                  class="w-full accent-hot-pink"
+                  class="w-full slider-accent"
+                  style="accent-color: var(--color-accent, #FF69B4)"
                   onInput={(e) => {
                     const value = parseInt((e.target as HTMLInputElement).value);
                     charWidth.value = value;
@@ -429,9 +447,10 @@ export default function Dropzone() {
                       if (useColor.value) useRainbow.value = false; // Disable rainbow
                       scheduleReprocess();
                     }}
-                    class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
+                    class="w-5 h-5 group-hover:animate-wiggle"
+                    style="accent-color: var(--color-accent, #FF69B4)"
                   />
-                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                  <span class="font-mono font-bold transition-colors group-hover:opacity-80" style="color: var(--color-text, #0A0A0A)">
                     Color mode
                   </span>
                 </label>
@@ -446,9 +465,10 @@ export default function Dropzone() {
                       if (useRainbow.value) useColor.value = false; // Disable regular color
                       scheduleReprocess();
                     }}
-                    class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
+                    class="w-5 h-5 group-hover:animate-wiggle"
+                    style="accent-color: var(--color-accent, #FF69B4)"
                   />
-                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                  <span class="font-mono font-bold transition-colors group-hover:opacity-80" style="color: var(--color-text, #0A0A0A)">
                     Rainbow
                   </span>
                 </label>
@@ -462,9 +482,10 @@ export default function Dropzone() {
                       invertBrightness.value = (e.target as HTMLInputElement).checked;
                       scheduleReprocess();
                     }}
-                    class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
+                    class="w-5 h-5 group-hover:animate-wiggle"
+                    style="accent-color: var(--color-accent, #FF69B4)"
                   />
-                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                  <span class="font-mono font-bold transition-colors group-hover:opacity-80" style="color: var(--color-text, #0A0A0A)">
                     Invert
                   </span>
                 </label>
@@ -478,9 +499,10 @@ export default function Dropzone() {
                       enhanceImage.value = (e.target as HTMLInputElement).checked;
                       scheduleReprocess();
                     }}
-                    class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
+                    class="w-5 h-5 group-hover:animate-wiggle"
+                    style="accent-color: var(--color-accent, #FF69B4)"
                   />
-                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                  <span class="font-mono font-bold transition-colors group-hover:opacity-80" style="color: var(--color-text, #0A0A0A)">
                     Enhance
                   </span>
                 </label>
@@ -496,9 +518,10 @@ export default function Dropzone() {
                         clearTimeout(updateTimeoutRef.current);
                       }
                     }}
-                    class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
+                    class="w-5 h-5 group-hover:animate-wiggle"
+                    style="accent-color: var(--color-accent, #FF69B4)"
                   />
-                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                  <span class="font-mono font-bold transition-colors group-hover:opacity-80" style="color: var(--color-text, #0A0A0A)">
                     Live update
                   </span>
                 </label>

@@ -15,7 +15,7 @@ export interface Theme {
 export const themes: Theme[] = [
   {
     name: "WARM",
-    vibe: "soft and friendly",
+    vibe: "sunset vibes",
     base: "linear-gradient(135deg, #FAF9F6 0%, #FFF8F3 100%)",      // cream with subtle warmth
     secondary: "#FFE5B4",  // peach
     accent: "#FF69B4",     // hot pink
@@ -24,7 +24,7 @@ export const themes: Theme[] = [
   },
   {
     name: "COOL",
-    vibe: "fresh and clean",
+    vibe: "ocean breeze",
     base: "linear-gradient(135deg, #F0F8FF 0%, #E6F7FF 100%)",     // alice blue with subtle gradient
     secondary: "#87CEEB",  // sky blue
     accent: "#00CED1",     // turquoise
@@ -33,7 +33,7 @@ export const themes: Theme[] = [
   },
   {
     name: "EARTH",
-    vibe: "grounded and calm",
+    vibe: "forest floor",
     base: "linear-gradient(135deg, #F5FFFA 0%, #F0FFF4 100%)",     // mint cream with subtle sage
     secondary: "#BCE4D8",  // sage
     accent: "#FFB000",     // amber
@@ -42,12 +42,21 @@ export const themes: Theme[] = [
   },
   {
     name: "DREAM",
-    vibe: "soft and playful",
+    vibe: "cotton candy",
     base: "linear-gradient(135deg, #F8F4FF 0%, #FFF0F5 100%)",     // ghost white to lavender blush
     secondary: "#DDA0DD",  // plum
     accent: "#FF1493",     // deep pink
     text: "#4B0082",       // indigo
     border: "#4B0082",
+  },
+  {
+    name: "TERMINAL",
+    vibe: "hacker mode",
+    base: "#1a1a1a",       // off-black terminal background
+    secondary: "#2a2a2a",  // slightly lighter for cards
+    accent: "#00ff41",     // classic terminal green
+    text: "#00ff41",       // terminal green text
+    border: "#00ff41",     // green borders for full terminal aesthetic
   },
 ];
 

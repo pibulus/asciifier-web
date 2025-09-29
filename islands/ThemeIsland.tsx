@@ -48,7 +48,7 @@ export default function ThemeIsland() {
       {/* Theme Picker Dropdown */}
       {showPicker && (
         <div
-          class="absolute top-full right-0 mt-2 w-64 rounded-lg shadow-brutal overflow-hidden animate-slide-up"
+          class="absolute top-full right-0 mt-2 w-64 rounded-lg shadow-brutal overflow-hidden animate-slide-up z-50"
           style="background-color: var(--color-base, #FAF9F6); border: 3px solid var(--color-border, #0A0A0A)"
         >
           <div class="p-3 font-mono">

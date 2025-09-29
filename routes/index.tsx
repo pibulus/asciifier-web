@@ -1,4 +1,4 @@
-import Dropzone from "../islands/Dropzone.tsx";
+import TabsIsland from "../islands/TabsIsland.tsx";
 import ThemeIsland from "../islands/ThemeIsland.tsx";
 
 export default function Home() {
@@ -17,7 +17,7 @@ export default function Home() {
               <p class="text-lg mt-2 font-mono" style="color: var(--color-text, #0A0A0A)">
                 The best ASCII art converter on the internet.
                 <br/>
-                <span class="text-sm opacity-80">Drop an image → Get text art</span>
+                <span class="text-sm opacity-80">From pixels to characters in seconds</span>
               </p>
             </div>
             <ThemeIsland />
@@ -27,7 +27,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
-        <Dropzone />
+        <TabsIsland />
       </main>
 
       {/* Footer */}
