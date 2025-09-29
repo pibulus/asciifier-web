@@ -2,13 +2,15 @@ import { useSignal, computed } from "@preact/signals";
 import { useRef, useState, useEffect } from "preact/hooks";
 import { ImageProcessor, type ProcessOptions } from "../utils/image-processor.ts";
 import { CHARACTER_SETS, STYLE_DESCRIPTIONS, type CharacterStyle } from "../utils/character-sets.ts";
+import { sounds } from "../utils/sounds.ts";
+import { easterEggs } from "../utils/easter-eggs.ts";
 
 // Preset configurations for quick starts
 const PRESETS = [
-  { name: "Terminal Classic", style: "classic", color: false, width: 80, enhance: false },
-  { name: "Emoji Party 🎉", style: "emoji", color: true, width: 40, enhance: true },
-  { name: "Matrix Mode", style: "dense", color: false, width: 100, enhance: true },
-  { name: "Chunky Blocks", style: "blocks", color: true, width: 60, enhance: false },
+  { name: "Terminal", style: "classic", color: false, width: 80, enhance: false, vibe: "90s hacker" },
+  { name: "Emoji", style: "emoji", color: true, width: 40, enhance: true, vibe: "chaos mode" },
+  { name: "Matrix", style: "dense", color: false, width: 100, enhance: true, vibe: "follow the rabbit" },
+  { name: "Blocks", style: "blocks", color: true, width: 60, enhance: false, vibe: "chunky boi" },
 ];
 
 export default function Dropzone() {
@@ -36,6 +38,9 @@ export default function Dropzone() {
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
+      // Check for Konami code
+      easterEggs.checkKonami(e.key);
+
       if (!imageLoaded) return;
 
       // Cmd/Ctrl + Z for reset
@@ -74,9 +79,11 @@ export default function Dropzone() {
   const handleDrop = async (e: DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    sounds.drop();
 
     const files = e.dataTransfer?.files;
     if (files && files[0]) {
+      easterEggs.maybeShowVibe(0.2);
       await processImage(files[0]);
     }
   };
@@ -84,6 +91,8 @@ export default function Dropzone() {
   const handleFileSelect = async (e: Event) => {
     const input = e.target as HTMLInputElement;
     if (input.files && input.files[0]) {
+      sounds.click();
+      easterEggs.maybeShowVibe(0.15);
       await processImage(input.files[0]);
     }
   };
@@ -118,10 +127,14 @@ export default function Dropzone() {
       };
 
       const ascii = processor.current.processImage(img, options);
-      const formatted = processor.current.formatAscii(ascii, useColor.value);
+      let formatted = processor.current.formatAscii(ascii, useColor.value);
+
+      // Maybe add secret watermark
+      formatted = easterEggs.addSecretWatermark(formatted);
 
       setAsciiOutput(formatted);
       setImageLoaded(true);
+      sounds.success();
     } catch (error) {
       console.error("Error processing image:", error);
       alert("Failed to process image. Please try another file.");
@@ -150,6 +163,7 @@ export default function Dropzone() {
   };
 
   const applyPreset = (preset: typeof PRESETS[0], index: number) => {
+    sounds.click();
     selectedStyle.value = preset.style as CharacterStyle;
     useColor.value = preset.color;
     charWidth.value = preset.width;
@@ -204,9 +218,11 @@ export default function Dropzone() {
     try {
       await navigator.clipboard.writeText(asciiOutput.replace(/<[^>]*>/g, ''));
       setCopiedToClipboard(true);
+      sounds.copy();
       setTimeout(() => setCopiedToClipboard(false), 2000);
     } catch (err) {
-      alert('Failed to copy to clipboard');
+      sounds.error();
+      alert('Recalibration needed. Try again.');
     }
   };
 
@@ -233,10 +249,11 @@ export default function Dropzone() {
           {/* Friendly greeting */}
           <div class="space-y-2">
             <h2 class="text-3xl font-bold animate-bounce-subtle">
-              Let's make some ASCII art!
+              Drop a pic.
+              <span class="text-hot-pink"> Get art.</span>
             </h2>
-            <p class="text-gray-600">
-              Drop an image below or paste one with <kbd class="px-2 py-1 bg-gray-200 rounded text-xs font-mono">Cmd+V</kbd>
+            <p class="text-soft-black opacity-80 font-mono text-sm">
+              Paste works too • <kbd class="px-2 py-1 bg-soft-yellow rounded text-xs">Cmd+V</kbd>
             </p>
           </div>
 
@@ -262,13 +279,13 @@ export default function Dropzone() {
 
             <div class="space-y-4 pointer-events-none">
               <div class={`text-7xl transition-all duration-300 ${isDragging ? 'animate-spin' : 'group-hover:animate-wiggle'}`}>
-                {isDragging ? "🎯" : "🎨"}
+                {isDragging ? "🎯" : "💾"}
               </div>
-              <h3 class="text-2xl font-bold">
-                {isDragging ? "Drop it like it's hot!" : "Drag your image here"}
+              <h3 class="text-2xl font-bold font-mono">
+                {isDragging ? "Release to convert" : "Click or drop"}
               </h3>
-              <p class="text-gray-500 text-sm">
-                JPG, PNG, GIF, WebP • Max 10MB
+              <p class="text-soft-black opacity-60 text-sm font-mono">
+                JPG PNG GIF WebP • 10MB max
               </p>
             </div>
 
@@ -281,7 +298,7 @@ export default function Dropzone() {
 
           {/* Quick Start Presets */}
           <div class="space-y-3">
-            <p class="text-sm text-gray-500">Choose a preset style (applies when you drop an image):</p>
+            <p class="text-sm font-mono text-soft-black opacity-60">Pick your vibe:</p>
             <div class="flex flex-wrap gap-3 justify-center">
               {PRESETS.map((preset, i) => (
                 <button
@@ -294,13 +311,14 @@ export default function Dropzone() {
                   }`}
                   title={imageLoaded ? `Press ${i + 1} to apply` : 'Select preset before uploading'}
                 >
-                  <span>{preset.name}</span>
-                  <span class="absolute -top-2 -right-2 bg-black text-white text-xs px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="font-mono font-bold">{preset.name}</span>
+                  <span class="absolute -top-2 -right-2 bg-soft-black text-white text-xs px-1.5 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity font-mono">
                     {i + 1}
                   </span>
                   {selectedPreset === i && (
-                    <span class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-xs animate-bounce">✓</span>
+                    <span class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 text-xs animate-bounce">✓</span>
                   )}
+                  <span class="block text-xs opacity-60 mt-0.5">{preset.vibe}</span>
                 </button>
               ))}
             </div>
@@ -314,8 +332,8 @@ export default function Dropzone() {
           {/* Left: Controls */}
           <div class="space-y-4">
             {/* Quick Actions */}
-            <div class="bg-white border-4 border-black rounded-lg p-4 shadow-brutal">
-              <h3 class="font-bold mb-3">Quick Actions</h3>
+            <div class="bg-white border-4 border-soft-black rounded-lg p-4 shadow-brutal">
+              <h3 class="font-mono font-bold mb-3 text-soft-black">PRESETS</h3>
               <div class="grid grid-cols-2 gap-2">
                 {PRESETS.map((preset, i) => (
                   <button
@@ -335,13 +353,14 @@ export default function Dropzone() {
             </div>
 
             {/* Style Selector with Preview */}
-            <div class="bg-white border-4 border-black rounded-lg p-4 shadow-brutal">
-              <label class="block text-sm font-bold mb-2">Character Style</label>
+            <div class="bg-white border-4 border-soft-black rounded-lg p-4 shadow-brutal">
+              <label class="block text-sm font-mono font-bold mb-2 text-soft-black">STYLE PICKER</label>
               <div class="space-y-2">
                 {Object.keys(CHARACTER_SETS).map(style => (
                   <button
                     key={style}
                     onClick={() => {
+                      sounds.click();
                       selectedStyle.value = style as CharacterStyle;
                       scheduleReprocess();
                     }}
@@ -353,8 +372,8 @@ export default function Dropzone() {
                         : 'bg-white border-gray-300 hover:border-black hover:shadow-brutal-sm hover:animate-pop'
                     } active:scale-95`}
                   >
-                    <div class="font-bold">{style}</div>
-                    <div class="text-xs opacity-75">{STYLE_DESCRIPTIONS[style as CharacterStyle]}</div>
+                    <div class="font-mono font-bold">{style}</div>
+                    <div class="text-xs opacity-60">{STYLE_DESCRIPTIONS[style as CharacterStyle]}</div>
                     {showStylePreview === style && (
                       <div class="mt-1 font-mono text-xs bg-black text-terminal-green p-1 rounded animate-slide-up">
                         {CHARACTER_SETS[style as CharacterStyle]}
@@ -366,11 +385,11 @@ export default function Dropzone() {
             </div>
 
             {/* Controls */}
-            <div class="bg-white border-4 border-black rounded-lg p-4 shadow-brutal space-y-4">
+            <div class="bg-white border-4 border-soft-black rounded-lg p-4 shadow-brutal space-y-4">
               {/* Width Slider */}
               <div>
-                <label class="block text-sm font-bold mb-2">
-                  Width: <span class="text-hot-pink">{charWidth.value}</span> chars
+                <label class="block text-sm font-mono font-bold mb-2 text-soft-black">
+                  WIDTH • <span class="text-hot-pink">{charWidth.value}</span>
                 </label>
                 <input
                   type="range"
@@ -379,14 +398,16 @@ export default function Dropzone() {
                   value={charWidth.value}
                   class="w-full accent-hot-pink"
                   onInput={(e) => {
-                    charWidth.value = parseInt((e.target as HTMLInputElement).value);
+                    const value = parseInt((e.target as HTMLInputElement).value);
+                    charWidth.value = value;
+                    if (Math.random() < 0.1) sounds.slide(value); // Occasional sound feedback
                     scheduleReprocess();
                   }}
                 />
-                <div class="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>Tiny</span>
-                  <span>Normal</span>
-                  <span>Huge</span>
+                <div class="flex justify-between text-xs font-mono text-soft-black opacity-60 mt-1">
+                  <span>smol</span>
+                  <span>just right</span>
+                  <span>thicc</span>
                 </div>
               </div>
 
@@ -397,13 +418,14 @@ export default function Dropzone() {
                     type="checkbox"
                     checked={useColor.value}
                     onChange={(e) => {
+                      sounds.toggle();
                       useColor.value = (e.target as HTMLInputElement).checked;
                       scheduleReprocess();
                     }}
                     class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
                   />
-                  <span class="font-bold group-hover:text-hot-pink transition-colors">
-                    <span class="inline-block group-hover:animate-spring">🎨</span> Use Colors
+                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                    <span class="inline-block group-hover:animate-spring">🎨</span> Color mode
                   </span>
                 </label>
 
@@ -412,13 +434,14 @@ export default function Dropzone() {
                     type="checkbox"
                     checked={invertBrightness.value}
                     onChange={(e) => {
+                      sounds.toggle();
                       invertBrightness.value = (e.target as HTMLInputElement).checked;
                       scheduleReprocess();
                     }}
                     class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
                   />
-                  <span class="font-bold group-hover:text-hot-pink transition-colors">
-                    <span class="inline-block group-hover:animate-spring">🔄</span> Invert
+                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                    <span class="inline-block group-hover:animate-spring">🔄</span> Flip it
                   </span>
                 </label>
 
@@ -427,13 +450,14 @@ export default function Dropzone() {
                     type="checkbox"
                     checked={enhanceImage.value}
                     onChange={(e) => {
+                      sounds.toggle();
                       enhanceImage.value = (e.target as HTMLInputElement).checked;
                       scheduleReprocess();
                     }}
                     class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
                   />
-                  <span class="font-bold group-hover:text-hot-pink transition-colors">
-                    <span class="inline-block group-hover:animate-spring">✨</span> Enhance
+                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                    <span class="inline-block group-hover:animate-spring">✨</span> Juice it
                   </span>
                 </label>
 
@@ -442,6 +466,7 @@ export default function Dropzone() {
                     type="checkbox"
                     checked={autoUpdate.value}
                     onChange={(e) => {
+                      sounds.toggle();
                       autoUpdate.value = (e.target as HTMLInputElement).checked;
                       if (!autoUpdate.value && updateTimeoutRef.current) {
                         clearTimeout(updateTimeoutRef.current);
@@ -449,8 +474,8 @@ export default function Dropzone() {
                     }}
                     class="w-5 h-5 accent-hot-pink group-hover:animate-wiggle"
                   />
-                  <span class="font-bold group-hover:text-hot-pink transition-colors">
-                    <span class="inline-block group-hover:animate-spring">⚡</span> Live Update
+                  <span class="font-mono font-bold group-hover:text-hot-pink transition-colors">
+                    <span class="inline-block group-hover:animate-spring">⚡</span> Auto-refresh
                   </span>
                 </label>
               </div>
@@ -459,9 +484,9 @@ export default function Dropzone() {
               {!autoUpdate.value && (
                 <button
                   onClick={reprocess}
-                  class="w-full px-4 py-2 bg-terminal-green text-black border-2 border-black rounded-lg font-bold hover:animate-jello hover:shadow-brutal-sm transition-all duration-200 active:scale-95"
+                  class="w-full px-4 py-2 bg-terminal-green text-soft-black border-2 border-soft-black rounded-lg font-mono font-bold hover:animate-jello hover:shadow-brutal-sm transition-all duration-200 active:scale-95"
                 >
-                  🔄 Apply Changes
+                  🔄 REFRESH
                 </button>
               )}
             </div>
@@ -470,14 +495,14 @@ export default function Dropzone() {
           {/* Right: ASCII Preview */}
           <div class="lg:col-span-2 space-y-4">
             {/* Output Display */}
-            <div class="bg-black text-terminal-green rounded-lg border-4 border-black shadow-brutal overflow-hidden">
-              <div class="bg-gray-900 px-4 py-2 border-b-2 border-black flex items-center justify-between">
+            <div class="bg-soft-black text-terminal-green rounded-lg border-4 border-soft-black shadow-brutal overflow-hidden">
+              <div class="bg-gray-900 px-4 py-2 border-b-2 border-soft-black flex items-center justify-between">
                 <div class="flex space-x-2">
-                  <div class="w-3 h-3 bg-red-500 rounded-full hover:animate-pulse-soft cursor-pointer"></div>
-                  <div class="w-3 h-3 bg-yellow-500 rounded-full hover:animate-pulse-soft cursor-pointer"></div>
-                  <div class="w-3 h-3 bg-green-500 rounded-full hover:animate-pulse-soft cursor-pointer"></div>
+                  <div class="w-3 h-3 bg-red-500 rounded-full hover:animate-pulse-soft cursor-pointer" title="Close (jk)"></div>
+                  <div class="w-3 h-3 bg-yellow-500 rounded-full hover:animate-pulse-soft cursor-pointer" title="Minimize (nope)"></div>
+                  <div class="w-3 h-3 bg-green-500 rounded-full hover:animate-pulse-soft cursor-pointer" title="Full screen (maybe)"></div>
                 </div>
-                <span class="text-xs font-mono text-gray-500">ascii-output.txt</span>
+                <span class="text-xs font-mono text-gray-500">~/output/art.txt</span>
               </div>
               <div class="p-6 overflow-x-auto max-h-96 overflow-y-auto custom-scrollbar">
                 <pre
@@ -492,42 +517,44 @@ export default function Dropzone() {
             <div class="flex flex-wrap gap-3">
               <button
                 onClick={downloadText}
-                class="flex-1 px-4 py-3 bg-white border-3 border-black rounded-lg font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
+                class="flex-1 px-4 py-3 bg-white border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
               >
-                <span class="group-hover:animate-bounce-subtle inline-block">📄</span> Download TXT
+                <span class="group-hover:animate-bounce-subtle inline-block">💾</span> .TXT
               </button>
 
               <button
                 onClick={downloadHTML}
-                class="flex-1 px-4 py-3 bg-peach border-3 border-black rounded-lg font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
+                class="flex-1 px-4 py-3 bg-peach border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
               >
-                <span class="group-hover:animate-bounce-subtle inline-block">🌐</span> Download HTML
+                <span class="group-hover:animate-bounce-subtle inline-block">🌐</span> .HTML
               </button>
 
               <button
                 onClick={copyToClipboard}
-                class={`flex-1 px-4 py-3 border-3 border-black rounded-lg font-bold shadow-brutal hover:shadow-brutal-lg ${copiedToClipboard ? 'animate-jello' : 'hover:animate-pop'} active:scale-95 transition-all duration-200 group ${
-                  copiedToClipboard ? 'bg-terminal-green text-black' : 'bg-soft-mint'
+                class={`flex-1 px-4 py-3 border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg ${copiedToClipboard ? 'animate-jello' : 'hover:animate-pop'} active:scale-95 transition-all duration-200 group ${
+                  copiedToClipboard ? 'bg-terminal-green text-soft-black' : 'bg-soft-mint'
                 }`}
               >
                 <span class="group-hover:animate-bounce-subtle inline-block">
-                  {copiedToClipboard ? '✅' : '📋'}
-                </span> {copiedToClipboard ? 'Copied!' : 'Copy'}
+                  {copiedToClipboard ? '✓' : '✂'}
+                </span> {copiedToClipboard ? 'GOT IT' : 'COPY'}
               </button>
 
               <button
                 onClick={handleReset}
-                class="flex-1 px-4 py-3 bg-hot-pink text-white border-3 border-black rounded-lg font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
+                class="flex-1 px-4 py-3 bg-hot-pink text-white border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
               >
-                <span class="group-hover:animate-spin inline-block">🔄</span> New Image
+                <span class="group-hover:animate-spin inline-block">🔁</span> AGAIN
               </button>
             </div>
 
             {/* Keyboard Shortcuts Help */}
-            <div class="text-xs text-gray-500 text-center space-x-4">
-              <span><kbd class="px-1.5 py-0.5 bg-gray-200 rounded font-mono">Cmd+C</kbd> Copy</span>
-              <span><kbd class="px-1.5 py-0.5 bg-gray-200 rounded font-mono">Cmd+Z</kbd> Reset</span>
-              <span><kbd class="px-1.5 py-0.5 bg-gray-200 rounded font-mono">1-4</kbd> Presets</span>
+            <div class="text-xs font-mono text-soft-black opacity-60 text-center space-x-4">
+              <span><kbd class="px-1.5 py-0.5 bg-soft-yellow rounded">Cmd+C</kbd> copy</span>
+              <span><kbd class="px-1.5 py-0.5 bg-soft-yellow rounded">Cmd+Z</kbd> reset</span>
+              <span><kbd class="px-1.5 py-0.5 bg-soft-yellow rounded">1-4</kbd> presets</span>
+              <span class="opacity-40">•</span>
+              <span class="opacity-40">try: ↑↑↓↓←→←→BA</span>
             </div>
           </div>
         </div>
@@ -535,11 +562,11 @@ export default function Dropzone() {
 
       {/* Processing Overlay */}
       {isProcessing && (
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div class="bg-white p-8 rounded-xl border-4 border-black shadow-brutal-lg animate-spring">
-            <div class="text-5xl animate-spin mb-4">🎨</div>
-            <p class="font-bold text-lg">Creating your masterpiece...</p>
-            <div class="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div class="fixed inset-0 bg-soft-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div class="bg-paper p-8 rounded-xl border-4 border-soft-black shadow-brutal-lg animate-spring">
+            <div class="text-5xl animate-spin mb-4">💾</div>
+            <p class="font-mono font-bold text-lg text-soft-black">Converting pixels...</p>
+            <div class="mt-4 h-2 bg-soft-yellow rounded-full overflow-hidden">
               <div class="h-full bg-gradient-to-r from-hot-pink to-terminal-green animate-slide-right"></div>
             </div>
           </div>

@@ -5,12 +5,12 @@ export default function App({ Component }: PageProps) {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>ASCIIFIER - Turn Images into Beautiful ASCII Art</title>
-        <meta name="description" content="The ultimate image to ASCII art tool. 12 character styles, color support, instant conversion. No complexity, just beautiful ASCII art." />
+        <title>ASCIIFIER • Text Art Machine</title>
+        <meta name="description" content="Drop a pic. Get ASCII magic. 12 styles, live preview, $0 forever. No scale, no BS." />
 
         {/* Open Graph */}
-        <meta property="og:title" content="ASCIIFIER - Beautiful ASCII Art Generator" />
-        <meta property="og:description" content="Turn any image into ASCII art with style, color, and soul!" />
+        <meta property="og:title" content="ASCIIFIER • Pics to Text Art" />
+        <meta property="og:description" content="The text art machine that actually slaps. Drop image, get ASCII." />
         <meta property="og:type" content="website" />
 
         {/* Favicon */}
