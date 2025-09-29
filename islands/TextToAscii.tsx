@@ -122,244 +122,223 @@ export default function TextToAscii() {
   };
 
   return (
-    <div class="max-w-7xl mx-auto px-4 py-8">
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
-        {/* Left Column - Main Canvas */}
-        <div class="space-y-6">
-          {/* Text Input Section */}
-          <div>
-            <label
-              class="block text-base font-mono font-black tracking-[0.1em] uppercase mb-4"
-              style="color: var(--color-text, #0A0A0A);"
+    <div class="max-w-4xl mx-auto px-4 py-8">
+      {/* Text Input Section */}
+      <div class="mb-10">
+        <label
+          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
+          style="color: var(--color-text, #0A0A0A);"
+        >
+          ✨ YOUR TEXT
+        </label>
+        <div class="relative">
+          <input
+            type="text"
+            value={inputText.value}
+            onInput={(e) => {
+              sounds.click();
+              inputText.value = (e.target as HTMLInputElement).value;
+            }}
+            placeholder="Type something magical..."
+            maxLength={20}
+            class="w-full px-8 py-5 border-4 rounded-3xl font-mono text-2xl font-black focus:outline-none transition-all hover:scale-[1.005] focus:scale-[1.01] shadow-brutal"
+            style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"
+          />
+          <div class="absolute right-8 top-1/2 -translate-y-1/2">
+            <span
+              class="font-mono font-bold text-lg"
+              style="color: var(--color-accent, #FF69B4)"
             >
-              ✨ YOUR TEXT
-            </label>
-            <div class="relative">
-              <input
-                type="text"
-                value={inputText.value}
-                onInput={(e) => {
-                  sounds.click();
-                  inputText.value = (e.target as HTMLInputElement).value;
-                }}
-                placeholder="Type something magical..."
-                maxLength={20}
-                class="w-full px-6 py-4 border-4 rounded-2xl font-mono text-xl font-black focus:outline-none transition-all hover:scale-[1.005] focus:scale-[1.01] shadow-brutal"
-                style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"
-              />
-              <div class="absolute right-6 top-1/2 -translate-y-1/2">
-                <span
-                  class="font-mono font-bold text-base opacity-60"
-                  style="color: var(--color-text, #0A0A0A)"
-                >
-                  {inputText.value.length}/20
-                </span>
-              </div>
-            </div>
-            {inputText.value.length > 0 && (
-              <div
-                class="text-xs font-mono mt-2 animate-fade-in opacity-60"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                ✨ Looking good!
-              </div>
-            )}
-          </div>
-
-          {/* Output Section - Main Preview */}
-          <div class="sticky top-4">
-            <div
-              class={`rounded-2xl border-4 shadow-brutal overflow-hidden transition-all duration-300 ${
-                asciiOutput ? "opacity-100 scale-100" : "opacity-50 scale-98"
-              }`}
-              style="background-color: #000000; border-color: var(--color-border, #0A0A0A); min-height: 400px;"
-            >
-              <div
-                class="px-4 py-3 border-b-4 flex items-center justify-between"
-                style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)"
-              >
-                <div class="flex space-x-2">
-                  <div
-                    class="w-3 h-3 bg-red-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
-                    title="Close (jk)"
-                  >
-                  </div>
-                  <div
-                    class="w-3 h-3 bg-yellow-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
-                    title="Minimize (nope)"
-                  >
-                  </div>
-                  <div
-                    class="w-3 h-3 bg-green-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
-                    title="Full screen (maybe)"
-                  >
-                  </div>
-                </div>
-                <span class="text-xs font-mono opacity-60">
-                  ~/output/text-art.txt
-                </span>
-              </div>
-              <div
-                class="p-6 overflow-auto custom-scrollbar flex items-center justify-center"
-                style="min-height: 350px"
-              >
-                {asciiOutput
-                  ? (
-                    <pre
-                      class="ascii-display leading-tight animate-slide-up"
-                      style="color: #00FF41; font-size: clamp(0.6rem, 1.8vw, 1rem); font-family: monospace;"
-                      dangerouslySetInnerHTML={{
-                        __html: colorEffect.value !== "none" && htmlOutput
-                          ? htmlOutput
-                          : asciiOutput.replace(/</g, "&lt;").replace(
-                            />/g,
-                            "&gt;",
-                          ),
-                      }}
-                    />
-                  )
-                  : (
-                    <div class="text-center opacity-40" style="color: #00FF41;">
-                      <p class="font-mono text-sm">
-                        // Start typing to see magic...
-                      </p>
-                    </div>
-                  )}
-              </div>
-            </div>
+              {inputText.value.length}/20
+            </span>
           </div>
         </div>
-
-        {/* Right Column - Control Panel */}
-        <div class="lg:sticky lg:top-4 space-y-6">
-          {/* Font Style Section */}
-          <div>
-            <label
-              class="block text-base font-mono font-black tracking-[0.1em] uppercase mb-4"
-              style="color: var(--color-text, #0A0A0A);"
-            >
-              🎨 FONT STYLE
-            </label>
-            <div class="grid grid-cols-2 gap-3">
-              {FIGLET_FONTS.map((font) => (
-                <button
-                  key={font.file}
-                  onClick={() => {
-                    sounds.click();
-                    selectedFont.value = font.file;
-                  }}
-                  class={`px-4 py-4 rounded-2xl text-sm font-bold transition-all relative overflow-hidden group ${
-                    selectedFont.value === font.file
-                      ? "shadow-brutal-lg transform-gpu"
-                      : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
-                  }`}
-                  style={selectedFont.value === font.file
-                    ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A);"
-                    : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
-                >
-                  <span class="relative z-10 flex items-center justify-center">
-                    {selectedFont.value === font.file && (
-                      <span class="mr-1 text-xs">✓</span>
-                    )}
-                    {font.name}
-                  </span>
-                  <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Color Effects */}
-          <div>
-            <label
-              class="block text-base font-mono font-black tracking-[0.1em] uppercase mb-4"
-              style="color: var(--color-text, #0A0A0A);"
-            >
-              🌈 COLOR MAGIC
-            </label>
-            <div class="grid grid-cols-2 gap-3">
-              {COLOR_EFFECTS.map((effect) => (
-                <button
-                  key={effect.value}
-                  onClick={() => {
-                    sounds.click();
-                    colorEffect.value = effect.value;
-                  }}
-                  class={`px-4 py-4 rounded-2xl text-sm font-bold transition-all relative overflow-hidden group ${
-                    colorEffect.value === effect.value
-                      ? "shadow-brutal-lg transform-gpu"
-                      : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
-                  }`}
-                  style={colorEffect.value === effect.value
-                    ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A);"
-                    : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
-                >
-                  <span class="relative z-10 flex items-center justify-center">
-                    {colorEffect.value === effect.value && (
-                      <span class="mr-1 text-xs">✓</span>
-                    )}
-                    {effect.name}
-                  </span>
-                  <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                  </div>
-                </button>
-              ))}
-            </div>
-            <div
-              class="text-xs font-mono opacity-60 text-center mt-3"
-              style="color: var(--color-text, #0A0A0A)"
-            >
-              {colorEffect.value === "none"
-                ? "🎭 Simple & clean"
-                : "✨ Adding color magic!"}
-            </div>
-          </div>
-
-          {/* Export Actions - At bottom of control panel */}
+        {inputText.value.length > 0 && (
           <div
-            class="border-t-4 pt-6"
-            style="border-color: var(--color-border, #0A0A0A);"
+            class="text-sm font-mono mt-3 animate-fade-in opacity-60"
+            style="color: var(--color-text, #0A0A0A)"
           >
-            <div class="grid grid-cols-1 gap-3">
-              <button
-                onClick={copyToClipboard}
-                disabled={!asciiOutput}
-                class={`w-full px-6 py-4 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all group relative overflow-hidden ${
-                  asciiOutput
-                    ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
-                    : "opacity-50 cursor-not-allowed"
-                } ${copiedToClipboard ? "animate-bounce-once" : ""}`}
-                style={copiedToClipboard
-                  ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
-                  : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
-              >
-                <span class="relative z-10 flex items-center justify-center gap-2 text-base">
-                  {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
-                </span>
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                </div>
-              </button>
+            ✨ Looking good!
+          </div>
+        )}
+      </div>
 
-              <button
-                onClick={downloadText}
-                disabled={!asciiOutput}
-                class={`w-full px-6 py-4 border-4 rounded-2xl font-mono font-black transition-all group relative overflow-hidden ${
-                  asciiOutput
-                    ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
-                    : "opacity-50 cursor-not-allowed"
-                }`}
-                style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-              >
-                <span class="relative z-10 flex items-center justify-center gap-2 text-base">
-                  💾 SAVE AS TEXT
-                </span>
-                <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Output Section - Appears after text entry */}
+      {asciiOutput && (
+        <div class="mb-10 animate-slide-up">
+          <div
+            class="rounded-3xl border-4 shadow-brutal overflow-hidden"
+            style="background-color: #000000; border-color: var(--color-border, #0A0A0A);"
+          >
+            <div
+              class="px-4 py-3 border-b-4 flex items-center justify-between"
+              style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)"
+            >
+              <div class="flex space-x-2">
+                <div
+                  class="w-3 h-3 bg-red-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
+                  title="Close (jk)"
+                >
                 </div>
-              </button>
+                <div
+                  class="w-3 h-3 bg-yellow-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
+                  title="Minimize (nope)"
+                >
+                </div>
+                <div
+                  class="w-3 h-3 bg-green-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
+                  title="Full screen (maybe)"
+                >
+                </div>
+              </div>
+              <span class="text-xs font-mono opacity-60">
+                ~/output/text-art.txt
+              </span>
+            </div>
+            <div
+              class="p-6 overflow-auto custom-scrollbar"
+              style="max-height: 40vh;"
+            >
+              <pre
+                class="ascii-display leading-tight"
+                style="color: #00FF41; font-size: clamp(0.6rem, 1.4vw, 0.9rem); font-family: monospace;"
+                dangerouslySetInnerHTML={{
+                  __html: colorEffect.value !== "none" && htmlOutput
+                    ? htmlOutput
+                    : asciiOutput.replace(/</g, "&lt;").replace(
+                      />/g,
+                      "&gt;",
+                    ),
+                }}
+              />
             </div>
           </div>
         </div>
+      )}
+
+      {/* Font Style Section */}
+      <div class="mb-10">
+        <label
+          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
+          style="color: var(--color-text, #0A0A0A);"
+        >
+          🎨 FONT STYLE
+        </label>
+        <div class="grid grid-cols-2 gap-4">
+          {FIGLET_FONTS.map((font) => (
+            <button
+              key={font.file}
+              onClick={() => {
+                sounds.click();
+                selectedFont.value = font.file;
+              }}
+              class={`px-6 py-5 rounded-3xl text-base font-bold transition-all relative overflow-hidden group ${
+                selectedFont.value === font.file
+                  ? "shadow-brutal-lg"
+                  : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
+              }`}
+              style={selectedFont.value === font.file
+                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A);"
+                : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
+            >
+              <span class="relative z-10 flex items-center justify-center">
+                {selectedFont.value === font.file && (
+                  <span class="mr-2">
+                    ✓
+                  </span>
+                )}
+                {font.name}
+              </span>
+              <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Color Effects */}
+      <div class="mb-10">
+        <label
+          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
+          style="color: var(--color-text, #0A0A0A);"
+        >
+          🌈 COLOR MAGIC
+        </label>
+        <div class="grid grid-cols-3 gap-4">
+          {COLOR_EFFECTS.map((effect) => (
+            <button
+              key={effect.value}
+              onClick={() => {
+                sounds.click();
+                colorEffect.value = effect.value;
+              }}
+              class={`px-5 py-5 rounded-3xl text-sm font-bold transition-all relative overflow-hidden group ${
+                colorEffect.value === effect.value
+                  ? "shadow-brutal-lg"
+                  : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
+              }`}
+              style={colorEffect.value === effect.value
+                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A);"
+                : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
+            >
+              <span class="relative z-10 flex items-center justify-center">
+                {colorEffect.value === effect.value && (
+                  <span class="mr-1">✓</span>
+                )}
+                {effect.name}
+              </span>
+              <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+              </div>
+            </button>
+          ))}
+        </div>
+        <div
+          class="text-sm font-mono opacity-60 text-center mt-4"
+          style="color: var(--color-text, #0A0A0A)"
+        >
+          {colorEffect.value === "none"
+            ? "🎭 Simple & clean"
+            : "✨ Adding color magic!"}
+        </div>
+      </div>
+
+      {/* Export Actions */}
+      <div class="grid grid-cols-2 gap-4">
+        <button
+          onClick={downloadText}
+          disabled={!asciiOutput}
+          class={`px-6 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
+            asciiOutput
+              ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
+              : "opacity-50 cursor-not-allowed"
+          }`}
+          style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+        >
+          <span class="relative z-10 flex items-center justify-center gap-2 text-lg">
+            💾 SAVE AS TEXT
+          </span>
+          <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          </div>
+        </button>
+
+        <button
+          onClick={copyToClipboard}
+          disabled={!asciiOutput}
+          class={`px-6 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal-lg transition-all group relative overflow-hidden ${
+            asciiOutput
+              ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+              : "opacity-50 cursor-not-allowed"
+          } ${copiedToClipboard ? "animate-bounce-once" : ""}`}
+          style={copiedToClipboard
+            ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
+            : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
+        >
+          <span class="relative z-10 flex items-center justify-center gap-2 text-lg">
+            {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
+          </span>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          </div>
+        </button>
       </div>
 
       <style>
