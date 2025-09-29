@@ -116,9 +116,55 @@ export default function TextToAscii() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "ascii-text.txt";
+    a.download = "ascii-art.txt";
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const downloadPNG = async () => {
+    // Find the ASCII display element
+    const asciiElement = document.querySelector('.ascii-display');
+    if (!asciiElement) return;
+
+    // Get the terminal window container
+    const terminalWindow = asciiElement.closest('[style*="background-color: #000000"]');
+    if (!terminalWindow) return;
+
+    // Use html2canvas to capture the rendered ASCII art
+    const loadScript = () => {
+      return new Promise((resolve) => {
+        if (window.html2canvas) {
+          resolve();
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+        script.onload = resolve;
+        document.head.appendChild(script);
+      });
+    };
+
+    await loadScript();
+
+    // Capture the terminal window
+    window.html2canvas(terminalWindow, {
+      backgroundColor: '#000000',
+      scale: 2, // Higher quality
+      logging: false,
+    }).then(canvas => {
+      // Create filename from input text
+      const filename = inputText.value.toLowerCase().replace(/[^a-z0-9]/g, '-') || 'ascii-art';
+
+      // Download the image
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${filename}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    });
   };
 
   return (
@@ -153,14 +199,6 @@ export default function TextToAscii() {
             </span>
           </div>
         </div>
-        {inputText.value.length > 0 && (
-          <div
-            class="text-sm font-mono mt-3 animate-fade-in opacity-60"
-            style="color: var(--color-text, #0A0A0A)"
-          >
-            ✨ Looking good!
-          </div>
-        )}
       </div>
 
       {/* Output Section - Appears after text entry */}
@@ -203,12 +241,9 @@ export default function TextToAscii() {
                 class="ascii-display leading-tight"
                 style="color: #00FF41; font-size: clamp(0.6rem, 1.4vw, 0.9rem); font-family: monospace;"
                 dangerouslySetInnerHTML={{
-                  __html: colorEffect.value !== "none" && htmlOutput
-                    ? htmlOutput
-                    : asciiOutput.replace(/</g, "&lt;").replace(
-                      />/g,
-                      "&gt;",
-                    ),
+                  __html: colorEffect.value === "none"
+                    ? asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                    : (htmlOutput || asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")),
                 }}
               />
             </div>
@@ -303,28 +338,11 @@ export default function TextToAscii() {
       </div>
 
       {/* Export Actions */}
-      <div class="grid grid-cols-2 gap-4">
-        <button
-          onClick={downloadText}
-          disabled={!asciiOutput}
-          class={`px-6 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
-            asciiOutput
-              ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
-              : "opacity-50 cursor-not-allowed"
-          }`}
-          style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-        >
-          <span class="relative z-10 flex items-center justify-center gap-2 text-lg">
-            💾 SAVE AS TEXT
-          </span>
-          <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-          </div>
-        </button>
-
+      <div class="grid grid-cols-3 gap-4">
         <button
           onClick={copyToClipboard}
           disabled={!asciiOutput}
-          class={`px-6 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal-lg transition-all group relative overflow-hidden ${
+          class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal-lg transition-all group relative overflow-hidden ${
             asciiOutput
               ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
               : "opacity-50 cursor-not-allowed"
@@ -333,10 +351,44 @@ export default function TextToAscii() {
             ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
             : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
         >
-          <span class="relative z-10 flex items-center justify-center gap-2 text-lg">
+          <span class="relative z-10 flex items-center justify-center gap-2 text-base">
             {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
           </span>
           <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          </div>
+        </button>
+
+        <button
+          onClick={downloadText}
+          disabled={!asciiOutput}
+          class={`px-5 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
+            asciiOutput
+              ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
+              : "opacity-50 cursor-not-allowed"
+          }`}
+          style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+        >
+          <span class="relative z-10 flex items-center justify-center gap-2 text-base">
+            💾 SAVE TXT
+          </span>
+          <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+          </div>
+        </button>
+
+        <button
+          onClick={downloadPNG}
+          disabled={!asciiOutput}
+          class={`px-5 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
+            asciiOutput
+              ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
+              : "opacity-50 cursor-not-allowed"
+          }`}
+          style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+        >
+          <span class="relative z-10 flex items-center justify-center gap-2 text-base">
+            🖼️ SAVE PNG
+          </span>
+          <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
           </div>
         </button>
       </div>
