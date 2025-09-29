@@ -141,7 +141,7 @@ export default function TextToAscii() {
             }}
             placeholder="Type something magical..."
             maxLength={20}
-            class="w-full px-8 py-5 border-3 rounded-2xl font-mono text-2xl font-bold focus:outline-none transition-all hover:scale-[1.01] focus:scale-[1.02] shadow-lg"
+            class="w-full px-8 py-5 border-4 rounded-3xl font-mono text-2xl font-black focus:outline-none transition-all hover:scale-[1.01] focus:scale-[1.02] shadow-brutal"
             style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"
           />
           <div class="absolute right-4 top-1/2 -translate-y-1/2">
@@ -160,30 +160,31 @@ export default function TextToAscii() {
         )}
       </div>
 
-      {/* Output Section - Positioned right after input */}
-      {asciiOutput && (
-        <div class="mb-10 animate-slide-up">
+      {/* Output Section - Fixed height to prevent jumping */}
+      <div class={`mb-10 transition-all duration-500 ${asciiOutput ? 'opacity-100' : 'opacity-0'}`}
+        style="min-height: 200px">
+        {asciiOutput && (
           <div
-            class="rounded-2xl border-4 shadow-brutal overflow-hidden"
+            class="rounded-3xl border-4 shadow-brutal overflow-hidden animate-slide-up"
             style="background-color: #000000; border-color: var(--color-border, #0A0A0A)"
           >
             <div
-              class="px-4 py-2 border-b-2 flex items-center justify-between"
+              class="px-4 py-3 border-b-4 flex items-center justify-between"
               style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)"
             >
               <div class="flex space-x-2">
                 <div
-                  class="w-3 h-3 bg-red-500 rounded-full hover:animate-pulse-soft cursor-pointer"
+                  class="w-3 h-3 bg-red-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
                   title="Close (jk)"
                 >
                 </div>
                 <div
-                  class="w-3 h-3 bg-yellow-500 rounded-full hover:animate-pulse-soft cursor-pointer"
+                  class="w-3 h-3 bg-yellow-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
                   title="Minimize (nope)"
                 >
                 </div>
                 <div
-                  class="w-3 h-3 bg-green-500 rounded-full hover:animate-pulse-soft cursor-pointer"
+                  class="w-3 h-3 bg-green-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
                   title="Full screen (maybe)"
                 >
                 </div>
@@ -194,7 +195,7 @@ export default function TextToAscii() {
             </div>
             <div
               class="p-6 overflow-auto custom-scrollbar"
-              style="max-height: 30vh"
+              style="height: 200px"
             >
               <pre
                 class="ascii-display leading-tight"
@@ -207,8 +208,8 @@ export default function TextToAscii() {
               />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Controls Section - Font & Color in a card */}
       <div class="space-y-8">
@@ -228,20 +229,23 @@ export default function TextToAscii() {
                   sounds.click();
                   selectedFont.value = font.file;
                 }}
-                class={`px-6 py-4 rounded-2xl text-base font-bold transition-all relative overflow-hidden ${
+                class={`px-6 py-5 rounded-3xl text-base font-black transition-all relative overflow-hidden group ${
                   selectedFont.value === font.file
-                    ? "border-3 scale-[1.02] shadow-lg"
-                    : "border-2 hover:scale-[1.02] hover:shadow-md active:scale-95"
+                    ? "shadow-brutal-lg transform-gpu"
+                    : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
                 }`}
                 style={selectedFont.value === font.file
-                  ? "background-color: var(--color-secondary, #FFE5B4); color: var(--color-accent, #FF69B4); border-color: var(--color-accent, #FF69B4);"
+                  ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A); transform: scale(1.05) rotate(-0.5deg);"
                   : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
               >
-                <span class="relative z-10">{font.name}</span>
-                {selectedFont.value === font.file && (
-                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer">
-                  </div>
-                )}
+                <span class="relative z-10 flex items-center justify-center">
+                  {selectedFont.value === font.file && (
+                    <span class="mr-2">✓</span>
+                  )}
+                  {font.name}
+                </span>
+                <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
               </button>
             ))}
           </div>
@@ -263,20 +267,23 @@ export default function TextToAscii() {
                   sounds.click();
                   colorEffect.value = effect.value;
                 }}
-                class={`px-5 py-4 rounded-2xl text-base font-bold transition-all relative overflow-hidden ${
+                class={`px-5 py-5 rounded-3xl text-base font-bold transition-all relative overflow-hidden group ${
                   colorEffect.value === effect.value
-                    ? "border-3 scale-[1.02] shadow-lg"
-                    : "border-2 hover:scale-[1.02] hover:shadow-md active:scale-95"
+                    ? "shadow-brutal-lg transform-gpu"
+                    : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
                 }`}
                 style={colorEffect.value === effect.value
-                  ? "background-color: var(--color-secondary, #FFE5B4); color: var(--color-accent, #FF69B4); border-color: var(--color-accent, #FF69B4);"
+                  ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A); transform: scale(1.05) rotate(0.5deg);"
                   : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
               >
-                <span class="relative z-10">{effect.name}</span>
-                {colorEffect.value === effect.value && (
-                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer">
-                  </div>
-                )}
+                <span class="relative z-10 flex items-center justify-center">
+                  {colorEffect.value === effect.value && (
+                    <span class="mr-1">✓</span>
+                  )}
+                  {effect.name}
+                </span>
+                <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
               </button>
             ))}
           </div>
@@ -296,25 +303,29 @@ export default function TextToAscii() {
         <div class="flex gap-4 mt-10">
           <button
             onClick={downloadText}
-            class="flex-1 px-6 py-4 border-2 rounded-2xl font-mono font-bold transition-all hover:scale-[1.02] hover:shadow-md active:scale-95 group relative overflow-hidden"
+            class="flex-1 px-8 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal transition-all hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0 group relative overflow-hidden"
             style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
           >
-            <span class="relative z-10 flex items-center justify-center gap-2">
+            <span class="relative z-10 flex items-center justify-center gap-2 text-lg">
               💾 SAVE AS TEXT
             </span>
+            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
           </button>
 
           <button
             onClick={copyToClipboard}
-            class={`flex-1 px-6 py-4 border-3 rounded-2xl font-mono font-bold shadow-brutal transition-all hover:shadow-brutal-lg hover:scale-[1.02] active:scale-95 group relative overflow-hidden`}
+            class={`flex-1 px-8 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 group relative overflow-hidden ${
+              copiedToClipboard ? 'animate-bounce-once' : ''
+            }`}
             style={copiedToClipboard
-              ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A)"
-              : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"}
+              ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
+              : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
           >
-            <span class="relative z-10 flex items-center justify-center gap-2">
+            <span class="relative z-10 flex items-center justify-center gap-2 text-lg">
               {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
             </span>
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer">
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
           </button>
         </div>
@@ -487,7 +498,53 @@ export default function TextToAscii() {
 
         /* Removed magnetic button effect to reduce visual clutter */
 
-        /* Soft Shadows */
+        /* Brutal Shadows - Chunky and bold */
+        .shadow-brutal {
+          box-shadow: 4px 4px 0 var(--color-border, #0A0A0A);
+        }
+
+        .shadow-brutal-lg {
+          box-shadow: 6px 6px 0 var(--color-border, #0A0A0A);
+        }
+
+        .shadow-brutal-xl {
+          box-shadow: 8px 8px 0 var(--color-border, #0A0A0A);
+        }
+
+        .hover\\:shadow-brutal:hover {
+          box-shadow: 4px 4px 0 var(--color-border, #0A0A0A);
+        }
+
+        .hover\\:shadow-brutal-lg:hover {
+          box-shadow: 6px 6px 0 var(--color-border, #0A0A0A);
+        }
+
+        .hover\\:shadow-brutal-xl:hover {
+          box-shadow: 8px 8px 0 var(--color-border, #0A0A0A);
+        }
+
+        /* Bounce once animation for copy success */
+        @keyframes bounceOnce {
+          0%, 100% { transform: translateY(0); }
+          25% { transform: translateY(-10px); }
+          50% { transform: translateY(0); }
+          75% { transform: translateY(-5px); }
+        }
+
+        .animate-bounce-once {
+          animation: bounceOnce 0.5s ease-out;
+        }
+
+        /* Transform utilities */
+        .hover\\:-translate-y-1:hover {
+          transform: translateY(-4px);
+        }
+
+        .active\\:translate-y-0:active {
+          transform: translateY(0);
+        }
+
+        /* Soft Shadows - kept for other uses */
         .shadow-soft {
           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
