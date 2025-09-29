@@ -1,14 +1,16 @@
 # 🔧 TINKER.md - ASCIIFIER-WEB Quick Reference
 
-*For when you haven't touched this in 6 months and need to change something NOW*
+_For when you haven't touched this in 6 months and need to change something NOW_
 
-**ADHD MODE**: Jump to [QUICK WINS](#-quick-wins---80-of-what-youll-change) or [WHEN SHIT BREAKS](#-when-shit-breaks---top-3-fixes)
+**ADHD MODE**: Jump to [QUICK WINS](#-quick-wins---80-of-what-youll-change) or
+[WHEN SHIT BREAKS](#-when-shit-breaks---top-3-fixes)
 
 ---
 
 ## 🚀 START HERE - RUN THE DAMN THING
 
 ### Dev Mode
+
 ```bash
 # STACK: DENO/FRESH
 deno task start
@@ -16,11 +18,13 @@ deno task start
 ```
 
 ### Production Build
+
 ```bash
 deno task build
 ```
 
 ### Health Check
+
 ```bash
 deno task check    # Format, lint, type check
 ```
@@ -54,6 +58,7 @@ asciifier-web/
 ```
 
 ### The Files You'll Actually Touch:
+
 1. **routes/index.tsx** - Main page text, taglines, layout
 2. **routes/api/figlet.ts** - Fonts, ASCII generation logic
 3. **utils/themes.ts** - Colors, theme definitions
@@ -65,6 +70,7 @@ asciifier-web/
 ## 🎯 QUICK WINS - 80% OF WHAT YOU'LL CHANGE
 
 ### 1. Change the Main Text/Copy
+
 ```
 File: routes/index.tsx
 Lines: 18-22
@@ -73,6 +79,7 @@ Change: Update taglines and descriptions
 ```
 
 ### 2. Add New Figlet Fonts
+
 ```
 File: routes/api/figlet.ts
 Look for: font = "standard"
@@ -81,6 +88,7 @@ Add to options array for frontend
 ```
 
 ### 3. Change Colors/Theme
+
 ```
 File: utils/themes.ts
 Look for: brutalistDark, pastelPunk, retroWave themes
@@ -89,6 +97,7 @@ Options: Edit theme objects or create new themes
 ```
 
 ### 4. Modify Lolcat Effects
+
 ```
 File: routes/api/colorize.ts
 Look for: effect types
@@ -97,6 +106,7 @@ Add: New effect names to the enum and switch
 ```
 
 ### 5. Change Port
+
 ```
 File: dev.ts and main.ts
 Look for: :8001
@@ -108,6 +118,7 @@ Change to: :YOUR_PORT
 ## 🔧 COMMON TWEAKS
 
 ### Add a New Color Effect
+
 ```bash
 # Edit the colorize API
 File: routes/api/colorize.ts
@@ -117,6 +128,7 @@ File: routes/api/colorize.ts
 ```
 
 ### Add New ASCII Character Set
+
 ```bash
 File: utils/character-sets.ts
 1. Create new character array (light → dark)
@@ -125,6 +137,7 @@ File: utils/character-sets.ts
 ```
 
 ### Change Themes
+
 ```bash
 File: utils/themes.ts
 1. Edit existing theme colors
@@ -133,6 +146,7 @@ File: utils/themes.ts
 ```
 
 ### Modify Main Layout
+
 ```bash
 File: routes/index.tsx
 - Header: lines 8-30
@@ -145,6 +159,7 @@ File: routes/index.tsx
 ## 💥 WHEN SHIT BREAKS - TOP 3 FIXES
 
 ### 1. Port Already in Use (8001)
+
 ```bash
 # Find what's using it:
 lsof -i :8001
@@ -156,6 +171,7 @@ kill -9 PID_NUMBER
 ```
 
 ### 2. Fresh Manifest Fucked
+
 ```bash
 # Regenerate manifest:
 deno task manifest
@@ -166,6 +182,7 @@ deno task start  # Auto-regenerates
 ```
 
 ### 3. Dependencies Broken
+
 ```bash
 # Clear cache:
 rm deno.lock
@@ -182,6 +199,7 @@ rm -rf node_modules
 ## 🚦 DEPLOYMENT - SHIP IT
 
 ### Deno Deploy (Recommended)
+
 ```bash
 # First deploy (adds project ID to deno.json):
 deployctl deploy --production
@@ -192,6 +210,7 @@ deployctl deploy --prod
 ```
 
 ### Manual Deploy Steps
+
 1. Build it: `deno task build`
 2. Test it: `deno task preview` (or check localhost:8001)
 3. Push it: `git push origin main`
@@ -202,6 +221,7 @@ deployctl deploy --prod
 ## 🌈 API ENDPOINTS - THE SERVER-SIDE MAGIC
 
 ### POST /api/figlet
+
 ```json
 {
   "text": "HELLO",
@@ -212,6 +232,7 @@ deployctl deploy --prod
 ```
 
 ### POST /api/colorize
+
 ```json
 {
   "text": "plain text",
@@ -221,6 +242,7 @@ deployctl deploy --prod
 ```
 
 ### GET /api/joke
+
 ```bash
 curl http://localhost:8001/api/joke
 ```
@@ -230,12 +252,14 @@ curl http://localhost:8001/api/joke
 ## 🎨 ENVIRONMENT VARIABLES
 
 ### Where They Live
+
 ```
 File: .env.local (create if needed)
 Format: KEY=value
 ```
 
 ### Available Options
+
 - `PORT` - Server port (default: 8001)
 - Any Deno Deploy vars get set in dashboard
 
@@ -244,18 +268,21 @@ Format: KEY=value
 ## 📝 NOTES FOR FUTURE PABLO
 
 ### The Revolutionary Architecture Discovery:
+
 - **Server-side terminal tools in browser** = GENIUS breakthrough
 - Figlet + Lolcat running on server, serving rich HTML to browser
 - ANSI-to-HTML conversion for Gmail paste compatibility
 - No client-side CLI emulation needed!
 
 ### Pablo's Project Quirks:
+
 - **Rainbow Wizard Mode**: The lolcat effects are PERFECT
 - **Pastel-punk aesthetic**: CSS vars system for easy theming
 - **80/20 energy**: Focused on the essential ASCII magic
 - **Terminal-to-web pipeline**: Converts shell tools to web APIs
 
 ### Technical Innovations:
+
 - Fresh/Deno for modern server-side rendering
 - CSS custom properties for dynamic theming
 - Islands architecture for interactive components
@@ -278,17 +305,18 @@ deno task start
 ```
 
 **Quick paths:**
+
 - Text/copy: `routes/index.tsx` (lines 18-22)
 - Colors: `utils/themes.ts`
 - API logic: `routes/api/figlet.ts`
 - Main layout: `routes/index.tsx`
 
-**Live URL:** http://localhost:8001
-**Architecture:** Deno/Fresh + Figlet + LolcatJS + Tailwind
-**The Magic:** Server-side terminal tools → Rich browser experience
+**Live URL:** http://localhost:8001 **Architecture:** Deno/Fresh + Figlet +
+LolcatJS + Tailwind **The Magic:** Server-side terminal tools → Rich browser
+experience
 
 ---
 
-*"Server-side terminal tools in browsers = Revolutionary architecture!" 🌈⚡*
+_"Server-side terminal tools in browsers = Revolutionary architecture!" 🌈⚡_
 
 **Generated from the legendary Rainbow ASCII breakthrough session** 🚀

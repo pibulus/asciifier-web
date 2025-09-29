@@ -1,5 +1,10 @@
 import { useEffect, useState } from "preact/hooks";
-import { themes, applyTheme, getNextTheme, loadTheme } from "../utils/themes.ts";
+import {
+  applyTheme,
+  getNextTheme,
+  loadTheme,
+  themes,
+} from "../utils/themes.ts";
 import { sounds } from "../utils/sounds.ts";
 
 export default function ThemeIsland() {
@@ -52,23 +57,30 @@ export default function ThemeIsland() {
           style="background-color: var(--color-base, #FAF9F6); border: 3px solid var(--color-border, #0A0A0A)"
         >
           <div class="p-3 font-mono">
-            <div class="text-xs font-bold mb-2" style="color: var(--color-text, #0A0A0A)">
+            <div
+              class="text-xs font-bold mb-2"
+              style="color: var(--color-text, #0A0A0A)"
+            >
               PICK YOUR VIBE
             </div>
             <div class="space-y-1 max-h-96 overflow-y-auto">
-              {themes.map(theme => (
+              {themes.map((theme) => (
                 <button
                   key={theme.name}
                   onClick={() => handleThemeChange(theme)}
                   onMouseEnter={() => sounds.hover()}
                   class={`w-full text-left px-3 py-2 rounded text-xs font-mono hover:animate-pop transition-all ${
-                    currentTheme.name === theme.name ? 'ring-2' : ''
+                    currentTheme.name === theme.name ? "ring-2" : ""
                   }`}
                   style={`
                     background-color: ${theme.secondary};
                     color: ${theme.text};
                     border: 2px solid ${theme.border};
-                    ${currentTheme.name === theme.name ? `ring-color: ${theme.accent}` : ''}
+                    ${
+                    currentTheme.name === theme.name
+                      ? `ring-color: ${theme.accent}`
+                      : ""
+                  }
                   `}
                 >
                   <div class="flex items-center justify-between">
@@ -77,9 +89,24 @@ export default function ThemeIsland() {
                   </div>
                   <div class="opacity-60 text-xs mt-1">{theme.vibe}</div>
                   <div class="flex gap-1 mt-2">
-                    <div class="w-4 h-4 rounded" style={`background-color: ${theme.base}`} title="60%"></div>
-                    <div class="w-4 h-4 rounded" style={`background-color: ${theme.secondary}`} title="30%"></div>
-                    <div class="w-4 h-4 rounded" style={`background-color: ${theme.accent}`} title="10%"></div>
+                    <div
+                      class="w-4 h-4 rounded"
+                      style={`background-color: ${theme.base}`}
+                      title="60%"
+                    >
+                    </div>
+                    <div
+                      class="w-4 h-4 rounded"
+                      style={`background-color: ${theme.secondary}`}
+                      title="30%"
+                    >
+                    </div>
+                    <div
+                      class="w-4 h-4 rounded"
+                      style={`background-color: ${theme.accent}`}
+                      title="10%"
+                    >
+                    </div>
                   </div>
                 </button>
               ))}

@@ -2,9 +2,18 @@
 // "20% element of chance for delightful micro-moments"
 
 export class EasterEggEngine {
-  private konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
-                            'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
-                            'b', 'a'];
+  private konamiSequence = [
+    "ArrowUp",
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowLeft",
+    "ArrowRight",
+    "b",
+    "a",
+  ];
   private currentSequence: string[] = [];
   private activated = false;
 
@@ -55,10 +64,10 @@ export class EasterEggEngine {
 
   triggerSecretMode() {
     // Add rainbow background animation
-    document.body.style.animation = 'rainbow-bg 5s linear infinite';
+    document.body.style.animation = "rainbow-bg 5s linear infinite";
 
     // Add CSS for rainbow effect
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       @keyframes rainbow-bg {
         0% { background: linear-gradient(45deg, #FFE5B4, #FFB6C1); }
@@ -79,14 +88,15 @@ export class EasterEggEngine {
 
     // Reset after 10 seconds
     setTimeout(() => {
-      document.body.style.animation = '';
+      document.body.style.animation = "";
       style.remove();
       this.activated = false;
     }, 10000);
   }
 
   getRandomVibe(): string {
-    return this.vibeMessages[Math.floor(Math.random() * this.vibeMessages.length)];
+    return this
+      .vibeMessages[Math.floor(Math.random() * this.vibeMessages.length)];
   }
 
   getRandomSignature(): string {
@@ -94,8 +104,8 @@ export class EasterEggEngine {
   }
 
   showSecretMessage(message: string) {
-    const div = document.createElement('div');
-    div.className = 'secret-message';
+    const div = document.createElement("div");
+    div.className = "secret-message";
     div.textContent = message;
     div.style.cssText = `
       position: fixed;
@@ -118,7 +128,7 @@ export class EasterEggEngine {
     document.body.appendChild(div);
 
     setTimeout(() => {
-      div.style.animation = 'slide-up 0.5s ease-in';
+      div.style.animation = "slide-up 0.5s ease-in";
       setTimeout(() => div.remove(), 500);
     }, 2000);
   }
@@ -132,7 +142,7 @@ export class EasterEggEngine {
   }
 
   showFloatingMessage(message: string) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.textContent = message;
     div.style.cssText = `
       position: fixed;
@@ -154,7 +164,7 @@ export class EasterEggEngine {
     document.body.appendChild(div);
 
     setTimeout(() => {
-      div.style.animation = 'slide-up 0.4s ease-in reverse';
+      div.style.animation = "slide-up 0.4s ease-in reverse";
       setTimeout(() => div.remove(), 400);
     }, 3000);
   }
@@ -163,7 +173,7 @@ export class EasterEggEngine {
   addSecretWatermark(ascii: string): string {
     if (Math.random() < 0.05) { // 5% chance
       const signature = this.getRandomSignature();
-      return ascii + '\n\n' + signature;
+      return ascii + "\n\n" + signature;
     }
     return ascii;
   }

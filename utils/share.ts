@@ -7,7 +7,7 @@ export function generateShareableAscii(ascii: string, style: string): string {
     art: ascii.substring(0, 5000), // Limit for URL safety
     style: style,
     ts: Date.now(),
-    v: '2.0',
+    v: "2.0",
   };
 
   // Simple base64 encoding
@@ -19,11 +19,13 @@ export function generateShareableAscii(ascii: string, style: string): string {
   return url;
 }
 
-export function parseSharedAscii(hash: string): { art: string; style: string } | null {
-  if (!hash.startsWith('#share=')) return null;
+export function parseSharedAscii(
+  hash: string,
+): { art: string; style: string } | null {
+  if (!hash.startsWith("#share=")) return null;
 
   try {
-    const encoded = hash.replace('#share=', '');
+    const encoded = hash.replace("#share=", "");
     const decoded = atob(encoded);
     const data = JSON.parse(decoded);
 

@@ -1,4 +1,4 @@
-import { getCharacters, type CharacterStyle } from "./character-sets.ts";
+import { type CharacterStyle, getCharacters } from "./character-sets.ts";
 
 export interface ProcessOptions {
   width?: number;
@@ -15,9 +15,9 @@ export class ImageProcessor {
   private ctx: CanvasRenderingContext2D;
 
   constructor() {
-    if (typeof document !== 'undefined') {
-      this.canvas = document.createElement('canvas');
-      this.ctx = this.canvas.getContext('2d')!;
+    if (typeof document !== "undefined") {
+      this.canvas = document.createElement("canvas");
+      this.ctx = this.canvas.getContext("2d")!;
     } else {
       // Server-side fallback
       this.canvas = {} as HTMLCanvasElement;
@@ -37,7 +37,7 @@ export class ImageProcessor {
 
       img.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(new Error('Failed to load image'));
+        reject(new Error("Failed to load image"));
       };
 
       img.src = url;
@@ -48,7 +48,7 @@ export class ImageProcessor {
     originalWidth: number,
     originalHeight: number,
     targetWidth?: number,
-    maxHeight?: number
+    maxHeight?: number,
   ): { width: number; height: number } {
     // Default to 80 chars wide if not specified
     targetWidth = targetWidth || 80;
@@ -75,20 +75,30 @@ export class ImageProcessor {
     for (let i = 0; i < data.length; i += 4) {
       // Apply contrast to RGB channels
       data[i] = Math.min(255, Math.max(0, factor * (data[i] - 128) + 128));
-      data[i + 1] = Math.min(255, Math.max(0, factor * (data[i + 1] - 128) + 128));
-      data[i + 2] = Math.min(255, Math.max(0, factor * (data[i + 2] - 128) + 128));
+      data[i + 1] = Math.min(
+        255,
+        Math.max(0, factor * (data[i + 1] - 128) + 128),
+      );
+      data[i + 2] = Math.min(
+        255,
+        Math.max(0, factor * (data[i + 2] - 128) + 128),
+      );
     }
 
     return imageData;
   }
 
-  processImage(img: HTMLImageElement, options: ProcessOptions = {}): string[][] {
-    const { width: targetWidth, height: targetHeight } = this.calculateOptimalSize(
-      img.width,
-      img.height,
-      options.width,
-      options.height
-    );
+  processImage(
+    img: HTMLImageElement,
+    options: ProcessOptions = {},
+  ): string[][] {
+    const { width: targetWidth, height: targetHeight } = this
+      .calculateOptimalSize(
+        img.width,
+        img.height,
+        options.width,
+        options.height,
+      );
 
     // Resize image
     this.canvas.width = targetWidth;
@@ -102,7 +112,7 @@ export class ImageProcessor {
       imageData = this.enhanceImage(imageData);
     }
 
-    const chars = getCharacters(options.style || 'classic');
+    const chars = getCharacters(options.style || "classic");
     const result: string[][] = [];
 
     for (let y = 0; y < targetHeight; y++) {
@@ -127,7 +137,8 @@ export class ImageProcessor {
         // Store character with optional color info
         if (options.rainbow) {
           // Rainbow gradient based on position
-          const hue = ((x + y * 2) * 360 / (targetWidth + targetHeight * 2)) % 360;
+          const hue = ((x + y * 2) * 360 / (targetWidth + targetHeight * 2)) %
+            360;
           row.push(`<span style="color: hsl(${hue}, 70%, 50%)">${char}</span>`);
         } else if (options.useColor) {
           row.push(`<span style="color: rgb(${r}, ${g}, ${b})">${char}</span>`);
@@ -145,12 +156,12 @@ export class ImageProcessor {
   formatAscii(ascii: string[][], useColor: boolean = false): string {
     if (useColor) {
       // Return HTML for colored display
-      return ascii.map(row => row.join('')).join('\n');
+      return ascii.map((row) => row.join("")).join("\n");
     } else {
       // Return plain text
-      return ascii.map(row =>
-        row.map(cell => cell.replace(/<[^>]*>/g, '')).join('')
-      ).join('\n');
+      return ascii.map((row) =>
+        row.map((cell) => cell.replace(/<[^>]*>/g, "")).join("")
+      ).join("\n");
     }
   }
 }

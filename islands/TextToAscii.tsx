@@ -2,15 +2,70 @@ import { useSignal } from "@preact/signals";
 import { useEffect, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 
-// Available figlet fonts
+// Available figlet fonts - 35+ options organized by category!
 const FIGLET_FONTS = [
-  { name: "Standard", file: "standard" },
-  { name: "Big", file: "big" },
-  { name: "Slant", file: "slant" },
-  { name: "3D-ASCII", file: "3d-ascii" },
+  // Classic fonts
+  { name: "Standard", file: "Standard", category: "classic" },
+  { name: "Big", file: "Big", category: "classic" },
+  { name: "Slant", file: "Slant", category: "classic" },
+  { name: "Small", file: "Small", category: "classic" },
+  { name: "Banner", file: "Banner", category: "classic" },
+  { name: "Block", file: "Block", category: "classic" },
+  { name: "Bubble", file: "Bubble", category: "classic" },
+  { name: "Digital", file: "Digital", category: "classic" },
+  { name: "Ivrit", file: "Ivrit", category: "classic" },
+  { name: "Mini", file: "Mini", category: "classic" },
+  { name: "Script", file: "Script", category: "classic" },
+  { name: "Shadow", file: "Shadow", category: "classic" },
+
+  // 3D fonts
+  { name: "3D-ASCII", file: "3-D", category: "3d" },
+  { name: "3x5", file: "3x5", category: "3d" },
+  { name: "5 Line Oblique", file: "5 Line Oblique", category: "3d" },
+  { name: "Alphabet", file: "Alphabet", category: "3d" },
+  { name: "Isometric1", file: "Isometric1", category: "3d" },
+  { name: "Isometric2", file: "Isometric2", category: "3d" },
+  { name: "Isometric3", file: "Isometric3", category: "3d" },
+  { name: "Isometric4", file: "Isometric4", category: "3d" },
+
+  // Cool/Modern fonts
+  { name: "Doom", file: "Doom", category: "modern" },
+  { name: "Epic", file: "Epic", category: "modern" },
+  { name: "Poison", file: "Poison", category: "modern" },
+  { name: "Alligator", file: "Alligator", category: "modern" },
+  { name: "Avatar", file: "Avatar", category: "modern" },
+  { name: "Big Chief", file: "Big Chief", category: "modern" },
+  { name: "Broadway", file: "Broadway", category: "modern" },
+  { name: "Crazy", file: "Crazy", category: "modern" },
+  { name: "Ghost", file: "Ghost", category: "modern" },
+  { name: "Gothic", file: "Gothic", category: "modern" },
+  { name: "Graffiti", file: "Graffiti", category: "modern" },
+  { name: "Sub-Zero", file: "Sub-Zero", category: "modern" },
+  { name: "Swamp Land", file: "Swamp Land", category: "modern" },
+
+  // Special/Fun fonts
+  { name: "Star Wars", file: "Star Wars", category: "fun" },
+  { name: "Sweet", file: "Sweet", category: "fun" },
+  { name: "Weird", file: "Weird", category: "fun" },
+  { name: "Fire Font-s", file: "Fire Font-s", category: "fun" },
+  { name: "Fuzzy", file: "Fuzzy", category: "fun" },
+  { name: "Bloody", file: "Bloody", category: "fun" },
+  { name: "Colossal", file: "Colossal", category: "fun" },
+  { name: "Calgphy2", file: "Calgphy2", category: "fun" },
+  { name: "Crawford", file: "Crawford", category: "fun" },
 ];
 
-// Color effects
+// Border styles for ASCII art
+const BORDER_STYLES = [
+  { name: "⬜ None", value: "none" },
+  { name: "─ Single", value: "single" },
+  { name: "═ Double", value: "double" },
+  { name: "█ Block", value: "block" },
+  { name: "┌ Angles", value: "angles" },
+  { name: "╭ Round", value: "round" },
+];
+
+// Enhanced color effects
 const COLOR_EFFECTS = [
   { name: "⚫ Plain", value: "none" },
   { name: "🌈 Rainbow", value: "rainbow" },
@@ -18,6 +73,8 @@ const COLOR_EFFECTS = [
   { name: "🌊 Ocean", value: "ocean" },
   { name: "🦄 Unicorn", value: "unicorn" },
   { name: "🔋 Matrix", value: "matrix" },
+  { name: "🔩 Metal", value: "metal" },
+  { name: "✨ Chrome", value: "chrome" },
 ];
 
 export default function TextToAscii() {
@@ -25,10 +82,12 @@ export default function TextToAscii() {
   const [htmlOutput, setHtmlOutput] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+  const [showAdvancedFonts, setShowAdvancedFonts] = useState(false);
 
   const inputText = useSignal("");
-  const selectedFont = useSignal("standard");
+  const selectedFont = useSignal("Standard");
   const colorEffect = useSignal("none");
+  const borderStyle = useSignal("none");
 
   const generateAscii = async () => {
     if (!inputText.value.trim()) {
@@ -39,17 +98,20 @@ export default function TextToAscii() {
 
     setIsGenerating(true);
     try {
-      // Call server-side figlet API
-      const response = await fetch("/api/figlet", {
+      // Always use enhanced-figlet API which has all the features
+      const apiEndpoint = "/api/enhanced-figlet";
+
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          text: inputText.value.slice(0, 20),
+          text: inputText.value.slice(0, 30),
           font: selectedFont.value,
-          colorize: colorEffect.value !== "none",
           effect: colorEffect.value,
+          borderStyle: borderStyle.value,
+          color: "#00FF41", // Default green color
         }),
       });
 
@@ -78,7 +140,12 @@ export default function TextToAscii() {
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [inputText.value, selectedFont.value, colorEffect.value]);
+  }, [
+    inputText.value,
+    selectedFont.value,
+    colorEffect.value,
+    borderStyle.value,
+  ]);
 
   const copyToClipboard = async () => {
     try {
@@ -110,15 +177,29 @@ export default function TextToAscii() {
   };
 
   const downloadText = () => {
-    // Strip ANSI codes for plain text download
-    const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, "");
+    // Strip HTML tags and ANSI codes for plain text download
+    let plainText = asciiOutput;
+
+    // If it contains HTML, extract just the text
+    if (plainText.includes("<span")) {
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = plainText;
+      plainText = tempDiv.textContent || tempDiv.innerText || "";
+    }
+
+    // Also strip any remaining ANSI codes
+    plainText = plainText.replace(/\u001b\[[0-9;]*m/g, "");
+
     const blob = new Blob([plainText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "ascii-art.txt";
+    a.download = `${
+      inputText.value.toLowerCase().replace(/[^a-z0-9]/g, "-") || "ascii-art"
+    }.txt`;
     a.click();
     URL.revokeObjectURL(url);
+    sounds.success();
   };
 
   const downloadPNG = () => {
@@ -275,6 +356,8 @@ export default function TextToAscii() {
       canvas.toBlob((blob) => {
         if (!blob) {
           console.error("Failed to create blob");
+          sounds.error();
+          alert("Failed to generate PNG. Please try again.");
           return;
         }
         const url = URL.createObjectURL(blob);
@@ -283,9 +366,12 @@ export default function TextToAscii() {
         a.download = `${filename}.png`;
         a.click();
         URL.revokeObjectURL(url);
+        sounds.success();
       }, "image/png");
     } catch (error) {
       console.error("Error generating PNG:", error);
+      sounds.error();
+      alert("Failed to export as PNG. Please try again.");
     }
   };
 
@@ -377,20 +463,29 @@ export default function TextToAscii() {
       {/* Font Style Section */}
       <div class="mb-10">
         <label
-          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
+          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4 flex items-center justify-between"
           style="color: var(--color-text, #0A0A0A);"
         >
-          🎨 FONT STYLE
+          <span>🎨 FONT STYLE</span>
+          <button
+            onClick={() => setShowAdvancedFonts(!showAdvancedFonts)}
+            class="text-sm font-bold px-3 py-1 rounded-xl border-2 transition-all hover:scale-105"
+            style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4);"
+          >
+            {showAdvancedFonts ? "Show Less" : "Show All Fonts"}
+          </button>
         </label>
-        <div class="grid grid-cols-2 gap-4">
-          {FIGLET_FONTS.map((font) => (
+        <div class="grid grid-cols-3 gap-3">
+          {(showAdvancedFonts ? FIGLET_FONTS : FIGLET_FONTS.slice(0, 9)).map((
+            font,
+          ) => (
             <button
               key={font.file}
               onClick={() => {
                 sounds.click();
                 selectedFont.value = font.file;
               }}
-              class={`px-6 py-5 rounded-3xl text-base font-bold transition-all relative overflow-hidden group ${
+              class={`px-4 py-4 rounded-2xl text-sm font-bold transition-all relative overflow-hidden group ${
                 selectedFont.value === font.file
                   ? "shadow-brutal-lg"
                   : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
@@ -457,6 +552,44 @@ export default function TextToAscii() {
           {colorEffect.value === "none"
             ? "🎭 Simple & clean"
             : "✨ Adding color magic!"}
+        </div>
+      </div>
+
+      {/* Border Styles */}
+      <div class="mb-10">
+        <label
+          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
+          style="color: var(--color-text, #0A0A0A);"
+        >
+          🖼️ BORDER STYLE
+        </label>
+        <div class="grid grid-cols-3 gap-4">
+          {BORDER_STYLES.map((border) => (
+            <button
+              key={border.value}
+              onClick={() => {
+                sounds.click();
+                borderStyle.value = border.value;
+              }}
+              class={`px-5 py-5 rounded-3xl text-sm font-bold transition-all relative overflow-hidden group ${
+                borderStyle.value === border.value
+                  ? "shadow-brutal-lg"
+                  : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
+              }`}
+              style={borderStyle.value === border.value
+                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A);"
+                : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
+            >
+              <span class="relative z-10 flex items-center justify-center">
+                {borderStyle.value === border.value && (
+                  <span class="mr-1">✓</span>
+                )}
+                {border.name}
+              </span>
+              <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 

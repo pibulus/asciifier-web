@@ -8,7 +8,7 @@ export const CHARACTER_SETS: Record<string, string> = {
   shades: " ▁▂▃▄▅▆▇█",
   geometric: " ◦▫▪■",
   hearts: " ♡♥",
-  gradient: " ░▒▓█"
+  gradient: " ░▒▓█",
 };
 
 export type CharacterStyle = keyof typeof CHARACTER_SETS;
@@ -27,5 +27,5 @@ export const STYLE_DESCRIPTIONS: Record<CharacterStyle, string> = {
   shades: "Smooth gradients. Subtle depth.",
   geometric: "Sharp shapes. Clean lines.",
   hearts: "Romance mode activated.",
-  gradient: "Smooth transitions. Soft edges."
+  gradient: "Smooth transitions. Soft edges.",
 };
