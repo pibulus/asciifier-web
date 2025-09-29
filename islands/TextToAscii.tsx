@@ -630,14 +630,20 @@ export default function TextToAscii() {
               asciiOutput
                 ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
                 : "opacity-50 cursor-not-allowed"
-            } ${copiedToClipboard && copiedFormat === "email" ? "animate-bounce-once" : ""}`}
+            } ${
+              copiedToClipboard && copiedFormat === "email"
+                ? "animate-bounce-once"
+                : ""
+            }`}
             style={copiedToClipboard && copiedFormat === "email"
               ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
               : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
           >
             <span class="relative z-10 flex flex-col items-center justify-center gap-1">
               <span class="text-base">
-                {copiedToClipboard && copiedFormat === "email" ? "✅ COPIED!" : "📧 COPY FOR EMAIL"}
+                {copiedToClipboard && copiedFormat === "email"
+                  ? "✅ COPIED!"
+                  : "📧 COPY FOR EMAIL"}
               </span>
               <span class="text-xs opacity-80">Rich colors preserved</span>
             </span>
@@ -653,14 +659,20 @@ export default function TextToAscii() {
               asciiOutput
                 ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
                 : "opacity-50 cursor-not-allowed"
-            } ${copiedToClipboard && copiedFormat === "message" ? "animate-bounce-once" : ""}`}
+            } ${
+              copiedToClipboard && copiedFormat === "message"
+                ? "animate-bounce-once"
+                : ""
+            }`}
             style={copiedToClipboard && copiedFormat === "message"
               ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
               : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
           >
             <span class="relative z-10 flex flex-col items-center justify-center gap-1">
               <span class="text-base">
-                {copiedToClipboard && copiedFormat === "message" ? "✅ COPIED!" : "💬 COPY FOR MESSAGES"}
+                {copiedToClipboard && copiedFormat === "message"
+                  ? "✅ COPIED!"
+                  : "💬 COPY FOR MESSAGES"}
               </span>
               <span class="text-xs opacity-80">Works everywhere</span>
             </span>
