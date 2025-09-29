@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(deno check:*)",
-      "Bash(deno fmt:*)"
+      "Bash(deno fmt:*)",
+      "Bash(open:*)"
     ],
     "deny": [],
     "ask": []

@@ -10,7 +10,7 @@ const FIGLET_FONTS = [
   { name: "3D-ASCII", file: "3d-ascii" },
 ];
 
-// Color effects - now includes 'none' option
+// Color effects
 const COLOR_EFFECTS = [
   { name: "⚫ Plain", value: "none" },
   { name: "🌈 Rainbow", value: "rainbow" },
@@ -28,7 +28,7 @@ export default function TextToAscii() {
 
   const inputText = useSignal("");
   const selectedFont = useSignal("standard");
-  const colorEffect = useSignal("none"); // Default to none (plain text)
+  const colorEffect = useSignal("none");
 
   const generateAscii = async () => {
     if (!inputText.value.trim()) {
@@ -46,7 +46,7 @@ export default function TextToAscii() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          text: inputText.value.slice(0, 20), // Limit to 20 chars for performance
+          text: inputText.value.slice(0, 20),
           font: selectedFont.value,
           colorize: colorEffect.value !== "none",
           effect: colorEffect.value,
@@ -124,33 +124,37 @@ export default function TextToAscii() {
   const downloadPNG = () => {
     try {
       // Get the ASCII display element
-      const asciiElement = document.querySelector('.ascii-display');
+      const asciiElement = document.querySelector(".ascii-display");
       if (!asciiElement) {
-        console.error('ASCII display element not found');
+        console.error("ASCII display element not found");
         return;
       }
 
-      // Parse the HTML to extract text and colors character by character
-      const lines: { chars: { char: string; color: string }[] }[] = [];
-      let currentLine: { char: string; color: string }[] = [];
+      // Parse HTML to extract text and colors character by character
+      type CharData = { char: string; color: string };
+      type LineData = { chars: CharData[] };
+      const lines: LineData[] = [];
+      let currentLine: CharData[] = [];
 
       // Function to extract color from a span element
       const getColorFromElement = (element: Element): string => {
-        if (element.tagName === 'SPAN') {
+        if (element.tagName === "SPAN") {
           const style = (element as HTMLElement).style.color;
           if (style) return style;
         }
-        return '#00FF41'; // Default green
+        return "#00FF41"; // Default green
       };
 
-      // Process the HTML content
+      // Process HTML content recursively
       const processNode = (node: Node) => {
         if (node.nodeType === Node.TEXT_NODE) {
-          const text = node.textContent || '';
-          const parentColor = node.parentElement ? getColorFromElement(node.parentElement) : '#00FF41';
+          const text = node.textContent || "";
+          const parentColor = node.parentElement
+            ? getColorFromElement(node.parentElement)
+            : "#00FF41";
 
           for (const char of text) {
-            if (char === '\n') {
+            if (char === "\n") {
               if (currentLine.length > 0) {
                 lines.push({ chars: currentLine });
                 currentLine = [];
@@ -162,18 +166,21 @@ export default function TextToAscii() {
         } else if (node.nodeType === Node.ELEMENT_NODE) {
           const element = node as HTMLElement;
 
-          if (element.tagName === 'BR') {
+          if (element.tagName === "BR") {
             if (currentLine.length > 0) {
               lines.push({ chars: currentLine });
               currentLine = [];
             }
-          } else if (element.tagName === 'SPAN' && element.childNodes.length === 1 && element.childNodes[0].nodeType === Node.TEXT_NODE) {
+          } else if (
+            element.tagName === "SPAN" && element.childNodes.length === 1 &&
+            element.childNodes[0].nodeType === Node.TEXT_NODE
+          ) {
             // Direct span with text
-            const text = element.textContent || '';
+            const text = element.textContent || "";
             const color = getColorFromElement(element);
 
             for (const char of text) {
-              if (char === '\n') {
+              if (char === "\n") {
                 if (currentLine.length > 0) {
                   lines.push({ chars: currentLine });
                   currentLine = [];
@@ -191,23 +198,21 @@ export default function TextToAscii() {
         }
       };
 
-      // Process all nodes
-      for (const child of Array.from(asciiElement.childNodes)) {
-        processNode(child);
-      }
+      // Process all child nodes
+      Array.from(asciiElement.childNodes).forEach(processNode);
 
-      // Add the last line if it exists
+      // Add remaining line
       if (currentLine.length > 0) {
         lines.push({ chars: currentLine });
       }
 
-      // Filter out empty lines but keep structure
-      const nonEmptyLines = lines.filter(line =>
-        line.chars.some(c => c.char.trim().length > 0)
+      // Keep only non-empty lines
+      const nonEmptyLines = lines.filter((line) =>
+        line.chars.some((c) => c.char.trim().length > 0)
       );
 
       if (nonEmptyLines.length === 0) {
-        console.error('No ASCII text found');
+        console.error("No ASCII text found");
         return;
       }
 
@@ -218,20 +223,22 @@ export default function TextToAscii() {
       const padding = 40;
 
       // Find the maximum line width
-      const maxLineLength = Math.max(...nonEmptyLines.map(line => line.chars.length));
+      const maxLineLength = Math.max(
+        ...nonEmptyLines.map((line) => line.chars.length),
+      );
 
       const canvasWidth = (maxLineLength * charWidth) + (padding * 2);
       const canvasHeight = (nonEmptyLines.length * lineHeight) + (padding * 2);
 
-      // Create canvas with higher resolution for better quality
-      const canvas = document.createElement('canvas');
-      const scale = 2; // For retina displays
+      // Create high-DPI canvas
+      const canvas = document.createElement("canvas");
+      const scale = 2;
       canvas.width = canvasWidth * scale;
       canvas.height = canvasHeight * scale;
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (!ctx) {
-        console.error('Could not get canvas context');
+        console.error("Could not get canvas context");
         return;
       }
 
@@ -239,13 +246,13 @@ export default function TextToAscii() {
       ctx.scale(scale, scale);
 
       // Fill black background
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
       // Set font
       ctx.font = `${fontSize}px monospace`;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
 
       // Draw each character with its exact color
       nonEmptyLines.forEach((line, lineIndex) => {
@@ -261,26 +268,26 @@ export default function TextToAscii() {
       });
 
       // Create filename from input text
-      const filename = inputText.value.toLowerCase().replace(/[^a-z0-9]/g, '-') || 'ascii-art';
+      const filename =
+        inputText.value.toLowerCase().replace(/[^a-z0-9]/g, "-") || "ascii-art";
 
       // Convert canvas to blob and download
       canvas.toBlob((blob) => {
         if (!blob) {
-          console.error('Failed to create blob');
+          console.error("Failed to create blob");
           return;
         }
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = `${filename}.png`;
         a.click();
         URL.revokeObjectURL(url);
-      }, 'image/png');
+      }, "image/png");
     } catch (error) {
-      console.error('Error generating PNG:', error);
+      console.error("Error generating PNG:", error);
     }
   };
-
 
   return (
     <div class="max-w-4xl mx-auto px-4 py-8">
@@ -358,7 +365,8 @@ export default function TextToAscii() {
                 dangerouslySetInnerHTML={{
                   __html: colorEffect.value === "none"
                     ? asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                    : (htmlOutput || asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")),
+                    : (htmlOutput ||
+                      asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")),
                 }}
               />
             </div>
