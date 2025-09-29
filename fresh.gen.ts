@@ -8,6 +8,7 @@ import * as $api_joke from "./routes/api/joke.ts";
 import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
 import * as $Dropzone from "./islands/Dropzone.tsx";
+import * as $ThemeIsland from "./islands/ThemeIsland.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -20,6 +21,7 @@ const manifest = {
   },
   islands: {
     "./islands/Dropzone.tsx": $Dropzone,
+    "./islands/ThemeIsland.tsx": $ThemeIsland,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

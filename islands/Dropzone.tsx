@@ -5,12 +5,12 @@ import { CHARACTER_SETS, STYLE_DESCRIPTIONS, type CharacterStyle } from "../util
 import { sounds } from "../utils/sounds.ts";
 import { easterEggs } from "../utils/easter-eggs.ts";
 
-// Preset configurations for quick starts
+// Preset configurations for quick starts - now with color focus
 const PRESETS = [
-  { name: "Terminal", style: "classic", color: false, width: 80, enhance: false, vibe: "90s hacker" },
-  { name: "Emoji", style: "emoji", color: true, width: 40, enhance: true, vibe: "chaos mode" },
-  { name: "Matrix", style: "dense", color: false, width: 100, enhance: true, vibe: "follow the rabbit" },
-  { name: "Blocks", style: "blocks", color: true, width: 60, enhance: false, vibe: "chunky boi" },
+  { name: "B&W", style: "classic", color: false, width: 80, enhance: false, vibe: "monochrome magic", icon: "⬜" },
+  { name: "COLOR", style: "classic", color: true, width: 80, enhance: true, vibe: "full spectrum", icon: "🎨" },
+  { name: "INVERT", style: "classic", color: false, width: 80, enhance: false, invert: true, vibe: "negative space", icon: "🔄" },
+  { name: "TINY", style: "dense", color: false, width: 120, enhance: false, vibe: "maximum detail", icon: "🔬" },
 ];
 
 export default function Dropzone() {
@@ -168,6 +168,7 @@ export default function Dropzone() {
     useColor.value = preset.color;
     charWidth.value = preset.width;
     enhanceImage.value = preset.enhance;
+    invertBrightness.value = preset.invert || false;
     setSelectedPreset(index);
     if (imageLoaded) {
       scheduleReprocess();
@@ -248,12 +249,12 @@ export default function Dropzone() {
         <div class="text-center space-y-6">
           {/* Friendly greeting */}
           <div class="space-y-2">
-            <h2 class="text-3xl font-bold animate-bounce-subtle">
+            <h2 class="text-3xl font-bold animate-bounce-subtle" style="color: var(--color-text, #0A0A0A)">
               Drop a pic.
-              <span class="text-hot-pink"> Get art.</span>
+              <span style="color: var(--color-accent, #FF69B4)"> Get art.</span>
             </h2>
-            <p class="text-soft-black opacity-80 font-mono text-sm">
-              Paste works too • <kbd class="px-2 py-1 bg-soft-yellow rounded text-xs">Cmd+V</kbd>
+            <p class="opacity-80 font-mono text-sm" style="color: var(--color-text, #0A0A0A)">
+              Paste works too • <kbd class="px-2 py-1 rounded text-xs" style="background-color: var(--color-secondary, #FFE5B4)">Cmd+V</kbd>
             </p>
           </div>
 
@@ -261,9 +262,13 @@ export default function Dropzone() {
           <div
             class={`relative border-4 border-dashed transition-all duration-300 rounded-xl p-20 cursor-pointer group ${
               isDragging
-                ? 'border-hot-pink bg-gradient-to-br from-peach to-soft-yellow scale-105 shadow-brutal-lg rotate-1'
-                : 'border-black bg-white hover:bg-gradient-to-br hover:from-white hover:to-peach hover:scale-102 shadow-brutal hover:shadow-brutal-lg'
+                ? 'scale-105 shadow-brutal-lg rotate-1'
+                : 'hover:scale-102 shadow-brutal hover:shadow-brutal-lg'
             }`}
+            style={isDragging
+              ? `border-color: var(--color-accent, #FF69B4); background-color: var(--color-secondary, #FFE5B4)`
+              : `border-color: var(--color-border, #0A0A0A); background-color: var(--color-base, #FAF9F6)`
+            }
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -281,10 +286,10 @@ export default function Dropzone() {
               <div class={`text-7xl transition-all duration-300 ${isDragging ? 'animate-spin' : 'group-hover:animate-wiggle'}`}>
                 {isDragging ? "🎯" : "💾"}
               </div>
-              <h3 class="text-2xl font-bold font-mono">
+              <h3 class="text-2xl font-bold font-mono" style="color: var(--color-text, #0A0A0A)">
                 {isDragging ? "Release to convert" : "Click or drop"}
               </h3>
-              <p class="text-soft-black opacity-60 text-sm font-mono">
+              <p class="opacity-60 text-sm font-mono" style="color: var(--color-text, #0A0A0A)">
                 JPG PNG GIF WebP • 10MB max
               </p>
             </div>
@@ -298,27 +303,37 @@ export default function Dropzone() {
 
           {/* Quick Start Presets */}
           <div class="space-y-3">
-            <p class="text-sm font-mono text-soft-black opacity-60">Pick your vibe:</p>
+            <p class="text-sm font-mono opacity-60" style="color: var(--color-text, #0A0A0A)">Pick output style:</p>
             <div class="flex flex-wrap gap-3 justify-center">
               {PRESETS.map((preset, i) => (
                 <button
                   key={preset.name}
                   onClick={() => applyPreset(preset, i)}
-                  class={`group relative px-4 py-2 border-2 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                  class={`group relative px-4 py-2 border-2 rounded-lg font-semibold text-sm transition-all duration-200 hover:animate-pop ${
                     selectedPreset === i
-                      ? 'bg-hot-pink text-white border-black shadow-brutal animate-pulse-soft'
-                      : 'bg-white border-black shadow-brutal-sm hover:shadow-brutal hover:animate-pop'
+                      ? 'shadow-brutal animate-pulse-soft'
+                      : 'shadow-brutal-sm hover:shadow-brutal'
                   }`}
+                  style={selectedPreset === i
+                    ? `background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)`
+                    : `background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)`
+                  }
                   title={imageLoaded ? `Press ${i + 1} to apply` : 'Select preset before uploading'}
                 >
-                  <span class="font-mono font-bold">{preset.name}</span>
-                  <span class="absolute -top-2 -right-2 bg-soft-black text-white text-xs px-1.5 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity font-mono">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">{preset.icon}</span>
+                    <div>
+                      <span class="font-mono font-bold">{preset.name}</span>
+                      <span class="block text-xs opacity-60">{preset.vibe}</span>
+                    </div>
+                  </div>
+                  <span class="absolute -top-2 -right-2 text-xs px-1.5 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity font-mono"
+                    style="background-color: var(--color-text, #0A0A0A); color: var(--color-base, #FAF9F6)">
                     {i + 1}
                   </span>
                   {selectedPreset === i && (
                     <span class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 text-xs animate-bounce">✓</span>
                   )}
-                  <span class="block text-xs opacity-60 mt-0.5">{preset.vibe}</span>
                 </button>
               ))}
             </div>
@@ -332,8 +347,9 @@ export default function Dropzone() {
           {/* Left: Controls */}
           <div class="space-y-4">
             {/* Quick Actions */}
-            <div class="bg-white border-4 border-soft-black rounded-lg p-4 shadow-brutal">
-              <h3 class="font-mono font-bold mb-3 text-soft-black">PRESETS</h3>
+            <div class="border-4 rounded-lg p-4 shadow-brutal"
+              style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)">
+              <h3 class="font-mono font-bold mb-3" style="color: var(--color-text, #0A0A0A)">PRESETS</h3>
               <div class="grid grid-cols-2 gap-2">
                 {PRESETS.map((preset, i) => (
                   <button
@@ -353,8 +369,9 @@ export default function Dropzone() {
             </div>
 
             {/* Style Selector with Preview */}
-            <div class="bg-white border-4 border-soft-black rounded-lg p-4 shadow-brutal">
-              <label class="block text-sm font-mono font-bold mb-2 text-soft-black">STYLE PICKER</label>
+            <div class="border-4 rounded-lg p-4 shadow-brutal"
+              style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)">
+              <label class="block text-sm font-mono font-bold mb-2" style="color: var(--color-text, #0A0A0A)">STYLE PICKER</label>
               <div class="space-y-2">
                 {Object.keys(CHARACTER_SETS).map(style => (
                   <button
@@ -385,11 +402,12 @@ export default function Dropzone() {
             </div>
 
             {/* Controls */}
-            <div class="bg-white border-4 border-soft-black rounded-lg p-4 shadow-brutal space-y-4">
+            <div class="border-4 rounded-lg p-4 shadow-brutal space-y-4"
+              style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)">
               {/* Width Slider */}
               <div>
-                <label class="block text-sm font-mono font-bold mb-2 text-soft-black">
-                  WIDTH • <span class="text-hot-pink">{charWidth.value}</span>
+                <label class="block text-sm font-mono font-bold mb-2" style="color: var(--color-text, #0A0A0A)">
+                  WIDTH • <span style="color: var(--color-accent, #FF69B4)">{charWidth.value}</span>
                 </label>
                 <input
                   type="range"
@@ -494,21 +512,23 @@ export default function Dropzone() {
 
           {/* Right: ASCII Preview */}
           <div class="lg:col-span-2 space-y-4">
-            {/* Output Display */}
-            <div class="bg-soft-black text-terminal-green rounded-lg border-4 border-soft-black shadow-brutal overflow-hidden">
-              <div class="bg-gray-900 px-4 py-2 border-b-2 border-soft-black flex items-center justify-between">
+            {/* Output Display - Dynamic sizing */}
+            <div class="text-terminal-green rounded-lg border-4 shadow-brutal overflow-hidden"
+              style="background-color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)">
+              <div class="px-4 py-2 border-b-2 flex items-center justify-between"
+                style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)">
                 <div class="flex space-x-2">
                   <div class="w-3 h-3 bg-red-500 rounded-full hover:animate-pulse-soft cursor-pointer" title="Close (jk)"></div>
                   <div class="w-3 h-3 bg-yellow-500 rounded-full hover:animate-pulse-soft cursor-pointer" title="Minimize (nope)"></div>
                   <div class="w-3 h-3 bg-green-500 rounded-full hover:animate-pulse-soft cursor-pointer" title="Full screen (maybe)"></div>
                 </div>
-                <span class="text-xs font-mono text-gray-500">~/output/art.txt</span>
+                <span class="text-xs font-mono opacity-60">~/output/art.txt</span>
               </div>
-              <div class="p-6 overflow-x-auto max-h-96 overflow-y-auto custom-scrollbar">
+              <div class="p-4 overflow-auto custom-scrollbar" style="max-height: 70vh">
                 <pre
-                  class="ascii-display text-xs leading-tight"
-                  dangerouslySetInnerHTML={{ __html: useColor.value ? asciiOutput : asciiOutput }}
-                  style={useColor.value ? {} : { color: '#00FF41' }}
+                  class="ascii-display leading-tight"
+                  dangerouslySetInnerHTML={{ __html: asciiOutput }}
+                  style={`color: ${useColor.value ? 'inherit' : '#00FF41'}; font-size: clamp(0.5rem, 1.5vw, 0.75rem)`}
                 />
               </div>
             </div>

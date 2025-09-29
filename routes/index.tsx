@@ -1,38 +1,35 @@
 import Dropzone from "../islands/Dropzone.tsx";
+import ThemeIsland from "../islands/ThemeIsland.tsx";
 
 export default function Home() {
   return (
-    <div class="min-h-screen bg-paper relative overflow-hidden">
-      {/* Background Pattern */}
-      <div class="absolute inset-0 opacity-5 pointer-events-none">
-        <div class="absolute top-20 left-10 text-8xl rotate-12">⌘</div>
-        <div class="absolute top-40 right-20 text-6xl -rotate-6">¶</div>
-        <div class="absolute bottom-20 left-1/3 text-7xl rotate-45">@</div>
-        <div class="absolute bottom-40 right-1/4 text-9xl -rotate-12">#</div>
-        <div class="absolute top-1/2 left-1/2 text-8xl rotate-180">&</div>
-      </div>
+    <div class="min-h-screen flex flex-col" style="background-color: var(--color-base, #FAF9F6)">
+      {/* Theme Switcher */}
+      <ThemeIsland />
 
       {/* Header */}
-      <header class="border-b-4 border-soft-black bg-gradient-to-r from-peach via-white to-soft-yellow relative">
+      <header class="border-b-4" style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)">
         <div class="max-w-6xl mx-auto px-4 py-6">
           <div class="flex items-start justify-between">
             <div>
-              <h1 class="text-5xl font-bold flex items-baseline gap-3">
-                <span class="text-soft-black animate-pulse-soft">💾</span>
-                <span class="tracking-tight">ASCIIFIER</span>
-                <span class="text-xs bg-hot-pink text-white px-2 py-1 rounded-full font-normal">v2.0</span>
-              </h1>
-              <p class="text-lg mt-2 font-mono text-soft-black">
+              <a href="/" class="group">
+                <h1 class="text-5xl font-bold flex items-baseline gap-3 cursor-pointer">
+                  <span class="animate-pulse-soft group-hover:animate-spin">💾</span>
+                  <span class="tracking-tight" style="color: var(--color-text, #0A0A0A)">ASCIIFIER</span>
+                  <span class="text-xs text-white px-2 py-1 rounded-full font-normal" style="background-color: var(--color-accent, #FF69B4)">v2.0</span>
+                </h1>
+              </a>
+              <p class="text-lg mt-2 font-mono" style="color: var(--color-text, #0A0A0A)">
                 Pics → Text art.
                 <br/>
                 Zero friction.
               </p>
             </div>
             <div class="text-right space-y-1">
-              <div class="inline-block bg-terminal-green text-black px-3 py-1 rounded-full text-xs font-bold animate-glow">
+              <div class="inline-block px-3 py-1 rounded-full text-xs font-bold animate-pulse" style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6)">
                 • LIVE
               </div>
-              <p class="text-xs font-mono text-soft-black opacity-60">
+              <p class="text-xs font-mono opacity-60" style="color: var(--color-text, #0A0A0A)">
                 Drop. Convert. Ship.
               </p>
             </div>
@@ -41,27 +38,28 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main class="max-w-6xl mx-auto px-4 py-8 relative z-10">
+      <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
         <Dropzone />
       </main>
 
       {/* Footer */}
-      <footer class="border-t-4 border-soft-black mt-16 py-8 bg-gradient-to-r from-soft-mint via-white to-soft-blue relative">
+      <footer class="border-t-4 py-8" style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)">
         <div class="max-w-4xl mx-auto text-center space-y-3">
           <div class="flex items-center justify-center gap-4 text-sm font-mono">
-            <span class="text-soft-black">Built with</span>
-            <span class="text-hot-pink font-bold animate-bounce-subtle inline-block">80/20 energy</span>
-            <span class="text-soft-black">by</span>
-            <span class="text-soft-purple font-bold">Pablo 🎸</span>
+            <span style="color: var(--color-text, #0A0A0A)">Built with</span>
+            <span class="font-bold animate-bounce-subtle inline-block" style="color: var(--color-accent, #FF69B4)">80/20 energy</span>
+            <span style="color: var(--color-text, #0A0A0A)">by</span>
+            <span class="font-bold" style="color: var(--color-text, #0A0A0A)">Pablo 🎸</span>
           </div>
-          <div class="text-xs space-y-1 text-soft-black opacity-80">
+          <div class="text-xs space-y-1 opacity-80" style="color: var(--color-text, #0A0A0A)">
             <p>No scale. No data harvesting. No complexity theatre.</p>
-            <p>Just text art that slaps. Free forever. • <span class="text-hot-pink">$0</span></p>
+            <p>Just text art that slaps. Free forever. • <span style="color: var(--color-accent, #FF69B4)">$0</span></p>
           </div>
           <div class="pt-2">
             <a
               href="https://github.com/pibulus/asciifier"
-              class="inline-flex items-center gap-2 px-4 py-2 bg-soft-black text-white rounded-lg text-xs font-mono hover:animate-spring hover:shadow-brutal-sm transition-all"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono hover:animate-spring hover:shadow-brutal-sm transition-all"
+              style="background-color: var(--color-text, #0A0A0A); color: var(--color-base, #FAF9F6)"
               target="_blank"
             >
               <span>Source</span>

@@ -40,7 +40,9 @@ export class SoundEngine {
 
   // Sound effects library
   click() {
-    this.playTone(600, 0.05, 'square');
+    // Softer, more pleasant click
+    this.playTone(400, 0.03, 'sine');
+    setTimeout(() => this.playTone(800, 0.02, 'sine'), 10);
   }
 
   hover() {
