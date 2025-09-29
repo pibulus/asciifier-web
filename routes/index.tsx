@@ -14,11 +14,14 @@ export default function Home() {
                   <span class="tracking-tight" style="color: var(--color-text, #0A0A0A)">ASCIIFIER</span>
                 </h1>
               </a>
-              <p class="text-lg mt-2 font-mono" style="color: var(--color-text, #0A0A0A)">
-                The best ASCII art converter on the internet.
-                <br/>
-                <span class="text-sm opacity-80">From pixels to characters in seconds</span>
-              </p>
+              <div class="mt-3 space-y-2">
+                <p class="text-xl font-mono font-bold" style="color: var(--color-accent, #FF69B4)">
+                  Turn ANYTHING into text art
+                </p>
+                <p class="text-sm font-mono opacity-90 leading-relaxed" style="color: var(--color-text, #0A0A0A)">
+                  Images, text, memes, screenshots → Beautiful ASCII art that works everywhere
+                </p>
+              </div>
             </div>
             <ThemeIsland />
           </div>

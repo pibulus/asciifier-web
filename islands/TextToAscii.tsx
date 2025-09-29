@@ -26,17 +26,26 @@ export default function TextToAscii() {
 
     setIsGenerating(true);
     try {
-      // Import figlet dynamically
-      const figlet = await import("figlet");
-
-      const result = figlet.textSync(inputText.value.slice(0, 20), { // Limit to 20 chars for performance
-        font: selectedFont.value as any,
-        horizontalLayout: "fitted",
-        verticalLayout: "fitted",
+      // Call server-side figlet API
+      const response = await fetch("/api/figlet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: inputText.value.slice(0, 20), // Limit to 20 chars for performance
+          font: selectedFont.value,
+        }),
       });
 
-      setAsciiOutput(result);
-      sounds.success();
+      const data = await response.json();
+
+      if (data.success) {
+        setAsciiOutput(data.ascii);
+        sounds.success();
+      } else {
+        throw new Error(data.error || "Failed to generate ASCII text");
+      }
     } catch (error) {
       console.error("Error generating ASCII text:", error);
       setAsciiOutput("Error: Could not generate ASCII text");
