@@ -31,16 +31,17 @@ const BORDER_STYLES = [
   { name: "Block", value: "block" },
 ];
 
-// Enhanced color effects
+// Enhanced color effects - fun ones first!
 const COLOR_EFFECTS = [
-  { name: "Plain", value: "none" },
   { name: "Unicorn", value: "unicorn" },
+  { name: "Cyberpunk", value: "cyberpunk" },
+  { name: "Sunrise", value: "sunrise" },
+  { name: "Vaporwave", value: "vaporwave" },
   { name: "Fire", value: "fire" },
+  { name: "Bloody", value: "bloody" },
   { name: "Angel", value: "angel" },
   { name: "Chrome", value: "chrome" },
-  { name: "Sunrise", value: "sunrise" },
-  { name: "Cyberpunk", value: "cyberpunk" },
-  { name: "Bloody", value: "bloody" },
+  { name: "Plain", value: "none" },
 ];
 
 export default function TextToAscii() {
@@ -75,6 +76,21 @@ export default function TextToAscii() {
       setTimeout(() => setAllSelected(false), 600);
     }
   }, [fontChanged, colorChanged, borderChanged]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setFontDropdownOpen(false);
+      setColorDropdownOpen(false);
+      setBorderDropdownOpen(false);
+      setExportMenuOpen(false);
+    };
+
+    if (fontDropdownOpen || colorDropdownOpen || borderDropdownOpen || exportMenuOpen) {
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [fontDropdownOpen, colorDropdownOpen, borderDropdownOpen, exportMenuOpen]);
 
   const generateAscii = async () => {
     if (!inputText.value.trim()) {
@@ -415,12 +431,16 @@ export default function TextToAscii() {
         <div class={`grid grid-cols-1 md:grid-cols-3 gap-6 ${allSelected ? 'animate-wiggle' : ''}`}>
           {/* Font Dropdown */}
           <div class="relative">
+            <label class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider" style="color: var(--color-text, #0A0A0A);">
+              Font
+            </label>
             <div
               class="magic-select w-full px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5"
               style={fontChanged
                 ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
                 : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 sounds.click();
                 setFontDropdownOpen(!fontDropdownOpen);
                 setColorDropdownOpen(false);
@@ -434,8 +454,8 @@ export default function TextToAscii() {
             </div>
             {fontDropdownOpen && (
               <div
-                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden custom-dropdown"
-                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 320px; overflow-y: auto;"
+                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden dropdown-scrollbar animate-dropdown-open"
+                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 400px; overflow-y: auto;"
               >
                 {FIGLET_FONTS.map((font) => (
                   <div
@@ -460,12 +480,16 @@ export default function TextToAscii() {
 
           {/* Color Dropdown */}
           <div class="relative">
+            <label class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider" style="color: var(--color-text, #0A0A0A);">
+              Color
+            </label>
             <div
               class="magic-select w-full px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5"
               style={colorChanged
                 ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
                 : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 sounds.click();
                 setColorDropdownOpen(!colorDropdownOpen);
                 setFontDropdownOpen(false);
@@ -479,8 +503,8 @@ export default function TextToAscii() {
             </div>
             {colorDropdownOpen && (
               <div
-                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden"
-                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden dropdown-scrollbar animate-dropdown-open"
+                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 400px; overflow-y: auto;"
               >
                 {COLOR_EFFECTS.map((effect) => (
                   <div
@@ -505,12 +529,16 @@ export default function TextToAscii() {
 
           {/* Border Dropdown */}
           <div class="relative">
+            <label class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider" style="color: var(--color-text, #0A0A0A);">
+              Border
+            </label>
             <div
               class="magic-select w-full px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5"
               style={borderChanged
                 ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
                 : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 sounds.click();
                 setBorderDropdownOpen(!borderDropdownOpen);
                 setFontDropdownOpen(false);
@@ -524,8 +552,8 @@ export default function TextToAscii() {
             </div>
             {borderDropdownOpen && (
               <div
-                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden"
-                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden dropdown-scrollbar animate-dropdown-open"
+                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 400px; overflow-y: auto;"
               >
                 {BORDER_STYLES.map((border) => (
                   <div
@@ -569,7 +597,7 @@ export default function TextToAscii() {
           </div>
           <div
             class="p-8 overflow-auto custom-scrollbar"
-            style="height: 400px;"
+            style="height: 320px;"
           >
             {asciiOutput ? (
               <pre
@@ -759,13 +787,24 @@ export default function TextToAscii() {
           animation: slideUpFast 0.2s ease-out;
         }
 
-        /* Hide scrollbars completely */
-        .custom-dropdown {
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE/Edge */
+        /* Dropdown scrollbar styling */
+        .dropdown-scrollbar::-webkit-scrollbar {
+          width: 8px;
         }
-        .custom-dropdown::-webkit-scrollbar {
-          display: none; /* Chrome/Safari/Opera */
+        .dropdown-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .dropdown-scrollbar::-webkit-scrollbar-thumb {
+          background: var(--color-accent, #FF69B4);
+          border-radius: 4px;
+        }
+        .dropdown-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: var(--color-border, #0A0A0A);
+        }
+        /* Firefox scrollbar */
+        .dropdown-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: var(--color-accent, #FF69B4) transparent;
         }
 
         /* Custom Scrollbar for output terminal only */
@@ -807,6 +846,26 @@ export default function TextToAscii() {
 
         .animate-fade-in {
           animation: fadeIn 0.3s ease-in;
+        }
+
+        /* Dropdown open animation - light bounce */
+        @keyframes dropdownOpen {
+          0% {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.95);
+          }
+          60% {
+            opacity: 1;
+            transform: translateY(2px) scale(1.01);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        .animate-dropdown-open {
+          animation: dropdownOpen 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         /* Whimsical Spring Physics - Real bounce using linear() */

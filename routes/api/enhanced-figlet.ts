@@ -249,6 +249,14 @@ function getEffectColor(
       const bloodyBright = 40 + (bloodyProgress * 30); // Mid red to bright red
       return `hsl(0, 100%, ${bloodyBright}%)`;
 
+    case "vaporwave":
+      // Vaporwave - nostalgic 80s/90s aesthetic with pink, cyan, purple
+      const vaporProgress = y / totalLines;
+      const vaporHue = 280 + (vaporProgress * 80); // Purple (280) → Pink (320) → Hot Pink (340)
+      const vaporSat = 80 + Math.sin((x + y) * 0.3) * 15;
+      const vaporBright = 65 + Math.sin(x * 0.4) * 10;
+      return `hsl(${vaporHue}, ${vaporSat}%, ${vaporBright}%)`;
+
     case "none":
     default:
       // Plain terminal green

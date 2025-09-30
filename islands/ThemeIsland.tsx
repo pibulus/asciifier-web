@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState, useRef } from "preact/hooks";
 import { createThemeSystem, type Theme } from "../theme-system/mod.ts";
 import {
   asciifierThemeConfig,
@@ -11,6 +11,9 @@ export default function ThemeIsland() {
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
   const [showPicker, setShowPicker] = useState(false);
   const [themeSystem] = useState(() => createThemeSystem(asciifierThemeConfig));
+  const [grainLevel, setGrainLevel] = useState(0.08); // Default grain
+  const [scanLevel, setScanLevel] = useState(0.03); // Default scanlines
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Initialize theme system and load saved theme
@@ -25,8 +28,47 @@ export default function ThemeIsland() {
     // Initialize sounds
     sounds.init();
 
+    // Load saved vintage settings
+    const savedGrain = localStorage.getItem("vintage-grain");
+    const savedScan = localStorage.getItem("vintage-scan");
+    if (savedGrain) setGrainLevel(parseFloat(savedGrain));
+    if (savedScan) setScanLevel(parseFloat(savedScan));
+
     return unsubscribe;
   }, []);
+
+  // Update vintage effects when sliders change
+  useEffect(() => {
+    // Update the grain layer
+    const grainLayer = document.getElementById("grain-layer");
+    if (grainLayer) {
+      (grainLayer as HTMLElement).style.opacity = grainLevel.toString();
+    }
+    // Update the scanline layer
+    const scanLayer = document.getElementById("scan-layer");
+    if (scanLayer) {
+      (scanLayer as HTMLElement).style.opacity = scanLevel.toString();
+    }
+    // Save settings
+    localStorage.setItem("vintage-grain", grainLevel.toString());
+    localStorage.setItem("vintage-scan", scanLevel.toString());
+  }, [grainLevel, scanLevel]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowPicker(false);
+      }
+    };
+
+    if (showPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [showPicker]);
 
   const handleThemeChange = (theme: Theme) => {
     sounds.click();
@@ -59,7 +101,7 @@ export default function ThemeIsland() {
   };
 
   return (
-    <div class="relative">
+    <div class="relative" ref={dropdownRef}>
       {/* Theme Toggle Button */}
       <button
         onClick={() => setShowPicker(!showPicker)}
@@ -125,6 +167,63 @@ export default function ThemeIsland() {
                 <span class="uppercase">random</span>
               </span>
             </button>
+
+            {/* Divider */}
+            <div class="my-3 border-t-2 opacity-20" style="border-color: var(--color-border, #0A0A0A)"></div>
+
+            {/* Vintage Controls */}
+            <div class="space-y-3">
+              {/* Grain Slider - now goes up to 50%! */}
+              <div>
+                <label class="flex items-center justify-between text-xs font-mono mb-1" style="color: var(--color-text, #0A0A0A)">
+                  <span class="uppercase font-bold">Grain</span>
+                  <span class="opacity-60">{Math.round(grainLevel * 100)}%</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="0.5"
+                  step="0.01"
+                  value={grainLevel}
+                  onInput={(e) => setGrainLevel(parseFloat((e.target as HTMLInputElement).value))}
+                  class="w-full h-2 rounded-full outline-none cursor-pointer"
+                  style={`
+                    background: linear-gradient(to right,
+                      var(--color-accent, #FF69B4) 0%,
+                      var(--color-accent, #FF69B4) ${(grainLevel / 0.5) * 100}%,
+                      var(--color-secondary, #FFE5B4) ${(grainLevel / 0.5) * 100}%,
+                      var(--color-secondary, #FFE5B4) 100%);
+                    -webkit-appearance: none;
+                  `}
+                />
+              </div>
+
+              {/* Scan Slider - reduced max to 20% */}
+              <div>
+                <label class="flex items-center justify-between text-xs font-mono mb-1" style="color: var(--color-text, #0A0A0A)">
+                  <span class="uppercase font-bold">Scan</span>
+                  <span class="opacity-60">{Math.round(scanLevel * 100)}%</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="0.2"
+                  step="0.01"
+                  value={scanLevel}
+                  onInput={(e) => setScanLevel(parseFloat((e.target as HTMLInputElement).value))}
+                  class="w-full h-2 rounded-full outline-none cursor-pointer"
+                  style={`
+                    background: linear-gradient(to right,
+                      var(--color-accent, #FF69B4) 0%,
+                      var(--color-accent, #FF69B4) ${(scanLevel / 0.2) * 100}%,
+                      var(--color-secondary, #FFE5B4) ${(scanLevel / 0.2) * 100}%,
+                      var(--color-secondary, #FFE5B4) 100%);
+                    -webkit-appearance: none;
+                  `}
+                />
+              </div>
+
+            </div>
           </div>
         </div>
       )}
