@@ -2,79 +2,45 @@ import { useSignal } from "@preact/signals";
 import { useEffect, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 
-// Available figlet fonts - 35+ options organized by category!
+// Curated figlet fonts - hand-picked fonts for the ASCII Factory!
 const FIGLET_FONTS = [
-  // Classic fonts
-  { name: "Standard", file: "Standard", category: "classic" },
-  { name: "Big", file: "Big", category: "classic" },
-  { name: "Slant", file: "Slant", category: "classic" },
-  { name: "Small", file: "Small", category: "classic" },
-  { name: "Banner", file: "Banner", category: "classic" },
-  { name: "Block", file: "Block", category: "classic" },
-  { name: "Bubble", file: "Bubble", category: "classic" },
-  { name: "Digital", file: "Digital", category: "classic" },
-  { name: "Ivrit", file: "Ivrit", category: "classic" },
-  { name: "Mini", file: "Mini", category: "classic" },
-  { name: "Script", file: "Script", category: "classic" },
-  { name: "Shadow", file: "Shadow", category: "classic" },
-
-  // 3D fonts
-  { name: "3D-ASCII", file: "3-D", category: "3d" },
-  { name: "3x5", file: "3x5", category: "3d" },
-  { name: "5 Line Oblique", file: "5 Line Oblique", category: "3d" },
-  { name: "Alphabet", file: "Alphabet", category: "3d" },
-  { name: "Isometric1", file: "Isometric1", category: "3d" },
-  { name: "Isometric2", file: "Isometric2", category: "3d" },
-  { name: "Isometric3", file: "Isometric3", category: "3d" },
-  { name: "Isometric4", file: "Isometric4", category: "3d" },
-
-  // Cool/Modern fonts
-  { name: "Doom", file: "Doom", category: "modern" },
-  { name: "Epic", file: "Epic", category: "modern" },
-  { name: "Poison", file: "Poison", category: "modern" },
-  { name: "Alligator", file: "Alligator", category: "modern" },
-  { name: "Avatar", file: "Avatar", category: "modern" },
-  { name: "Big Chief", file: "Big Chief", category: "modern" },
-  { name: "Broadway", file: "Broadway", category: "modern" },
-  { name: "Crazy", file: "Crazy", category: "modern" },
-  { name: "Ghost", file: "Ghost", category: "modern" },
-  { name: "Gothic", file: "Gothic", category: "modern" },
-  { name: "Graffiti", file: "Graffiti", category: "modern" },
-  { name: "Sub-Zero", file: "Sub-Zero", category: "modern" },
-  { name: "Swamp Land", file: "Swamp Land", category: "modern" },
-
-  // Special/Fun fonts
-  { name: "Star Wars", file: "Star Wars", category: "fun" },
-  { name: "Sweet", file: "Sweet", category: "fun" },
-  { name: "Weird", file: "Weird", category: "fun" },
-  { name: "Fire Font-s", file: "Fire Font-s", category: "fun" },
-  { name: "Fuzzy", file: "Fuzzy", category: "fun" },
-  { name: "Bloody", file: "Bloody", category: "fun" },
-  { name: "Colossal", file: "Colossal", category: "fun" },
-  { name: "Calgphy2", file: "Calgphy2", category: "fun" },
-  { name: "Crawford", file: "Crawford", category: "fun" },
+  { name: "Standard", file: "Standard" },
+  { name: "Doom", file: "Doom" },
+  { name: "Slant", file: "Slant" },
+  { name: "Shadow", file: "Shadow" },
+  { name: "Ghost", file: "Ghost" },
+  { name: "Bloody", file: "Bloody" },
+  { name: "Colossal", file: "Colossal" },
+  { name: "Isometric3", file: "Isometric3" },
+  { name: "Poison", file: "Poison" },
+  { name: "Speed", file: "Speed" },
+  { name: "Star Wars", file: "Star Wars" },
+  { name: "Small", file: "Small" },
+  { name: "Chunky", file: "Chunky" },
+  { name: "Larry 3D", file: "Larry 3D" },
+  { name: "Banner", file: "Banner" },
+  { name: "Block", file: "Block" },
+  { name: "Big", file: "Big" },
 ];
 
 // Border styles for ASCII art
 const BORDER_STYLES = [
-  { name: "⬜ None", value: "none" },
-  { name: "─ Single", value: "single" },
-  { name: "═ Double", value: "double" },
-  { name: "█ Block", value: "block" },
-  { name: "┌ Angles", value: "angles" },
-  { name: "╭ Round", value: "round" },
+  { name: "None", value: "none" },
+  { name: "Single", value: "single" },
+  { name: "Double", value: "double" },
+  { name: "Block", value: "block" },
 ];
 
 // Enhanced color effects
 const COLOR_EFFECTS = [
-  { name: "⚫ Plain", value: "none" },
-  { name: "🌈 Rainbow", value: "rainbow" },
-  { name: "🔥 Fire", value: "fire" },
-  { name: "🌊 Ocean", value: "ocean" },
-  { name: "🦄 Unicorn", value: "unicorn" },
-  { name: "🔋 Matrix", value: "matrix" },
-  { name: "🔩 Metal", value: "metal" },
-  { name: "✨ Chrome", value: "chrome" },
+  { name: "Plain", value: "none" },
+  { name: "Rainbow", value: "rainbow" },
+  { name: "Fire", value: "fire" },
+  { name: "Ocean", value: "ocean" },
+  { name: "Unicorn", value: "unicorn" },
+  { name: "Matrix", value: "matrix" },
+  { name: "Metal", value: "metal" },
+  { name: "Chrome", value: "chrome" },
 ];
 
 export default function TextToAscii() {
@@ -83,12 +49,31 @@ export default function TextToAscii() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [copiedFormat, setCopiedFormat] = useState("");
-  const [showAdvancedFonts, setShowAdvancedFonts] = useState(false);
+
+  // Dropdown states
+  const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
+  const [colorDropdownOpen, setColorDropdownOpen] = useState(false);
+  const [borderDropdownOpen, setBorderDropdownOpen] = useState(false);
+  const [allSelected, setAllSelected] = useState(false);
+  const [fontChanged, setFontChanged] = useState(false);
+  const [colorChanged, setColorChanged] = useState(false);
+  const [borderChanged, setBorderChanged] = useState(false);
 
   const inputText = useSignal("");
   const selectedFont = useSignal("Standard");
   const colorEffect = useSignal("none");
   const borderStyle = useSignal("none");
+
+  // Check if all three dropdowns have been changed from default
+  useEffect(() => {
+    const allHaveChanged = fontChanged && colorChanged && borderChanged;
+    if (allHaveChanged && !allSelected) {
+      setAllSelected(true);
+      sounds.success(); // Play success sound on wiggle!
+      // Trigger wiggle animation
+      setTimeout(() => setAllSelected(false), 600);
+    }
+  }, [fontChanged, colorChanged, borderChanged]);
 
   const generateAscii = async () => {
     if (!inputText.value.trim()) {
@@ -398,13 +383,7 @@ export default function TextToAscii() {
   return (
     <div class="max-w-4xl mx-auto px-4 py-8">
       {/* Text Input Section */}
-      <div class="mb-10">
-        <label
-          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
-          style="color: var(--color-text, #0A0A0A);"
-        >
-          ✨ YOUR TEXT
-        </label>
+      <div class="mb-6">
         <div class="relative">
           <input
             type="text"
@@ -413,7 +392,7 @@ export default function TextToAscii() {
               sounds.click();
               inputText.value = (e.target as HTMLInputElement).value;
             }}
-            placeholder="Type something magical..."
+            placeholder="Type something magical... ✨"
             maxLength={20}
             class="w-full px-8 py-5 border-4 rounded-3xl font-mono text-2xl font-black focus:outline-none transition-all hover:scale-[1.005] focus:scale-[1.01] shadow-brutal"
             style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"
@@ -429,8 +408,192 @@ export default function TextToAscii() {
         </div>
       </div>
 
-      {/* Output Section - Appears after text entry */}
-      {asciiOutput && (
+      {/* ASCII FACTORY JUKEBOX - Three Dropdown Combo Machine! */}
+      <div class="mb-4">
+        {/* Three Dropdown Reels Side by Side */}
+        <div class={`grid grid-cols-1 md:grid-cols-3 gap-4 ${allSelected ? 'animate-wiggle' : ''}`}>
+          {/* Font Dropdown */}
+          <div class="relative">
+            <div
+              class="magic-select w-full px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5"
+              style={fontChanged
+                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+                : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
+              onClick={() => {
+                sounds.click();
+                setFontDropdownOpen(!fontDropdownOpen);
+                setColorDropdownOpen(false);
+                setBorderDropdownOpen(false);
+              }}
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-base">{FIGLET_FONTS.find(f => f.file === selectedFont.value)?.name || "Standard"}</span>
+                <span class="text-lg transition-transform" style={`color: var(--color-accent, #FF69B4); transform: rotate(${fontDropdownOpen ? '180' : '0'}deg);`}>▼</span>
+              </div>
+            </div>
+            {fontDropdownOpen && (
+              <div
+                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden custom-dropdown"
+                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 320px; overflow-y: auto;"
+              >
+                {FIGLET_FONTS.map((font) => (
+                  <div
+                    key={font.file}
+                    class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
+                    style={`background-color: ${selectedFont.value === font.file ? 'var(--color-accent, #FF69B4)' : 'transparent'}; color: ${selectedFont.value === font.file ? 'var(--color-base, #FAF9F6)' : 'var(--color-text, #0A0A0A)'};`}
+                    onClick={() => {
+                      sounds.click();
+                      selectedFont.value = font.file;
+                      setFontChanged(true);
+                      setFontDropdownOpen(false);
+                    }}
+                    onMouseEnter={() => sounds.hover && sounds.hover()}
+                  >
+                    {selectedFont.value === font.file && <span class="mr-2">✓</span>}
+                    {font.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Color Dropdown */}
+          <div class="relative">
+            <div
+              class="magic-select w-full px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5"
+              style={colorChanged
+                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+                : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
+              onClick={() => {
+                sounds.click();
+                setColorDropdownOpen(!colorDropdownOpen);
+                setFontDropdownOpen(false);
+                setBorderDropdownOpen(false);
+              }}
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-base">{COLOR_EFFECTS.find(e => e.value === colorEffect.value)?.name || "Plain"}</span>
+                <span class="text-lg transition-transform" style={`color: var(--color-accent, #FF69B4); transform: rotate(${colorDropdownOpen ? '180' : '0'}deg);`}>▼</span>
+              </div>
+            </div>
+            {colorDropdownOpen && (
+              <div
+                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden"
+                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+              >
+                {COLOR_EFFECTS.map((effect) => (
+                  <div
+                    key={effect.value}
+                    class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
+                    style={`background-color: ${colorEffect.value === effect.value ? 'var(--color-accent, #FF69B4)' : 'transparent'}; color: ${colorEffect.value === effect.value ? 'var(--color-base, #FAF9F6)' : 'var(--color-text, #0A0A0A)'};`}
+                    onClick={() => {
+                      sounds.click();
+                      colorEffect.value = effect.value;
+                      setColorChanged(true);
+                      setColorDropdownOpen(false);
+                    }}
+                    onMouseEnter={() => sounds.hover && sounds.hover()}
+                  >
+                    {colorEffect.value === effect.value && <span class="mr-2">✓</span>}
+                    {effect.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Border Dropdown */}
+          <div class="relative">
+            <div
+              class="magic-select w-full px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5"
+              style={borderChanged
+                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+                : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
+              onClick={() => {
+                sounds.click();
+                setBorderDropdownOpen(!borderDropdownOpen);
+                setFontDropdownOpen(false);
+                setColorDropdownOpen(false);
+              }}
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-base">{BORDER_STYLES.find(b => b.value === borderStyle.value)?.name || "None"}</span>
+                <span class="text-lg transition-transform" style={`color: var(--color-accent, #FF69B4); transform: rotate(${borderDropdownOpen ? '180' : '0'}deg);`}>▼</span>
+              </div>
+            </div>
+            {borderDropdownOpen && (
+              <div
+                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden"
+                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+              >
+                {BORDER_STYLES.map((border) => (
+                  <div
+                    key={border.value}
+                    class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
+                    style={`background-color: ${borderStyle.value === border.value ? 'var(--color-accent, #FF69B4)' : 'transparent'}; color: ${borderStyle.value === border.value ? 'var(--color-base, #FAF9F6)' : 'var(--color-text, #0A0A0A)'};`}
+                    onClick={() => {
+                      sounds.click();
+                      borderStyle.value = border.value;
+                      setBorderChanged(true);
+                      setBorderDropdownOpen(false);
+                    }}
+                    onMouseEnter={() => sounds.hover && sounds.hover()}
+                  >
+                    {borderStyle.value === border.value && <span class="mr-2">✓</span>}
+                    {border.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Terminal Display - Always visible */}
+      <div class="mb-10">
+        <div
+          class="rounded-3xl border-4 shadow-brutal overflow-hidden"
+          style="background-color: #000000; border-color: var(--color-border, #0A0A0A);"
+        >
+          <div
+            class="px-4 py-3 border-b-4 flex items-center justify-between"
+            style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)"
+          >
+            <div class="flex space-x-2">
+              <div class="w-3 h-3 bg-red-500 rounded-full hover:scale-125 transition-transform cursor-pointer" title="Close (jk)"></div>
+              <div class="w-3 h-3 bg-yellow-500 rounded-full hover:scale-125 transition-transform cursor-pointer" title="Minimize (nope)"></div>
+              <div class="w-3 h-3 bg-green-500 rounded-full hover:scale-125 transition-transform cursor-pointer" title="Full screen (maybe)"></div>
+            </div>
+            <span class="text-xs font-mono opacity-60">~/output/text-art.txt</span>
+          </div>
+          <div
+            class="p-6 overflow-auto custom-scrollbar"
+            style="max-height: 40vh; min-height: 200px;"
+          >
+            {asciiOutput ? (
+              <pre
+                class="ascii-display leading-tight"
+                style="color: #00FF41; font-size: clamp(0.6rem, 1.4vw, 0.9rem); font-family: monospace;"
+                dangerouslySetInnerHTML={{
+                  __html: colorEffect.value === "none"
+                    ? asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                    : (htmlOutput ||
+                      asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")),
+                }}
+              />
+            ) : (
+              <div class="flex items-center">
+                <pre class="font-mono text-lg" style="color: #00FF41;">
+                  <span class="blinking-cursor">█</span>
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Hidden - keeping for structure */}
+      {false && (
         <div class="mb-10 animate-slide-up">
           <div
             class="rounded-3xl border-4 shadow-brutal overflow-hidden"
@@ -480,155 +643,16 @@ export default function TextToAscii() {
         </div>
       )}
 
-      {/* Font Style Section */}
-      <div class="mb-10">
-        <label
-          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4 flex items-center justify-between"
-          style="color: var(--color-text, #0A0A0A);"
-        >
-          <span>🎨 FONT STYLE</span>
-          <button
-            onClick={() => setShowAdvancedFonts(!showAdvancedFonts)}
-            class="text-sm font-bold px-3 py-1 rounded-xl border-2 transition-all hover:scale-105"
-            style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4);"
-          >
-            {showAdvancedFonts ? "Show Less" : "Show All Fonts"}
-          </button>
-        </label>
-        <div class="grid grid-cols-3 gap-3">
-          {(showAdvancedFonts ? FIGLET_FONTS : FIGLET_FONTS.slice(0, 9)).map((
-            font,
-          ) => (
-            <button
-              key={font.file}
-              onClick={() => {
-                sounds.click();
-                selectedFont.value = font.file;
-              }}
-              class={`px-4 py-4 rounded-2xl text-sm font-bold transition-all relative overflow-hidden group ${
-                selectedFont.value === font.file
-                  ? "shadow-brutal-lg"
-                  : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
-              }`}
-              style={selectedFont.value === font.file
-                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A);"
-                : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
-            >
-              <span class="relative z-10 flex items-center justify-center">
-                {selectedFont.value === font.file && (
-                  <span class="mr-2">
-                    ✓
-                  </span>
-                )}
-                {font.name}
-              </span>
-              <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Color Effects */}
-      <div class="mb-10">
-        <label
-          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
-          style="color: var(--color-text, #0A0A0A);"
-        >
-          🌈 COLOR MAGIC
-        </label>
-        <div class="grid grid-cols-3 gap-4">
-          {COLOR_EFFECTS.map((effect) => (
-            <button
-              key={effect.value}
-              onClick={() => {
-                sounds.click();
-                colorEffect.value = effect.value;
-              }}
-              class={`px-5 py-5 rounded-3xl text-sm font-bold transition-all relative overflow-hidden group ${
-                colorEffect.value === effect.value
-                  ? "shadow-brutal-lg"
-                  : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
-              }`}
-              style={colorEffect.value === effect.value
-                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A);"
-                : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
-            >
-              <span class="relative z-10 flex items-center justify-center">
-                {colorEffect.value === effect.value && (
-                  <span class="mr-1">✓</span>
-                )}
-                {effect.name}
-              </span>
-              <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-              </div>
-            </button>
-          ))}
-        </div>
-        <div
-          class="text-sm font-mono opacity-60 text-center mt-4"
-          style="color: var(--color-text, #0A0A0A)"
-        >
-          {colorEffect.value === "none"
-            ? "🎭 Simple & clean"
-            : "✨ Adding color magic!"}
-        </div>
-      </div>
-
-      {/* Border Styles */}
-      <div class="mb-10">
-        <label
-          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
-          style="color: var(--color-text, #0A0A0A);"
-        >
-          🖼️ BORDER STYLE
-        </label>
-        <div class="grid grid-cols-3 gap-4">
-          {BORDER_STYLES.map((border) => (
-            <button
-              key={border.value}
-              onClick={() => {
-                sounds.click();
-                borderStyle.value = border.value;
-              }}
-              class={`px-5 py-5 rounded-3xl text-sm font-bold transition-all relative overflow-hidden group ${
-                borderStyle.value === border.value
-                  ? "shadow-brutal-lg"
-                  : "border-4 hover:shadow-brutal hover:-translate-y-1 active:translate-y-0"
-              }`}
-              style={borderStyle.value === border.value
-                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A);"
-                : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
-            >
-              <span class="relative z-10 flex items-center justify-center">
-                {borderStyle.value === border.value && (
-                  <span class="mr-1">✓</span>
-                )}
-                {border.name}
-              </span>
-              <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Export Actions */}
       <div class="mb-10">
-        <label
-          class="block text-lg font-mono font-black tracking-[0.15em] uppercase mb-4"
-          style="color: var(--color-text, #0A0A0A);"
-        >
-          📤 SHARE YOUR ART
-        </label>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          {/* Copy for Email */}
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Copy Button */}
           <button
             onClick={() => copyToClipboard("email")}
             disabled={!asciiOutput}
-            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal-lg transition-all group relative overflow-hidden ${
+            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal transition-all group relative overflow-hidden ${
               asciiOutput
-                ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                ? "hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
                 : "opacity-50 cursor-not-allowed"
             } ${
               copiedToClipboard && copiedFormat === "email"
@@ -639,83 +663,46 @@ export default function TextToAscii() {
               ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
               : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
           >
-            <span class="relative z-10 flex flex-col items-center justify-center gap-1">
-              <span class="text-base">
-                {copiedToClipboard && copiedFormat === "email"
-                  ? "✅ COPIED!"
-                  : "📧 COPY FOR EMAIL"}
-              </span>
-              <span class="text-xs opacity-80">Rich colors preserved</span>
+            <span class="relative z-10 flex items-center justify-center text-lg">
+              {copiedToClipboard && copiedFormat === "email" ? "✅ COPIED!" : "📋 COPY"}
             </span>
             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
           </button>
 
-          {/* Copy for Messages */}
-          <button
-            onClick={() => copyToClipboard("message")}
-            disabled={!asciiOutput}
-            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal-lg transition-all group relative overflow-hidden ${
-              asciiOutput
-                ? "hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
-                : "opacity-50 cursor-not-allowed"
-            } ${
-              copiedToClipboard && copiedFormat === "message"
-                ? "animate-bounce-once"
-                : ""
-            }`}
-            style={copiedToClipboard && copiedFormat === "message"
-              ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
-              : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
-          >
-            <span class="relative z-10 flex flex-col items-center justify-center gap-1">
-              <span class="text-base">
-                {copiedToClipboard && copiedFormat === "message"
-                  ? "✅ COPIED!"
-                  : "💬 COPY FOR MESSAGES"}
-              </span>
-              <span class="text-xs opacity-80">Works everywhere</span>
-            </span>
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-            </div>
-          </button>
-        </div>
-
-        {/* Download Options */}
-        <div class="grid grid-cols-2 gap-4">
+          {/* TXT Download */}
           <button
             onClick={downloadText}
             disabled={!asciiOutput}
-            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
+            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal transition-all group relative overflow-hidden ${
               asciiOutput
-                ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
+                ? "hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
                 : "opacity-50 cursor-not-allowed"
             }`}
-            style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+            style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
           >
-            <span class="relative z-10 flex flex-col items-center justify-center gap-1">
-              <span class="text-base">💾 DOWNLOAD TXT</span>
-              <span class="text-xs opacity-60">Plain text file</span>
+            <span class="relative z-10 flex items-center justify-center text-lg">
+              💾 TXT
             </span>
-            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
           </button>
 
+          {/* PNG Download */}
           <button
             onClick={downloadPNG}
             disabled={!asciiOutput}
-            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black transition-all group relative overflow-hidden ${
+            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal transition-all group relative overflow-hidden ${
               asciiOutput
-                ? "shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
+                ? "hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
                 : "opacity-50 cursor-not-allowed"
             }`}
-            style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
+            style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
           >
-            <span class="relative z-10 flex flex-col items-center justify-center gap-1">
-              <span class="text-base">🖼️ DOWNLOAD PNG</span>
-              <span class="text-xs opacity-60">Perfect screenshot</span>
+            <span class="relative z-10 flex items-center justify-center text-lg">
+              🖼️ PNG
             </span>
-            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-200/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
           </button>
         </div>
@@ -723,7 +710,26 @@ export default function TextToAscii() {
 
       <style>
         {`
-        /* Custom Scrollbar */
+        /* Blinking cursor animation */
+        @keyframes blink {
+          0%, 49% { opacity: 1; }
+          50%, 100% { opacity: 0; }
+        }
+
+        .blinking-cursor {
+          animation: blink 1s infinite;
+        }
+
+        /* Hide scrollbars completely */
+        .custom-dropdown {
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE/Edge */
+        }
+        .custom-dropdown::-webkit-scrollbar {
+          display: none; /* Chrome/Safari/Opera */
+        }
+
+        /* Custom Scrollbar for output terminal only */
         .custom-scrollbar::-webkit-scrollbar {
           width: 12px;
         }
@@ -797,11 +803,22 @@ export default function TextToAscii() {
           animation: gentlePulse 2s ease-in-out infinite;
         }
 
-        /* Micro Wiggle on Hover */
+        /* Wiggle Animation for All Selected */
         @keyframes wiggle {
           0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(0.5deg); }
-          75% { transform: rotate(-0.5deg); }
+          10% { transform: rotate(2deg); }
+          20% { transform: rotate(-2deg); }
+          30% { transform: rotate(2deg); }
+          40% { transform: rotate(-2deg); }
+          50% { transform: rotate(1deg); }
+          60% { transform: rotate(-1deg); }
+          70% { transform: rotate(0.5deg); }
+          80% { transform: rotate(-0.5deg); }
+          90% { transform: rotate(0deg); }
+        }
+
+        .animate-wiggle {
+          animation: wiggle 0.6s ease-in-out;
         }
 
         .hover\\:animate-wiggle:hover {

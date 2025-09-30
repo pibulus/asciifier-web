@@ -6,7 +6,9 @@
       "Bash(open:*)",
       "WebSearch",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "Bash(bash:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

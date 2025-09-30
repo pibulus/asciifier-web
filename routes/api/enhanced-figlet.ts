@@ -104,6 +104,9 @@ export const handler = async (
         "Fire Font-s",
         "Fuzzy",
         "Bloody",
+        "Speed",
+        "Chunky",
+        "Larry 3D",
       ];
 
       // Validate and fallback font
