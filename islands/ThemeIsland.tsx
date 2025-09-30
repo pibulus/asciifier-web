@@ -77,7 +77,7 @@ export default function ThemeIsland() {
       {showPicker && (
         <div
           class="absolute top-full right-0 mt-2 w-48 rounded-lg shadow-brutal overflow-hidden animate-slide-up z-50"
-          style="background-color: var(--color-base-solid, var(--color-base, #FAF9F6)); border: 3px solid var(--color-border, #0A0A0A)"
+          style="background-color: var(--color-base, #FAF9F6); border: 3px solid var(--color-border, #0A0A0A)"
         >
           <div class="p-3 font-mono">
             {/* Only show the two main themes */}

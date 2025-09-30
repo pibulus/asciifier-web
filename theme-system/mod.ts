@@ -97,13 +97,15 @@ export class ThemeSystem {
       });
     }
 
-    // Handle gradients
+    // Handle gradients and always set both solid and gradient versions
     if (theme.base.includes("gradient")) {
       this.setCSSVar(root, `${prefix}-base-gradient`, theme.base);
       // Extract a solid fallback color from gradient if possible
       const fallback = this.extractColorFromGradient(theme.base) || "#FAF9F6";
+      this.setCSSVar(root, `${prefix}-base`, fallback);
       this.setCSSVar(root, `${prefix}-base-solid`, fallback);
     } else {
+      this.setCSSVar(root, `${prefix}-base`, theme.base);
       this.setCSSVar(root, `${prefix}-base-gradient`, theme.base);
       this.setCSSVar(root, `${prefix}-base-solid`, theme.base);
     }
