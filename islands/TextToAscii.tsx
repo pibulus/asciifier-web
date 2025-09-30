@@ -381,9 +381,9 @@ export default function TextToAscii() {
   };
 
   return (
-    <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto px-4 py-8">
       {/* Text Input Section */}
-      <div class="mb-6">
+      <div class="mb-8">
         <div class="relative">
           <input
             type="text"
@@ -409,9 +409,9 @@ export default function TextToAscii() {
       </div>
 
       {/* ASCII FACTORY JUKEBOX - Three Dropdown Combo Machine! */}
-      <div class="mb-4">
+      <div class="mb-8">
         {/* Three Dropdown Reels Side by Side */}
-        <div class={`grid grid-cols-1 md:grid-cols-3 gap-4 ${allSelected ? 'animate-wiggle' : ''}`}>
+        <div class={`grid grid-cols-1 md:grid-cols-3 gap-6 ${allSelected ? 'animate-wiggle' : ''}`}>
           {/* Font Dropdown */}
           <div class="relative">
             <div
@@ -567,8 +567,8 @@ export default function TextToAscii() {
             <span class="text-xs font-mono opacity-60">~/output/text-art.txt</span>
           </div>
           <div
-            class="p-6 overflow-auto custom-scrollbar"
-            style="max-height: 40vh; min-height: 200px;"
+            class="p-8 overflow-auto custom-scrollbar"
+            style="height: 400px;"
           >
             {asciiOutput ? (
               <pre

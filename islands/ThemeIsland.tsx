@@ -76,48 +76,53 @@ export default function ThemeIsland() {
       {/* Theme Picker Dropdown */}
       {showPicker && (
         <div
-          class="absolute top-full right-0 mt-2 w-48 rounded-lg shadow-brutal overflow-hidden animate-slide-up z-50"
+          class="absolute top-full right-0 mt-2 w-56 rounded-xl shadow-brutal overflow-hidden animate-slide-up z-50"
           style="background-color: var(--color-base, #FAF9F6); border: 3px solid var(--color-border, #0A0A0A)"
         >
-          <div class="p-3 font-mono">
+          <div class="p-4 font-mono">
             {/* Only show the two main themes */}
-            <div class="space-y-2">
+            <div class="space-y-3">
               {themes.map((theme) => (
                 <button
                   key={theme.name}
                   onClick={() => handleThemeChange(theme)}
                   onMouseEnter={() => sounds.hover()}
-                  class={`w-full text-left px-4 py-3 rounded-lg text-xs font-mono hover:scale-[1.02] transition-all ${
-                    currentTheme.name === theme.name ? "ring-2" : ""
+                  class={`w-full text-center px-4 py-3 rounded-lg text-sm font-mono hover:scale-[1.02] transition-all ${
+                    currentTheme.name === theme.name ? "" : ""
                   }`}
                   style={`
                     background-color: ${theme.secondary};
                     color: ${theme.text};
-                    border: 2px solid ${theme.border};
+                    border: 3px solid ${theme.border};
                     ${
                     currentTheme.name === theme.name
-                      ? `ring-color: ${theme.accent}; box-shadow: 0 0 0 2px ${theme.accent}`
+                      ? `box-shadow: 0 0 0 2px ${theme.accent} inset`
                       : ""
                   }
                   `}
                 >
-                  <div class="flex items-center justify-between">
-                    <span class="font-bold text-sm">{theme.name.split(' ')[0]}</span>
-                    {currentTheme.name === theme.name && <span class="text-sm">✓</span>}
+                  <div class="flex items-center justify-center relative">
+                    <span class="font-black tracking-wider uppercase">{theme.name.split(' ')[0]}</span>
+                    {currentTheme.name === theme.name && (
+                      <span class="absolute right-0 text-lg">✓</span>
+                    )}
                   </div>
                 </button>
               ))}
             </div>
 
+            {/* Divider */}
+            <div class="my-3 border-t-2 opacity-20" style="border-color: var(--color-border, #0A0A0A)"></div>
+
             {/* Smart Random Theme Button - smaller and elegant */}
             <button
               onClick={generateRandomTheme}
-              class="w-full mt-2 px-2 py-1 rounded text-xs font-mono hover:scale-[1.02] transition-all opacity-80 hover:opacity-100"
-              style="background-color: var(--color-text, #0A0A0A); color: var(--color-base, #FAF9F6); border: 1px solid var(--color-border, #0A0A0A)"
+              class="w-full px-3 py-1.5 rounded-lg text-xs font-mono hover:scale-[1.02] transition-all"
+              style="background: linear-gradient(135deg, #E8E8E8 0%, #D0D0D0 100%); color: #2C2825; border: 2px solid #2C2825; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3)"
             >
-              <span class="flex items-center justify-center gap-1">
-                <span class="text-xs">🎲</span>
-                <span>random</span>
+              <span class="flex items-center justify-center gap-1.5 font-bold tracking-wide">
+                <span class="opacity-70">🎲</span>
+                <span class="uppercase">random</span>
               </span>
             </button>
           </div>

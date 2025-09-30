@@ -260,11 +260,11 @@ export class RandomThemeGenerator {
 
     if (isLight) {
       return {
-        base: this.hslToHex(baseHue, 12, 98), // Classy off-white, very subtle hue
-        secondary: this.hslToHex(secondaryHue, 35, 92), // Light, medium saturation
+        base: this.hslToHex(baseHue, 8, 98), // Very light, subtle hue
+        secondary: this.hslToHex(secondaryHue, 25, 88), // Pastel secondary
         accent: this.hslToHex(accentHue, 65, 58), // Sophisticated accent
-        text: this.hslToHex(0, 5, 15), // Classy charcoal, not pure black
-        border: this.hslToHex(0, 5, 15), // Same as text
+        text: this.hslToHex(0, 5, 15), // Always dark text for light themes
+        border: this.hslToHex(0, 5, 15), // Dark borders for contrast
       };
     } else {
       return {
