@@ -34,13 +34,13 @@ const BORDER_STYLES = [
 // Enhanced color effects
 const COLOR_EFFECTS = [
   { name: "Plain", value: "none" },
-  { name: "Rainbow", value: "rainbow" },
-  { name: "Fire", value: "fire" },
-  { name: "Ocean", value: "ocean" },
   { name: "Unicorn", value: "unicorn" },
-  { name: "Matrix", value: "matrix" },
-  { name: "Metal", value: "metal" },
+  { name: "Fire", value: "fire" },
+  { name: "Angel", value: "angel" },
   { name: "Chrome", value: "chrome" },
+  { name: "Sunrise", value: "sunrise" },
+  { name: "Cyberpunk", value: "cyberpunk" },
+  { name: "Bloody", value: "bloody" },
 ];
 
 export default function TextToAscii() {
@@ -58,6 +58,7 @@ export default function TextToAscii() {
   const [fontChanged, setFontChanged] = useState(false);
   const [colorChanged, setColorChanged] = useState(false);
   const [borderChanged, setBorderChanged] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
   const inputText = useSignal("");
   const selectedFont = useSignal("Standard");
@@ -552,7 +553,7 @@ export default function TextToAscii() {
       {/* Terminal Display - Always visible */}
       <div class="mb-10">
         <div
-          class="rounded-3xl border-4 shadow-brutal overflow-hidden"
+          class="rounded-3xl border-4 shadow-brutal overflow-hidden relative"
           style="background-color: #000000; border-color: var(--color-border, #0A0A0A);"
         >
           <div
@@ -589,6 +590,73 @@ export default function TextToAscii() {
               </div>
             )}
           </div>
+
+          {/* Floating Export Button - Appears when ASCII is ready */}
+          {asciiOutput && (
+            <div class="absolute bottom-6 left-6 z-10 animate-pop-in">
+              <div class="relative">
+                {/* Main Copy Button */}
+                <button
+                  onClick={() => copyToClipboard("email")}
+                  class={`px-6 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 flex items-center gap-2 ${
+                    copiedToClipboard ? "animate-bounce-once" : ""
+                  }`}
+                  style={copiedToClipboard
+                    ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
+                    : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
+                >
+                  <span class="text-base">
+                    {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
+                  </span>
+                  {/* Dropdown Arrow */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      sounds.click();
+                      setExportMenuOpen(!exportMenuOpen);
+                    }}
+                    class="ml-2 pl-2 border-l-2 transition-transform"
+                    style="border-color: currentColor;"
+                  >
+                    <span style={`transform: rotate(${exportMenuOpen ? '180' : '0'}deg); display: inline-block; transition: transform 0.2s;`}>
+                      ▼
+                    </span>
+                  </button>
+                </button>
+
+                {/* Export Options Menu */}
+                {exportMenuOpen && (
+                  <div
+                    class="absolute bottom-full mb-2 left-0 border-4 rounded-2xl shadow-brutal-lg overflow-hidden animate-slide-up-fast"
+                    style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); min-width: 200px;"
+                  >
+                    <button
+                      onClick={() => {
+                        downloadText();
+                        setExportMenuOpen(false);
+                      }}
+                      class="w-full px-5 py-3 font-mono font-bold text-left transition-all hover:pl-7"
+                      style="background-color: transparent; color: var(--color-text, #0A0A0A);"
+                      onMouseEnter={() => sounds.hover && sounds.hover()}
+                    >
+                      💾 Download TXT
+                    </button>
+                    <button
+                      onClick={() => {
+                        downloadPNG();
+                        setExportMenuOpen(false);
+                      }}
+                      class="w-full px-5 py-3 font-mono font-bold text-left transition-all hover:pl-7 border-t-2"
+                      style="background-color: transparent; color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                      onMouseEnter={() => sounds.hover && sounds.hover()}
+                    >
+                      🖼️ Download PNG
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -643,70 +711,6 @@ export default function TextToAscii() {
         </div>
       )}
 
-      {/* Export Actions */}
-      <div class="mb-10">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Copy Button */}
-          <button
-            onClick={() => copyToClipboard("email")}
-            disabled={!asciiOutput}
-            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal transition-all group relative overflow-hidden ${
-              asciiOutput
-                ? "hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
-                : "opacity-50 cursor-not-allowed"
-            } ${
-              copiedToClipboard && copiedFormat === "email"
-                ? "animate-bounce-once"
-                : ""
-            }`}
-            style={copiedToClipboard && copiedFormat === "email"
-              ? "background-color: #4ADE80; color: #0A0A0A; border: 4px solid var(--color-border, #0A0A0A)"
-              : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 4px solid var(--color-border, #0A0A0A)"}
-          >
-            <span class="relative z-10 flex items-center justify-center text-lg">
-              {copiedToClipboard && copiedFormat === "email" ? "✅ COPIED!" : "📋 COPY"}
-            </span>
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-            </div>
-          </button>
-
-          {/* TXT Download */}
-          <button
-            onClick={downloadText}
-            disabled={!asciiOutput}
-            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal transition-all group relative overflow-hidden ${
-              asciiOutput
-                ? "hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
-                : "opacity-50 cursor-not-allowed"
-            }`}
-            style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-          >
-            <span class="relative z-10 flex items-center justify-center text-lg">
-              💾 TXT
-            </span>
-            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-            </div>
-          </button>
-
-          {/* PNG Download */}
-          <button
-            onClick={downloadPNG}
-            disabled={!asciiOutput}
-            class={`px-5 py-5 border-4 rounded-3xl font-mono font-black shadow-brutal transition-all group relative overflow-hidden ${
-              asciiOutput
-                ? "hover:shadow-brutal-lg hover:-translate-y-1 active:translate-y-0"
-                : "opacity-50 cursor-not-allowed"
-            }`}
-            style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-          >
-            <span class="relative z-10 flex items-center justify-center text-lg">
-              🖼️ PNG
-            </span>
-            <div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-            </div>
-          </button>
-        </div>
-      </div>
 
       <style>
         {`
@@ -718,6 +722,41 @@ export default function TextToAscii() {
 
         .blinking-cursor {
           animation: blink 1s infinite;
+        }
+
+        /* Pop-in animation for export button */
+        @keyframes popIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.8) translateY(10px);
+          }
+          60% {
+            transform: scale(1.05) translateY(0);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+
+        .animate-pop-in {
+          animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Fast slide up for menu */
+        @keyframes slideUpFast {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-slide-up-fast {
+          animation: slideUpFast 0.2s ease-out;
         }
 
         /* Hide scrollbars completely */
@@ -803,26 +842,28 @@ export default function TextToAscii() {
           animation: gentlePulse 2s ease-in-out infinite;
         }
 
-        /* Wiggle Animation for All Selected */
-        @keyframes wiggle {
-          0%, 100% { transform: rotate(0deg); }
-          10% { transform: rotate(2deg); }
-          20% { transform: rotate(-2deg); }
-          30% { transform: rotate(2deg); }
-          40% { transform: rotate(-2deg); }
-          50% { transform: rotate(1deg); }
-          60% { transform: rotate(-1deg); }
-          70% { transform: rotate(0.5deg); }
-          80% { transform: rotate(-0.5deg); }
-          90% { transform: rotate(0deg); }
+        /* Shine/Bloop Animation - Warm and affirmatory! */
+        @keyframes shine {
+          0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 rgba(255, 105, 180, 0);
+          }
+          50% {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.6), 0 0 60px rgba(255, 255, 180, 0.3);
+          }
+          100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 rgba(255, 105, 180, 0);
+          }
         }
 
         .animate-wiggle {
-          animation: wiggle 0.6s ease-in-out;
+          animation: shine 0.6s ease-out;
         }
 
         .hover\\:animate-wiggle:hover {
-          animation: wiggle 0.3s ease-in-out;
+          animation: shine 0.3s ease-out;
         }
 
         /* Breathing Input Animation */

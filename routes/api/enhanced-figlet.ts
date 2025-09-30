@@ -204,42 +204,54 @@ function getEffectColor(
   totalLines: number,
 ): string {
   switch (effect) {
+    case "unicorn":
+      // Pastel rainbow - soft, magical
+      const unicornHue = (x * 360 / lineWidth) % 360;
+      return `hsl(${unicornHue}, 85%, 75%)`;
+
     case "fire":
-      // Enhanced fire gradient
+      // Fire gradient - red to yellow
       const fireHue = 60 - (y * 60 / totalLines);
       const fireSat = 100 - (y * 20 / totalLines);
       return `hsl(${fireHue}, ${fireSat}%, 50%)`;
 
-    case "ocean":
-      // Ocean waves
-      const oceanHue = 180 + Math.sin((x + y) * 0.2) * 30;
-      return `hsl(${oceanHue}, 70%, 50%)`;
-
-    case "unicorn":
-      // Pastel rainbow
-      const unicornHue = (x * 360 / lineWidth) % 360;
-      return `hsl(${unicornHue}, 85%, 75%)`;
-
-    case "matrix":
-      // Matrix green with depth
-      const matrixBrightness = 30 + Math.random() * 40;
-      return `hsl(120, 100%, ${matrixBrightness}%)`;
-
-    case "metal":
-      // Metallic silver/chrome effect
-      const metalBrightness = 60 + Math.sin(x * 0.3) * 20;
-      return `hsl(220, 10%, ${metalBrightness}%)`;
+    case "angel":
+      // Angel - lush whites with soft gold/blue shimmer
+      const angelProgress = (x + y) / (lineWidth + totalLines);
+      const angelHue = 45 + Math.sin(angelProgress * 8) * 15; // Soft gold shimmer (30-60)
+      const angelSat = 15 + Math.sin(angelProgress * 6) * 10; // Very subtle saturation
+      const angelBright = 85 + Math.sin(angelProgress * 10) * 10; // Bright whites (75-95)
+      return `hsl(${angelHue}, ${angelSat}%, ${angelBright}%)`;
 
     case "chrome":
-      // Chrome reflection effect
+      // Chrome reflection - cool blues/silvers
       const chromeHue = 200 + Math.sin(x * 0.2) * 60;
       const chromeBrightness = 70 + Math.sin(y * 0.3) * 20;
       return `hsl(${chromeHue}, 30%, ${chromeBrightness}%)`;
 
-    case "rainbow":
+    case "sunrise":
+      // Succulent sunrise - pink to orange to yellow gradient
+      const sunriseProgress = y / totalLines;
+      const sunriseHue = 330 + (sunriseProgress * 60); // Pink (330) → Orange (30) → Yellow (60)
+      const sunriseSat = 85 + (sunriseProgress * 15);
+      const sunriseBright = 60 + (sunriseProgress * 20);
+      return `hsl(${sunriseHue}, ${sunriseSat}%, ${sunriseBright}%)`;
+
+    case "cyberpunk":
+      // Bangkok cyberpunk - hot pink to cyan gradient
+      const cyberpunkProgress = (x + y) / (lineWidth + totalLines);
+      const cyberpunkHue = 320 - (cyberpunkProgress * 140); // Pink (320) → Purple (280) → Cyan (180)
+      return `hsl(${cyberpunkHue}, 100%, 65%)`;
+
+    case "bloody":
+      // Bloody - brighter blood red gradient
+      const bloodyProgress = (x + y * 2) / (lineWidth + totalLines * 2);
+      const bloodyBright = 40 + (bloodyProgress * 30); // Mid red to bright red
+      return `hsl(0, 100%, ${bloodyBright}%)`;
+
+    case "none":
     default:
-      // Classic rainbow
-      const hue = ((x + y * 2) * 360 / (lineWidth + totalLines * 2)) % 360;
-      return `hsl(${hue}, 70%, 50%)`;
+      // Plain terminal green
+      return "#00FF41";
   }
 }

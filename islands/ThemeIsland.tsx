@@ -92,8 +92,8 @@ export default function ThemeIsland() {
                   }`}
                   style={`
                     background-color: ${theme.secondary};
-                    color: ${theme.text};
-                    border: 3px solid ${theme.border};
+                    color: ${theme.name === "VINTAGE CREAM" ? "#2C2825" : theme.text};
+                    border: 3px solid ${theme.name === "VINTAGE CREAM" ? "#2C2825" : theme.border};
                     ${
                     currentTheme.name === theme.name
                       ? `box-shadow: 0 0 0 2px ${theme.accent} inset`
@@ -118,10 +118,10 @@ export default function ThemeIsland() {
             <button
               onClick={generateRandomTheme}
               class="w-full px-3 py-1.5 rounded-lg text-xs font-mono hover:scale-[1.02] transition-all"
-              style="background: linear-gradient(135deg, #E8E8E8 0%, #D0D0D0 100%); color: #2C2825; border: 2px solid #2C2825; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3)"
+              style="background: linear-gradient(90deg, #FFE8CC 0%, #FFD3B6 50%, #FFBFA0 100%); color: #2C2825; border: 2px solid #2C2825;"
             >
               <span class="flex items-center justify-center gap-1.5 font-bold tracking-wide">
-                <span class="opacity-70">🎲</span>
+                <span class="opacity-80">🎲</span>
                 <span class="uppercase">random</span>
               </span>
             </button>

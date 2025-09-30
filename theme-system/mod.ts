@@ -199,9 +199,76 @@ export class ThemeSystem {
 
 // Smart random theme generator with color harmony
 export class RandomThemeGenerator {
+  // Curated tasteful palettes for dark themes - multi-color harmony like the best cyberpunk UIs
+  private static readonly TASTEFUL_DARK_PALETTES = [
+    // Cyberpunk Mix (exactly like your good example - pink/salmon/gold)
+    { base: "#0A0B0F", secondary: "#1A1B2E", accent: "#FF6B9D", text: "#FFD700", border: "#FF69B4" },
+    // Matrix Duo (green primary with gold accents)
+    { base: "#000805", secondary: "#0A1510", accent: "#00FF88", text: "#FFD700", border: "#00CC66" },
+    // Sunset Gradient (pink to orange to yellow)
+    { base: "#0F0A0F", secondary: "#1A1520", accent: "#FF69B4", text: "#FFA500", border: "#FFD700" },
+    // Neon Nights (hot pink with electric blue accent)
+    { base: "#0A0A1A", secondary: "#15152A", accent: "#FF10F0", text: "#00E5FF", border: "#FF69B4" },
+    // Vaporwave Trinity (purple/pink/cyan classic)
+    { base: "#100818", secondary: "#1A0E28", accent: "#C084FC", text: "#00D4FF", border: "#FF69B4" },
+    // Plasma Core (purple with electric green)
+    { base: "#0A0015", secondary: "#15002A", accent: "#9D4EDD", text: "#00FF88", border: "#7209B7" },
+    // Rose Gold (pink with copper accents)
+    { base: "#1A0A10", secondary: "#2A1520", accent: "#FF69B4", text: "#B87333", border: "#FF1493" },
+    // Cherry Gold (pink primary with golden text)
+    { base: "#0F0A0D", secondary: "#1A1418", accent: "#F472B6", text: "#FFD700", border: "#EC4899" },
+    // Radioactive (green with hot pink contrast)
+    { base: "#001005", secondary: "#002010", accent: "#39FF14", text: "#FF69B4", border: "#00FF88" },
+    // Galaxy Mix (purple base with cyan and pink)
+    { base: "#08081A", secondary: "#10102A", accent: "#818CF8", text: "#00D4FF", border: "#FF69B4" },
+    // Coral Reef (salmon/turquoise ocean theme)
+    { base: "#0F0808", secondary: "#1A1010", accent: "#FB7185", text: "#4ECDC4", border: "#F43F5E" },
+    // Blood Moon (deep red with cyan glow)
+    { base: "#1A0505", secondary: "#2A0A0A", accent: "#DC143C", text: "#00E5FF", border: "#FF1744" },
+  ];
+
+  // Curated tasteful palettes for light themes - fresh, modern, no dusty library vibes
+  private static readonly TASTEFUL_LIGHT_PALETTES = [
+    // Gradient Dream (like QRBuddy - pink to purple)
+    { base: "#FFF9FC", secondary: "#FFE8F5", accent: "#FF69B4", text: "#2D2D3A", border: "#4A4568" },
+    // Turquoise Pop (fresh, modern)
+    { base: "#F8FFFF", secondary: "#E0F7FA", accent: "#4ECDC4", text: "#1A2332", border: "#2C3E50" },
+    // Peach Gradient (warm but fresh)
+    { base: "#FFF5F0", secondary: "#FFE5CC", accent: "#FF6B6B", text: "#2A2A3E", border: "#3F3F5C" },
+    // Lavender Haze (soft purple without brown)
+    { base: "#FAF7FF", secondary: "#EDE7F6", accent: "#B794F4", text: "#2D2838", border: "#4A4568" },
+    // Sky Blue (clean, airy)
+    { base: "#F5FCFF", secondary: "#E3F2FD", accent: "#64B5F6", text: "#1A237E", border: "#3949AB" },
+    // Mint Fresh (cool, modern)
+    { base: "#F5FFF9", secondary: "#E8F5E9", accent: "#66BB6A", text: "#1B2D1B", border: "#2E4A2E" },
+    // Coral Reef (vibrant but sophisticated)
+    { base: "#FFF8F5", secondary: "#FFE8E1", accent: "#FF7043", text: "#2C2C3A", border: "#424250" },
+    // Electric Blue (modern tech)
+    { base: "#F8FAFF", secondary: "#E8F0FF", accent: "#536DFE", text: "#1A1F36", border: "#2C3654" },
+    // Pink Lemonade (fun, fresh)
+    { base: "#FFF9FA", secondary: "#FFE4E8", accent: "#EC407A", text: "#2A2A3A", border: "#3F3F4F" },
+    // Cyan Wave (oceanic, clean)
+    { base: "#F0FFFF", secondary: "#E0F7FA", accent: "#00BCD4", text: "#0D2838", border: "#1A3A52" },
+    // Sunset Gradient (warm without brown)
+    { base: "#FFF9F5", secondary: "#FFE5B4", accent: "#FFA726", text: "#2D2D3D", border: "#424252" },
+    // Violet Dream (rich purple, no dust)
+    { base: "#FAF5FF", secondary: "#F3E5F5", accent: "#AB47BC", text: "#2A2235", border: "#3F3454" },
+  ];
+
   // Color harmony algorithms
   static generateHarmonicTheme(baseMode: "light" | "dark" = "light"): Theme {
     const isLight = baseMode === "light";
+
+    // 80% chance to use curated palettes (they're just better)
+    if (Math.random() < 0.8) {
+      const palettes = isLight ? this.TASTEFUL_LIGHT_PALETTES : this.TASTEFUL_DARK_PALETTES;
+      const palette = palettes[Math.floor(Math.random() * palettes.length)];
+      return {
+        name: `RANDOM_${Date.now()}`,
+        vibe: "curated palette",
+        ...palette,
+      };
+    }
 
     // Generate base hue
     const baseHue = Math.floor(Math.random() * 360);
@@ -259,12 +326,26 @@ export class RandomThemeGenerator {
     }
 
     if (isLight) {
+      // TASTEFUL LIGHT THEMES - warm, off-white bases with muted tones
+      // Avoid harsh saturation, prefer creamy/warm backgrounds
+
+      // Random choice between warm and cool tinted backgrounds
+      const warmBase = Math.random() > 0.5;
+      const baseColorHue = warmBase
+        ? Math.floor(Math.random() * 60 + 30)  // 30-90 (warm yellows/oranges)
+        : Math.floor(Math.random() * 60 + 200); // 200-260 (cool blues/purples)
+
       return {
-        base: this.hslToHex(baseHue, 8, 98), // Very light, subtle hue
-        secondary: this.hslToHex(secondaryHue, 25, 88), // Pastel secondary
-        accent: this.hslToHex(accentHue, 65, 58), // Sophisticated accent
-        text: this.hslToHex(0, 5, 15), // Always dark text for light themes
-        border: this.hslToHex(0, 5, 15), // Dark borders for contrast
+        // Background: Always off-white with subtle tint (never pure white)
+        base: this.hslToHex(baseColorHue, 15, 97), // Creamy/tinted off-white
+        // Secondary: Slightly more saturated version of base
+        secondary: this.hslToHex(baseColorHue, 20, 93), // Soft pastel
+        // Accent: Muted, sophisticated color (not neon!)
+        accent: this.hslToHex(accentHue, 45, 45), // Muted, readable accent
+        // Text: Always dark charcoal/brown for readability
+        text: this.hslToHex(baseColorHue, 10, 18), // Dark with slight tint
+        // Border: Dark but softer than pure black
+        border: this.hslToHex(baseColorHue, 8, 25), // Soft dark borders
       };
     } else {
       return {
