@@ -1,4 +1,4 @@
-# 🔧 TINKER.md - ASCIIFIER-WEB Quick Reference
+# 🔧 TINKER.md - JUICY-THEMES Quick Reference
 
 _For when you haven't touched this in 6 months and need to change something NOW_
 
