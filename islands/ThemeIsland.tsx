@@ -36,7 +36,9 @@ export default function ThemeIsland() {
 
   const generateRandomTheme = () => {
     sounds.click();
-    const randomTheme = generateAsciifierRandomTheme();
+    // Determine if current theme is light or dark based on the theme name
+    const isCurrentlyLight = currentTheme.name.includes("VINTAGE") || currentTheme.name.includes("CREAM");
+    const randomTheme = generateAsciifierRandomTheme(isCurrentlyLight);
     themeSystem.applyTheme(randomTheme);
     setCurrentTheme(randomTheme);
   };
@@ -59,17 +61,10 @@ export default function ThemeIsland() {
       {/* Theme Picker Dropdown */}
       {showPicker && (
         <div
-          class="absolute top-full right-0 mt-2 w-64 rounded-lg shadow-brutal overflow-hidden animate-slide-up z-50"
+          class="absolute top-full right-0 mt-2 w-48 rounded-lg shadow-brutal overflow-hidden animate-slide-up z-50"
           style="background-color: var(--color-base-solid, var(--color-base, #FAF9F6)); border: 3px solid var(--color-border, #0A0A0A)"
         >
           <div class="p-3 font-mono">
-            <div
-              class="text-xs font-bold mb-3"
-              style="color: var(--color-text, #0A0A0A)"
-            >
-              CHOOSE YOUR VIBE
-            </div>
-
             {/* Only show the two main themes */}
             <div class="space-y-2">
               {themes.map((theme) => (
@@ -77,7 +72,7 @@ export default function ThemeIsland() {
                   key={theme.name}
                   onClick={() => handleThemeChange(theme)}
                   onMouseEnter={() => sounds.hover()}
-                  class={`w-full text-left px-4 py-3 rounded-lg text-xs font-mono hover:scale-[1.02] transition-all ${
+                  class={`w-full text-left px-3 py-2 rounded text-xs font-mono hover:scale-[1.02] transition-all ${
                     currentTheme.name === theme.name ? "ring-2" : ""
                   }`}
                   style={`
@@ -91,54 +86,23 @@ export default function ThemeIsland() {
                   }
                   `}
                 >
-                  <div class="flex items-center justify-between mb-1">
-                    <span class="font-bold text-sm">{theme.name}</span>
-                    {currentTheme.name === theme.name && <span class="text-lg">✓</span>}
-                  </div>
-                  <div class="opacity-70 text-xs">{theme.vibe}</div>
-                  <div class="flex gap-1 mt-2">
-                    <div
-                      class="w-5 h-5 rounded border border-black/20"
-                      style={`background: ${theme.base.includes("gradient") ? theme.base : `linear-gradient(135deg, ${theme.base} 0%, ${theme.base} 100%)`}`}
-                      title="Base (60%)"
-                    >
-                    </div>
-                    <div
-                      class="w-5 h-5 rounded border border-black/20"
-                      style={`background-color: ${theme.secondary}`}
-                      title="Secondary (30%)"
-                    >
-                    </div>
-                    <div
-                      class="w-5 h-5 rounded border border-black/20"
-                      style={`background-color: ${theme.accent}`}
-                      title="Accent (10%)"
-                    >
-                    </div>
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold">{theme.name.split(' ')[0]}</span>
+                    {currentTheme.name === theme.name && <span>✓</span>}
                   </div>
                 </button>
               ))}
             </div>
 
-            {/* Divider */}
-            <div
-              class="my-3 border-t-2"
-              style="border-color: var(--color-border, #0A0A0A); opacity: 0.2"
-            />
-
-            {/* Smart Random Theme Button */}
+            {/* Smart Random Theme Button - smaller and elegant */}
             <button
               onClick={generateRandomTheme}
-              class="w-full px-4 py-3 rounded-lg text-xs font-mono font-bold hover:scale-[1.02] transition-all group"
-              style="background: linear-gradient(45deg, #FF6B9D, #00FF88, #FFB000, #00B4D8); color: #0A0A0A; border: 2px solid #0A0A0A"
+              class="w-full mt-2 px-2 py-1 rounded text-xs font-mono hover:scale-[1.02] transition-all opacity-80 hover:opacity-100"
+              style="background-color: var(--color-text, #0A0A0A); color: var(--color-base, #FAF9F6); border: 1px solid var(--color-border, #0A0A0A)"
             >
-              <span class="flex items-center justify-center gap-2">
-                <span class="text-base">🎲</span>
-                <span>SURPRISE ME!</span>
-                <span class="text-base">✨</span>
-              </span>
-              <span class="text-xs opacity-70 block mt-1">
-                {currentTheme.name === "RANDOM" ? `current: ${currentTheme.vibe}` : "generate harmonic colors"}
+              <span class="flex items-center justify-center gap-1">
+                <span class="text-xs">🎲</span>
+                <span>random</span>
               </span>
             </button>
           </div>

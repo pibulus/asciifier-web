@@ -8,14 +8,14 @@ import { RandomThemeGenerator } from "./mod.ts";
 export const vintageCream: Theme = {
   name: "VINTAGE CREAM",
   vibe: "warm nostalgia",
-  base: "linear-gradient(135deg, #FBF8F3 0%, #FFF9F4 100%)", // Warmer, creamier base
+  base: "linear-gradient(135deg, #FDFCF8 0%, #FFF9F3 100%)", // Classy off-white, not pure white
   secondary: "#FFE8CC", // Softer peach, more vintage
   accent: "#FF6B9D", // Slightly softer hot pink
-  text: "#1A1818", // Warmer black with brown undertones
+  text: "#2C2825", // Classy charcoal with warm undertones, not pure black
   textSecondary: "#6B5D54", // Warm gray-brown for secondary text
-  border: "#1A1818",
+  border: "#2C2825", // Same as text for consistency
   cssVars: {
-    "--color-base-solid": "#FBF8F3", // Solid fallback for gradient
+    "--color-base-solid": "#FDFCF8", // Classy off-white solid
     "--shadow-soft": "rgba(139, 90, 43, 0.1)", // Warm shadow
     "--highlight": "#FFD3B6", // Peachy highlight
   },
@@ -24,14 +24,14 @@ export const vintageCream: Theme = {
 export const terminalDusk: Theme = {
   name: "TERMINAL DUSK",
   vibe: "midnight hacker",
-  base: "#0D0E14", // Deep blue-black, like a CRT at night
-  secondary: "#1A1D29", // Slightly lighter with blue tint
+  base: "#0A0B0F", // Rich blue-black, not pure black
+  secondary: "#15171F", // Slightly lighter with blue depth
   accent: "#00FF88", // Classic terminal green with cyan twist
   text: "#00FF88", // Terminal green text
   textSecondary: "#00CC6A", // Darker green for secondary
   border: "#00FF88",
   cssVars: {
-    "--color-base-solid": "#0D0E14",
+    "--color-base-solid": "#0A0B0F",
     "--shadow-glow": "0 0 20px rgba(0, 255, 136, 0.3)", // Terminal glow effect
     "--terminal-amber": "#FFB000", // Alternative terminal color
     "--terminal-blue": "#00B4D8", // Cyan-blue for links
@@ -39,9 +39,9 @@ export const terminalDusk: Theme = {
 };
 
 // Random theme generator with app-specific constraints
-export function generateAsciifierRandomTheme(): Theme {
-  // Determine if we should generate light or dark
-  const isLight = Math.random() > 0.5;
+export function generateAsciifierRandomTheme(preferLight: boolean = true): Theme {
+  // Use the preference to determine light/dark
+  const isLight = preferLight;
 
   // Use the base themes as reference for constraints
   const baseTheme = isLight ? vintageCream : terminalDusk;

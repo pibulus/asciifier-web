@@ -258,17 +258,17 @@ export class RandomThemeGenerator {
 
     if (isLight) {
       return {
-        base: this.hslToHex(baseHue, 15, 97), // Very light, low saturation
-        secondary: this.hslToHex(secondaryHue, 40, 90), // Light, medium saturation
-        accent: this.hslToHex(accentHue, 70, 55), // Vibrant accent
-        text: this.hslToHex(0, 0, 10), // Near black
-        border: this.hslToHex(0, 0, 10), // Black borders
+        base: this.hslToHex(baseHue, 12, 98), // Classy off-white, very subtle hue
+        secondary: this.hslToHex(secondaryHue, 35, 92), // Light, medium saturation
+        accent: this.hslToHex(accentHue, 65, 58), // Sophisticated accent
+        text: this.hslToHex(0, 5, 15), // Classy charcoal, not pure black
+        border: this.hslToHex(0, 5, 15), // Same as text
       };
     } else {
       return {
-        base: this.hslToHex(baseHue, 20, 12), // Very dark
-        secondary: this.hslToHex(secondaryHue, 25, 18), // Slightly lighter
-        accent: this.hslToHex(accentHue, 80, 65), // Bright accent
+        base: this.hslToHex(baseHue, 25, 6), // Rich dark, not pure black
+        secondary: this.hslToHex(secondaryHue, 20, 12), // Slightly lighter
+        accent: this.hslToHex(accentHue, 75, 65), // Bright accent
         text: this.hslToHex(accentHue, 70, 75), // Colored text
         border: this.hslToHex(accentHue, 70, 65), // Colored borders
       };
