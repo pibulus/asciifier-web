@@ -60,57 +60,11 @@ export const handler = async (
       const figletModule = await import("figlet");
       const figlet = figletModule.default || figletModule;
 
-      // List of valid fonts we know exist
-      const validFonts = [
-        "Standard",
-        "Big",
-        "Slant",
-        "Small",
-        "Banner",
-        "Block",
-        "Bubble",
-        "Digital",
-        "Ivrit",
-        "Mini",
-        "Script",
-        "Shadow",
-        "3-D",
-        "3x5",
-        "5 Line Oblique",
-        "Alphabet",
-        "Doom",
-        "Epic",
-        "Ghost",
-        "Graffiti",
-        "Isometric1",
-        "Isometric2",
-        "Isometric3",
-        "Isometric4",
-        "Poison",
-        "Alligator",
-        "Avatar",
-        "Big Chief",
-        "Broadway",
-        "Crazy",
-        "Gothic",
-        "Sub-Zero",
-        "Swamp Land",
-        "Star Wars",
-        "Sweet",
-        "Weird",
-        "Colossal",
-        "Crawford",
-        "Calgphy2",
-        "Fire Font-s",
-        "Fuzzy",
-        "Bloody",
-        "Speed",
-        "Chunky",
-        "Larry 3D",
-      ];
+      // Get all available fonts dynamically from figlet
+      const availableFonts = figlet.fontsSync ? figlet.fontsSync() : [];
 
-      // Validate and fallback font
-      const safeFont = validFonts.includes(font) ? font : "Standard";
+      // Validate and fallback font - check if requested font exists
+      const safeFont = availableFonts.includes(font) ? font : "Standard";
 
       // Generate ASCII art with figlet
       result = figlet.textSync

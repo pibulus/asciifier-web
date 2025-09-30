@@ -36,8 +36,23 @@ export default function ThemeIsland() {
 
   const generateRandomTheme = () => {
     sounds.click();
-    // Determine if current theme is light or dark based on the theme name
-    const isCurrentlyLight = currentTheme.name.includes("VINTAGE") || currentTheme.name.includes("CREAM");
+    // Determine if current theme is light or dark based on the theme name or if it's a random theme, check the base color
+    let isCurrentlyLight = false;
+
+    if (currentTheme.name === "VINTAGE CREAM") {
+      isCurrentlyLight = true;
+    } else if (currentTheme.name === "TERMINAL DUSK") {
+      isCurrentlyLight = false;
+    } else if (currentTheme.name === "RANDOM") {
+      // For random themes, check if the base color is light (high lightness)
+      const baseColor = currentTheme.base.includes("gradient")
+        ? currentTheme.base.match(/#[0-9A-Fa-f]{6}/)?.[0] || currentTheme.base
+        : currentTheme.base;
+      // Simple check: if the color starts with F, E, D, C it's likely light
+      const firstChar = baseColor[1]?.toUpperCase();
+      isCurrentlyLight = ['F', 'E', 'D', 'C'].includes(firstChar);
+    }
+
     const randomTheme = generateAsciifierRandomTheme(isCurrentlyLight);
     themeSystem.applyTheme(randomTheme);
     setCurrentTheme(randomTheme);
@@ -54,7 +69,7 @@ export default function ThemeIsland() {
         title="Change theme"
       >
         <span class="mr-2">🎨</span>
-        {currentTheme.name}
+        {currentTheme.name.split(' ')[0]}
         <span class="ml-2 opacity-60 text-xs">↓</span>
       </button>
 
@@ -72,7 +87,7 @@ export default function ThemeIsland() {
                   key={theme.name}
                   onClick={() => handleThemeChange(theme)}
                   onMouseEnter={() => sounds.hover()}
-                  class={`w-full text-left px-3 py-2 rounded text-xs font-mono hover:scale-[1.02] transition-all ${
+                  class={`w-full text-left px-4 py-3 rounded-lg text-xs font-mono hover:scale-[1.02] transition-all ${
                     currentTheme.name === theme.name ? "ring-2" : ""
                   }`}
                   style={`
@@ -87,8 +102,8 @@ export default function ThemeIsland() {
                   `}
                 >
                   <div class="flex items-center justify-between">
-                    <span class="font-bold">{theme.name.split(' ')[0]}</span>
-                    {currentTheme.name === theme.name && <span>✓</span>}
+                    <span class="font-bold text-sm">{theme.name.split(' ')[0]}</span>
+                    {currentTheme.name === theme.name && <span class="text-sm">✓</span>}
                   </div>
                 </button>
               ))}
