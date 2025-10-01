@@ -41,9 +41,8 @@ const COLOR_EFFECTS = [
   { name: "Vaporwave", value: "vaporwave" },
   { name: "Fire", value: "fire" },
   { name: "Bloody", value: "bloody" },
-  { name: "Angel", value: "angel" },
   { name: "Chrome", value: "chrome" },
-  { name: "Plain", value: "none" },
+  { name: "Matrix", value: "none" },
 ];
 
 export default function TextToAscii() {
@@ -256,6 +255,16 @@ export default function TextToAscii() {
         const sat = 80 + Math.sin((x + y) * 0.3) * 15;
         const bright = 65 + Math.sin(x * 0.4) * 10;
         return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      case "chrome": {
+        const hue = 200 + Math.sin(x * 0.2) * 60;
+        const brightness = 70 + Math.sin(y * 0.3) * 20;
+        return `hsl(${hue}, 30%, ${brightness}%)`;
+      }
+      case "bloody": {
+        const progress = (x + y * 2) / (lineWidth + totalLines * 2);
+        const bright = 40 + (progress * 30);
+        return `hsl(0, 100%, ${bright}%)`;
       }
       default:
         return "#00FF41";
