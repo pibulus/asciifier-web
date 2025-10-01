@@ -2,7 +2,7 @@ import { useSignal } from "@preact/signals";
 import { useEffect, useState, useRef } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { analytics } from "../utils/analytics.ts";
-import { getTypeWriter } from "../utils/typewriter-sounds.ts";
+import { SimpleTypeWriter } from "../utils/simple-typewriter.js";
 
 // Curated figlet fonts - hand-picked fonts for the ASCII Factory!
 const FIGLET_FONTS = [
@@ -47,31 +47,29 @@ const COLOR_EFFECTS = [
 ];
 
 export default function TextToAscii() {
-  const inputRef = useRef<HTMLInputElement>(null);
-
   // Initialize analytics and typewriter sounds on mount
   useEffect(() => {
     analytics.init();
 
     // Initialize typewriter sounds
     if (typeof window !== "undefined") {
-      const typewriter = getTypeWriter();
+      const typewriter = new SimpleTypeWriter({
+        volume: 0.3,
+        enabled: true,
+      });
 
-      // Initialize the typewriter (loads sounds)
+      // Initialize and attach to input
       typewriter.init().then(() => {
-        // Attach to the specific input using ref
-        if (inputRef.current) {
-          const handler = (e: Event) => typewriter.play(e as KeyboardEvent);
-          inputRef.current.addEventListener("keydown", handler);
-
-          // Cleanup function
-          return () => {
-            inputRef.current?.removeEventListener("keydown", handler);
-          };
-        }
+        typewriter.attach('#ascii-text-input');
+        console.log("🎹 Typewriter sounds ready!");
       }).catch((err) => {
         console.warn("Typewriter sounds failed to load:", err);
       });
+
+      // Cleanup
+      return () => {
+        typewriter.dispose();
+      };
     }
   }, []);
 
@@ -618,7 +616,7 @@ export default function TextToAscii() {
       <div class="mb-8">
         <div class="relative">
           <input
-            ref={inputRef}
+            id="ascii-text-input"
             type="text"
             value={inputText.value}
             onInput={(e) => {
