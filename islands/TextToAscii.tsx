@@ -1,5 +1,5 @@
 import { useSignal } from "@preact/signals";
-import { useEffect, useState, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { analytics } from "../utils/analytics.ts";
 import { SimpleTypeWriter } from "../utils/simple-typewriter.js";
@@ -59,16 +59,16 @@ export default function TextToAscii() {
       });
 
       typewriter.init().then(() => {
-        typewriter.attach('#ascii-text-input');
+        typewriter.attach("#ascii-text-input");
 
         // Resume audio context on first click (browser autoplay policy)
         const resumeAudio = () => {
-          if (typewriter.audioContext?.state === 'suspended') {
+          if (typewriter.audioContext?.state === "suspended") {
             typewriter.audioContext.resume();
           }
-          document.removeEventListener('click', resumeAudio);
+          document.removeEventListener("click", resumeAudio);
         };
-        document.addEventListener('click', resumeAudio);
+        document.addEventListener("click", resumeAudio);
       }).catch((err) => {
         console.warn("Typewriter sounds unavailable:", err);
       });
@@ -199,18 +199,26 @@ export default function TextToAscii() {
 
         for (let y = 0; y < lines.length; y++) {
           const line = lines[y];
-          let colorizedLine = "";
 
-          for (let x = 0; x < line.length; x++) {
-            const char = line[x];
-            if (char === " " || char === "") {
-              colorizedLine += char;
-            } else {
-              const color = getEffectColor(effect, x, y, line.length, lines.length);
-              colorizedLine += `<span style="color: ${color};">${char}</span>`;
-            }
-          }
-          colorizedLines.push(colorizedLine);
+          // Escape the entire line first
+          const escapedLine = line
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+          // Calculate color for this line (use middle of line for consistent color)
+          const color = getEffectColor(
+            effect,
+            Math.floor(line.length / 2),
+            y,
+            line.length,
+            lines.length,
+          );
+
+          // Wrap entire line in one span
+          colorizedLines.push(`<span style="color: ${color};">${escapedLine}</span>`);
         }
 
         setWelcomeArtColorized(colorizedLines.join("\n"));
@@ -231,17 +239,17 @@ export default function TextToAscii() {
     switch (effect) {
       case "unicorn": {
         const hue = (x * 360 / lineWidth) % 360;
-        return `hsl(${hue}, 85%, 75%)`;
+        return `hsl(${hue}, 95%, 65%)`;
       }
       case "fire": {
         const hue = 60 - (y * 60 / totalLines);
         const sat = 100 - (y * 20 / totalLines);
-        return `hsl(${hue}, ${sat}%, 50%)`;
+        return `hsl(${hue}, ${sat}%, 55%)`;
       }
       case "cyberpunk": {
         const progress = (x + y) / (lineWidth + totalLines);
         const hue = 320 - (progress * 140);
-        return `hsl(${hue}, 100%, 65%)`;
+        return `hsl(${hue}, 100%, 60%)`;
       }
       case "sunrise": {
         const progress = y / totalLines;
@@ -363,6 +371,13 @@ export default function TextToAscii() {
     colorEffect.value,
     borderStyle.value,
   ]);
+
+  // Apply color effect to welcome art when COLOR dropdown changes
+  useEffect(() => {
+    if (welcomeArt && !asciiOutput) {
+      applyColorToWelcomeArt(colorEffect.value);
+    }
+  }, [colorEffect.value, welcomeArt]);
 
   const copyToClipboard = async (format = "email") => {
     analytics.trackExport(format === "email" ? "html" : "plain");
@@ -866,6 +881,20 @@ export default function TextToAscii() {
             )}
           </div>
         </div>
+
+        {/* Shuffle Button - Only when welcome art is shown */}
+        {!asciiOutput && welcomeArt && (
+          <div class="flex justify-end">
+            <button
+              onClick={shuffleArt}
+              class="px-4 py-2 border-4 rounded-lg font-mono font-bold transition-all hover:shadow-brutal hover:scale-105 active:scale-95"
+              style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A)"
+              title="Get a random ASCII art"
+            >
+              🎲 SHUFFLE
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Terminal Display - Always visible */}
@@ -898,36 +927,6 @@ export default function TextToAscii() {
             <span class="text-xs font-mono opacity-60">
               ~/output/text-art.txt
             </span>
-            {!asciiOutput && welcomeArt && (
-              <div class="flex gap-2 items-center">
-                {/* Color picker for random art */}
-                <select
-                  value={selectedWelcomeColor}
-                  onChange={(e) =>
-                    applyColorToWelcomeArt(
-                      (e.target as HTMLSelectElement).value,
-                    )}
-                  class="px-2 py-1 text-xs font-mono font-bold rounded border-2 transition-all"
-                  style="background-color: rgba(0,0,0,0.3); color: #00FF41; border-color: #00FF41;"
-                  title="Apply color effect"
-                >
-                  <option value="none">Plain</option>
-                  <option value="unicorn">Unicorn</option>
-                  <option value="cyberpunk">Cyberpunk</option>
-                  <option value="sunrise">Sunrise</option>
-                  <option value="vaporwave">Vaporwave</option>
-                  <option value="fire">Fire</option>
-                </select>
-                <button
-                  onClick={shuffleArt}
-                  class="px-2 py-1 text-xs font-mono font-bold transition-all hover:opacity-70"
-                  style="color: #00FF41;"
-                  title="Shuffle ASCII art"
-                >
-                  🎲 SHUFFLE
-                </button>
-              </div>
-            )}
           </div>
           <div
             class="p-8 overflow-auto custom-scrollbar transition-all duration-500 ease-out"
@@ -956,8 +955,8 @@ export default function TextToAscii() {
                   {welcomeArt
                     ? (
                       <pre
-                        class="font-mono text-sm opacity-40 animate-fade-in"
-                        style="color: #00FF41; line-height: 1.2; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: -0.5px; font-weight: 600;"
+                        class="font-mono text-base opacity-70 animate-fade-in"
+                        style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.5px; font-weight: 700; text-shadow: 0 0 2px currentColor, 0 0 4px currentColor;"
                         dangerouslySetInnerHTML={{
                           __html: welcomeArtColorized || welcomeArt,
                         }}

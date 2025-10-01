@@ -14,8 +14,8 @@ web APIs to create rich, colorful ASCII art experiences.
 
 ### The Rainbow Wizard Architecture™
 
-This project pioneered a revolutionary approach: **Server-side ASCII generation →
-Custom HSL color effects → Rich browser UI**
+This project pioneered a revolutionary approach: **Server-side ASCII generation
+→ Custom HSL color effects → Rich browser UI**
 
 **Why This Is Genius:**
 
@@ -113,7 +113,8 @@ deno task preview
 ### Revolutionary Approach
 
 - **Figlet** runs server-side in Deno runtime
-- **Custom HSL math** generates color gradients (lines 169-265 in enhanced-figlet.ts)
+- **Custom HSL math** generates color gradients (lines 169-265 in
+  enhanced-figlet.ts)
 - Effects: unicorn, fire, cyberpunk, sunrise, vaporwave, angel, chrome
 - Rich clipboard formats for Gmail pasting
 - Full font selection without client-side dependencies

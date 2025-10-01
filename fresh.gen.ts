@@ -11,6 +11,7 @@ import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
 import * as $thanks from "./routes/thanks.tsx";
 import * as $Dropzone from "./islands/Dropzone.tsx";
+import * as $KofiModal from "./islands/KofiModal.tsx";
 import * as $TabSwitcher from "./islands/TabSwitcher.tsx";
 import * as $TabsIsland from "./islands/TabsIsland.tsx";
 import * as $TextToAscii from "./islands/TextToAscii.tsx";
@@ -30,6 +31,7 @@ const manifest = {
   },
   islands: {
     "./islands/Dropzone.tsx": $Dropzone,
+    "./islands/KofiModal.tsx": $KofiModal,
     "./islands/TabSwitcher.tsx": $TabSwitcher,
     "./islands/TabsIsland.tsx": $TabsIsland,
     "./islands/TextToAscii.tsx": $TextToAscii,
