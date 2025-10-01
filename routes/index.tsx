@@ -32,16 +32,14 @@ export default function Home() {
                 Turn ANYTHING into text art
               </p>
             </div>
-            <div class="flex items-center gap-4">
-              <TabsIsland />
-              <ThemeIsland />
-            </div>
+            <ThemeIsland />
           </div>
         </div>
       </header>
 
-      {/* Main Content - Empty, TabsIsland handles content rendering */}
-      <main class="flex-1">
+      {/* Main Content */}
+      <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
+        <TabsIsland />
       </main>
 
       {/* Footer */}
