@@ -2,6 +2,7 @@ import { useSignal } from "@preact/signals";
 import TabSwitcher from "../islands/TabSwitcher.tsx";
 import TabsIsland from "../islands/TabsIsland.tsx";
 import ThemeIsland from "../islands/ThemeIsland.tsx";
+import { KofiButton } from "../islands/KofiModal.tsx";
 
 export default function Home() {
   const activeTab = useSignal("image");
@@ -65,16 +66,7 @@ export default function Home() {
                 Made with care by Pablo
               </span>
             </div>
-            <a
-              href="https://ko-fi.com/madebypablo"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 px-3 py-1.5 rounded border-2 transition-all hover:scale-105 font-bold"
-              style="color: var(--color-accent, #FF69B4); border-color: var(--color-accent, #FF69B4); background-color: var(--color-base, #FAF9F6)"
-            >
-              <span>☕</span>
-              <span>Support</span>
-            </a>
+            <KofiButton size="sm" label="☕ Support" />
           </div>
         </div>
       </footer>
