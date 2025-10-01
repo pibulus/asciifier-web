@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { createThemeSystem, type Theme } from "../theme-system/mod.ts";
 import {
   asciifierThemeConfig,
@@ -6,6 +6,7 @@ import {
   themes,
 } from "../theme-system/asciifier-themes.ts";
 import { sounds } from "../utils/sounds.ts";
+import { analytics } from "../utils/analytics.ts";
 
 export default function ThemeIsland() {
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[0]);
@@ -57,7 +58,10 @@ export default function ThemeIsland() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowPicker(false);
       }
     };
@@ -72,6 +76,7 @@ export default function ThemeIsland() {
 
   const handleThemeChange = (theme: Theme) => {
     sounds.click();
+    analytics.trackThemeChanged(currentTheme.name, theme.name);
     themeSystem.setTheme(theme.name);
     setShowPicker(false);
   };
@@ -92,7 +97,7 @@ export default function ThemeIsland() {
         : currentTheme.base;
       // Simple check: if the color starts with F, E, D, C it's likely light
       const firstChar = baseColor[1]?.toUpperCase();
-      isCurrentlyLight = ['F', 'E', 'D', 'C'].includes(firstChar);
+      isCurrentlyLight = ["F", "E", "D", "C"].includes(firstChar);
     }
 
     const randomTheme = generateAsciifierRandomTheme(isCurrentlyLight);
@@ -111,7 +116,7 @@ export default function ThemeIsland() {
         title="Change theme"
       >
         <span class="mr-2">🎨</span>
-        {currentTheme.name.split(' ')[0]}
+        {currentTheme.name.split(" ")[0]}
         <span class="ml-2 opacity-60 text-xs">↓</span>
       </button>
 
@@ -134,8 +139,12 @@ export default function ThemeIsland() {
                   }`}
                   style={`
                     background-color: ${theme.secondary};
-                    color: ${theme.name === "VINTAGE CREAM" ? "#2C2825" : theme.text};
-                    border: 3px solid ${theme.name === "VINTAGE CREAM" ? "#2C2825" : theme.border};
+                    color: ${
+                    theme.name === "VINTAGE CREAM" ? "#2C2825" : theme.text
+                  };
+                    border: 3px solid ${
+                    theme.name === "VINTAGE CREAM" ? "#2C2825" : theme.border
+                  };
                     ${
                     currentTheme.name === theme.name
                       ? `box-shadow: 0 0 0 2px ${theme.accent} inset`
@@ -144,7 +153,9 @@ export default function ThemeIsland() {
                   `}
                 >
                   <div class="flex items-center justify-center relative">
-                    <span class="font-black tracking-wider uppercase">{theme.name.split(' ')[0]}</span>
+                    <span class="font-black tracking-wider uppercase">
+                      {theme.name.split(" ")[0]}
+                    </span>
                     {currentTheme.name === theme.name && (
                       <span class="absolute right-0 text-lg">✓</span>
                     )}
@@ -154,7 +165,11 @@ export default function ThemeIsland() {
             </div>
 
             {/* Divider */}
-            <div class="my-3 border-t-2 opacity-20" style="border-color: var(--color-border, #0A0A0A)"></div>
+            <div
+              class="my-3 border-t-2 opacity-20"
+              style="border-color: var(--color-border, #0A0A0A)"
+            >
+            </div>
 
             {/* Smart Random Theme Button - smaller and elegant */}
             <button
@@ -169,15 +184,24 @@ export default function ThemeIsland() {
             </button>
 
             {/* Divider */}
-            <div class="my-3 border-t-2 opacity-20" style="border-color: var(--color-border, #0A0A0A)"></div>
+            <div
+              class="my-3 border-t-2 opacity-20"
+              style="border-color: var(--color-border, #0A0A0A)"
+            >
+            </div>
 
             {/* Vintage Controls */}
             <div class="space-y-3">
               {/* Grain Slider - now goes up to 50%! */}
               <div>
-                <label class="flex items-center justify-between text-xs font-mono mb-1" style="color: var(--color-text, #0A0A0A)">
+                <label
+                  class="flex items-center justify-between text-xs font-mono mb-1"
+                  style="color: var(--color-text, #0A0A0A)"
+                >
                   <span class="uppercase font-bold">Grain</span>
-                  <span class="opacity-60">{Math.round(grainLevel * 100)}%</span>
+                  <span class="opacity-60">
+                    {Math.round(grainLevel * 100)}%
+                  </span>
                 </label>
                 <input
                   type="range"
@@ -185,13 +209,18 @@ export default function ThemeIsland() {
                   max="0.5"
                   step="0.01"
                   value={grainLevel}
-                  onInput={(e) => setGrainLevel(parseFloat((e.target as HTMLInputElement).value))}
+                  onInput={(e) =>
+                    setGrainLevel(
+                      parseFloat((e.target as HTMLInputElement).value),
+                    )}
                   class="w-full h-2 rounded-full outline-none cursor-pointer"
                   style={`
                     background: linear-gradient(to right,
                       var(--color-accent, #FF69B4) 0%,
                       var(--color-accent, #FF69B4) ${(grainLevel / 0.5) * 100}%,
-                      var(--color-secondary, #FFE5B4) ${(grainLevel / 0.5) * 100}%,
+                      var(--color-secondary, #FFE5B4) ${
+                    (grainLevel / 0.5) * 100
+                  }%,
                       var(--color-secondary, #FFE5B4) 100%);
                     -webkit-appearance: none;
                   `}
@@ -200,7 +229,10 @@ export default function ThemeIsland() {
 
               {/* Scan Slider - reduced max to 20% */}
               <div>
-                <label class="flex items-center justify-between text-xs font-mono mb-1" style="color: var(--color-text, #0A0A0A)">
+                <label
+                  class="flex items-center justify-between text-xs font-mono mb-1"
+                  style="color: var(--color-text, #0A0A0A)"
+                >
                   <span class="uppercase font-bold">Scan</span>
                   <span class="opacity-60">{Math.round(scanLevel * 100)}%</span>
                 </label>
@@ -210,19 +242,23 @@ export default function ThemeIsland() {
                   max="0.2"
                   step="0.01"
                   value={scanLevel}
-                  onInput={(e) => setScanLevel(parseFloat((e.target as HTMLInputElement).value))}
+                  onInput={(e) =>
+                    setScanLevel(
+                      parseFloat((e.target as HTMLInputElement).value),
+                    )}
                   class="w-full h-2 rounded-full outline-none cursor-pointer"
                   style={`
                     background: linear-gradient(to right,
                       var(--color-accent, #FF69B4) 0%,
                       var(--color-accent, #FF69B4) ${(scanLevel / 0.2) * 100}%,
-                      var(--color-secondary, #FFE5B4) ${(scanLevel / 0.2) * 100}%,
+                      var(--color-secondary, #FFE5B4) ${
+                    (scanLevel / 0.2) * 100
+                  }%,
                       var(--color-secondary, #FFE5B4) 100%);
                     -webkit-appearance: none;
                   `}
                 />
               </div>
-
             </div>
           </div>
         </div>

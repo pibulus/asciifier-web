@@ -11,6 +11,7 @@ import {
 } from "../utils/character-sets.ts";
 import { sounds } from "../utils/sounds.ts";
 import { easterEggs } from "../utils/easter-eggs.ts";
+import { analytics } from "../utils/analytics.ts";
 
 // Preset configurations for quick starts
 const PRESETS = [
@@ -58,6 +59,7 @@ export default function Dropzone() {
   const [showStylePreview, setShowStylePreview] = useState<string | null>(null);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Settings with signals for reactive updates
   const selectedStyle = useSignal<CharacterStyle>("classic");
@@ -69,8 +71,18 @@ export default function Dropzone() {
   const autoUpdate = useSignal(true);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const processor = useRef(new ImageProcessor());
   const updateTimeoutRef = useRef<number | null>(null);
+
+  // Detect mobile device
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Modern best practice: check for touch points instead of userAgent
+      const isTouchDevice = navigator.maxTouchPoints > 0;
+      setIsMobile(isTouchDevice);
+    }
+  }, []);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -134,10 +146,20 @@ export default function Dropzone() {
     }
   };
 
+  const handleCameraCapture = async (e: Event) => {
+    const input = e.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      sounds.click();
+      easterEggs.maybeShowVibe(0.2);
+      await processImage(input.files[0]);
+    }
+  };
+
   const handlePaste = async (e: ClipboardEvent) => {
     const items = e.clipboardData?.items;
     if (items) {
-      for (const item of items) {
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
         if (item.type.indexOf("image") === 0) {
           const blob = item.getAsFile();
           if (blob) {
@@ -176,9 +198,15 @@ export default function Dropzone() {
       setAsciiOutput(formatted);
       setImageLoaded(true);
       sounds.success();
+      analytics.trackImageConverted(file.size, true);
     } catch (error) {
       console.error("Error processing image:", error);
       alert("Failed to process image. Please try another file.");
+      analytics.trackImageConverted(
+        file.size,
+        false,
+        error instanceof Error ? error.message : "unknown",
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -376,6 +404,45 @@ export default function Dropzone() {
                 JPG PNG GIF WebP • 10MB max
               </p>
             </div>
+          </div>
+
+          {/* Camera Capture Button (Mobile-first) */}
+          <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-center">
+            <button
+              onClick={() => cameraInputRef.current?.click()}
+              class={`group px-6 py-4 border-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-brutal hover:shadow-brutal-lg hover:scale-105 active:scale-95 ${
+                isMobile ? "animate-pulse-soft" : ""
+              }`}
+              style={`background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)`}
+            >
+              <div class="flex items-center justify-center gap-3">
+                <span class="text-3xl">📷</span>
+                <div class="text-left">
+                  <div class="font-mono font-bold">
+                    {isMobile ? "TAKE PHOTO" : "CAMERA"}
+                  </div>
+                  <div class="text-xs opacity-80">
+                    {isMobile ? "instant ASCII" : "use your camera"}
+                  </div>
+                </div>
+              </div>
+            </button>
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              class="hidden"
+              onChange={handleCameraCapture}
+            />
+            {!isMobile && (
+              <span
+                class="text-sm font-mono opacity-60"
+                style="color: var(--color-text, #0A0A0A)"
+              >
+                or choose from your library ↑
+              </span>
+            )}
           </div>
 
           {/* Quick Start Presets */}

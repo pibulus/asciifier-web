@@ -39,7 +39,9 @@ export const terminalDusk: Theme = {
 };
 
 // Random theme generator with app-specific constraints
-export function generateAsciifierRandomTheme(preferLight: boolean = true): Theme {
+export function generateAsciifierRandomTheme(
+  preferLight: boolean = true,
+): Theme {
   // Use the preference to determine light/dark
   const isLight = preferLight;
 
@@ -47,13 +49,24 @@ export function generateAsciifierRandomTheme(preferLight: boolean = true): Theme
   const baseTheme = isLight ? vintageCream : terminalDusk;
 
   // Generate a harmonically balanced random theme
-  const randomTheme = RandomThemeGenerator.generateHarmonicTheme(isLight ? "light" : "dark");
+  const randomTheme = RandomThemeGenerator.generateHarmonicTheme(
+    isLight ? "light" : "dark",
+  );
 
   // Override name and vibe with fun ASCII-themed names
   const asciiVibes = [
-    "glitch paradise", "pixel dreams", "retro terminal", "matrix flow",
-    "cyber sunset", "neon nights", "digital dawn", "ascii jazz",
-    "terminal poetry", "code carnival", "binary ballet", "hex harmony"
+    "glitch paradise",
+    "pixel dreams",
+    "retro terminal",
+    "matrix flow",
+    "cyber sunset",
+    "neon nights",
+    "digital dawn",
+    "ascii jazz",
+    "terminal poetry",
+    "code carnival",
+    "binary ballet",
+    "hex harmony",
   ];
 
   randomTheme.name = "RANDOM";

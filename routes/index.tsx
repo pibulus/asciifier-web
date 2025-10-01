@@ -14,7 +14,7 @@ export default function Home() {
       >
         <div class="max-w-6xl mx-auto px-4 py-6">
           <div class="flex items-start justify-between">
-            <div>
+            <div class="flex-1">
               <a href="/" class="group">
                 <h1 class="text-5xl font-bold flex items-baseline gap-3 cursor-pointer">
                   <span
@@ -25,30 +25,23 @@ export default function Home() {
                   </span>
                 </h1>
               </a>
-              <div class="mt-3 space-y-2">
-                <p
-                  class="text-xl font-mono font-bold"
-                  style="color: var(--color-accent, #FF69B4)"
-                >
-                  Turn ANYTHING into text art
-                </p>
-                <p
-                  class="text-sm font-mono opacity-90 leading-relaxed"
-                  style="color: var(--color-text, #0A0A0A)"
-                >
-                  Images, text, memes, screenshots → Beautiful ASCII art that
-                  works everywhere
-                </p>
-              </div>
+              <p
+                class="mt-3 text-xl font-mono font-bold"
+                style="color: var(--color-accent, #FF69B4)"
+              >
+                Turn ANYTHING into text art
+              </p>
             </div>
-            <ThemeIsland />
+            <div class="flex items-center gap-4">
+              <TabsIsland />
+              <ThemeIsland />
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
-        <TabsIsland />
+      {/* Main Content - Empty, TabsIsland handles content rendering */}
+      <main class="flex-1">
       </main>
 
       {/* Footer */}

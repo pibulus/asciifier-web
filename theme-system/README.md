@@ -1,15 +1,18 @@
 # 🎨 Pablo's Universal Theme System for Deno
 
-A modular, reusable theme engine for any Deno/Fresh app. Built with the 60/30/10 design principle and smart color harmony algorithms.
+A modular, reusable theme engine for any Deno/Fresh app. Built with the 60/30/10
+design principle and smart color harmony algorithms.
 
 ## Features
 
-- **60/30/10 Rule**: Automatic color balance (60% base, 30% secondary, 10% accent)
+- **60/30/10 Rule**: Automatic color balance (60% base, 30% secondary, 10%
+  accent)
 - **Smart Random Themes**: Generates harmonically balanced color schemes
 - **CSS Variable Integration**: Seamless theming with CSS custom properties
 - **LocalStorage Persistence**: Remembers user's theme choice
 - **TypeScript Support**: Full type safety
-- **Color Harmony Algorithms**: Analogous, triadic, complementary color generation
+- **Color Harmony Algorithms**: Analogous, triadic, complementary color
+  generation
 
 ## Installation
 
@@ -117,15 +120,15 @@ themeSystem.applyTheme(lightTheme);
 
 ```typescript
 interface Theme {
-  name: string;           // Display name
-  vibe: string;           // Theme description
-  base: string;           // 60% - Main background
-  secondary: string;      // 30% - Cards/sections
-  accent: string;         // 10% - CTAs/highlights
-  text: string;           // Primary text color
+  name: string; // Display name
+  vibe: string; // Theme description
+  base: string; // 60% - Main background
+  secondary: string; // 30% - Cards/sections
+  accent: string; // 10% - CTAs/highlights
+  text: string; // Primary text color
   textSecondary?: string; // Optional secondary text
-  border: string;         // Border color
-  shadow?: string;        // Optional shadow color
+  border: string; // Border color
+  shadow?: string; // Optional shadow color
   cssVars?: Record<string, string>; // Additional CSS variables
 }
 ```
@@ -133,6 +136,7 @@ interface Theme {
 ## Color Harmony Types
 
 The random generator supports:
+
 - **Analogous**: Colors next to each other on the color wheel
 - **Triadic**: Three colors evenly spaced around the wheel
 - **Complementary**: Opposite colors for high contrast
@@ -141,6 +145,7 @@ The random generator supports:
 ## Example Implementation
 
 See `asciifier-themes.ts` for a complete implementation example with:
+
 - Refined theme definitions
 - Custom random theme generation
 - App-specific configuration

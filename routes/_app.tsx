@@ -1,5 +1,12 @@
 import { type PageProps } from "$fresh/server.ts";
+
 export default function App({ Component }: PageProps) {
+  // Pass env vars to client for analytics (only public keys)
+  const analyticsEnv = {
+    POSTHOG_KEY: Deno.env.get("POSTHOG_KEY"),
+    POSTHOG_HOST: Deno.env.get("POSTHOG_HOST"),
+  };
+
   return (
     <html lang="en">
       <head>
@@ -27,6 +34,13 @@ export default function App({ Component }: PageProps) {
 
         {/* Styles */}
         <link rel="stylesheet" href="/styles.css" />
+
+        {/* Analytics env vars */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(analyticsEnv)};`,
+          }}
+        />
       </head>
       <body>
         {/* Real grain texture using noise image */}
@@ -42,7 +56,8 @@ export default function App({ Component }: PageProps) {
             zIndex: 9999,
             opacity: 0.08,
             // Using a base64 noise pattern for true random grain
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='9' numOctaves='4' seed='5'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E")`,
+            backgroundImage:
+              `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='9' numOctaves='4' seed='5'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E")`,
             backgroundRepeat: "repeat",
             mixBlendMode: "overlay",
           }}

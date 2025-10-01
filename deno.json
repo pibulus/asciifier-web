@@ -35,7 +35,8 @@
     "figlet": "npm:figlet@^1.7.0",
     "ascii-art": "npm:ascii-art@^2.8.5",
     "ascii-art-font": "npm:ascii-art-font@^1.0.2",
-    "ascii-art-table": "npm:ascii-art-table@^1.0.1"
+    "ascii-art-table": "npm:ascii-art-table@^1.0.1",
+    "posthog-js": "npm:posthog-js@^1.246.0"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

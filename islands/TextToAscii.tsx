@@ -1,6 +1,7 @@
 import { useSignal } from "@preact/signals";
 import { useEffect, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
+import { analytics } from "../utils/analytics.ts";
 
 // Curated figlet fonts - hand-picked fonts for the ASCII Factory!
 const FIGLET_FONTS = [
@@ -45,11 +46,18 @@ const COLOR_EFFECTS = [
 ];
 
 export default function TextToAscii() {
+  // Initialize analytics on mount
+  useEffect(() => {
+    analytics.init();
+  }, []);
   const [asciiOutput, setAsciiOutput] = useState<string>("");
   const [htmlOutput, setHtmlOutput] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [copiedFormat, setCopiedFormat] = useState("");
+  const [welcomeArt, setWelcomeArt] = useState<string>("");
+  const [artCache, setArtCache] = useState<string[]>([]);
+  const [isLoadingArt, setIsLoadingArt] = useState(false);
 
   // Dropdown states
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
@@ -65,6 +73,72 @@ export default function TextToAscii() {
   const selectedFont = useSignal("Standard");
   const colorEffect = useSignal("none");
   const borderStyle = useSignal("none");
+
+  // Function to fetch random ASCII art
+  const fetchRandomArt = async (): Promise<string | null> => {
+    try {
+      const response = await fetch("/api/random-ascii-art");
+      const data = await response.json();
+      analytics.trackRandomAscii(data.category);
+      return data.art || null;
+    } catch (error) {
+      console.error("Failed to fetch random ASCII art:", error);
+      return null;
+    }
+  };
+
+  // Escape HTML for display
+  const escapeHtml = (text: string): string => {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
+
+  // Prefetch multiple pieces of art
+  const prefetchArt = async (count: number = 3) => {
+    const promises = Array(count).fill(null).map(() => fetchRandomArt());
+    const results = await Promise.all(promises);
+    const validArt = results.filter((art): art is string => art !== null).map((
+      art,
+    ) => escapeHtml(art)); // Just escape, don't modify the art at all
+    setArtCache(validArt);
+    if (validArt.length > 0) {
+      setWelcomeArt(validArt[0]);
+    }
+  };
+
+  // Shuffle to next cached art or fetch new with loading state
+  const shuffleArt = () => {
+    sounds.click();
+    setIsLoadingArt(true);
+    setWelcomeArt(""); // Clear current art to show loading cursor
+
+    // Brief loading delay for satisfaction
+    setTimeout(() => {
+      if (artCache.length > 1) {
+        // Use next cached piece
+        const [_current, ...rest] = artCache;
+        setWelcomeArt(rest[0]); // Already trimmed and escaped
+        setArtCache(rest);
+        setIsLoadingArt(false);
+        // Prefetch one more to keep cache full
+        fetchRandomArt().then((art) => {
+          if (art) setArtCache((prev) => [...prev, escapeHtml(art)]);
+        });
+      } else {
+        // Fetch fresh if cache empty
+        prefetchArt(3).then(() => setIsLoadingArt(false));
+      }
+    }, 300); // 300ms loading delay
+  };
+
+  // Load and prefetch ASCII art on mount
+  useEffect(() => {
+    prefetchArt(3);
+  }, []);
 
   // Check if all three dropdowns have been changed from default
   useEffect(() => {
@@ -86,7 +160,10 @@ export default function TextToAscii() {
       setExportMenuOpen(false);
     };
 
-    if (fontDropdownOpen || colorDropdownOpen || borderDropdownOpen || exportMenuOpen) {
+    if (
+      fontDropdownOpen || colorDropdownOpen || borderDropdownOpen ||
+      exportMenuOpen
+    ) {
       document.addEventListener("click", handleClickOutside);
       return () => document.removeEventListener("click", handleClickOutside);
     }
@@ -124,6 +201,11 @@ export default function TextToAscii() {
         setAsciiOutput(data.ascii);
         setHtmlOutput(data.html || data.ascii);
         sounds.success();
+        analytics.trackAsciiGenerated(
+          selectedFont.value,
+          colorEffect.value,
+          true,
+        );
       } else {
         throw new Error(data.error || "Failed to generate ASCII text");
       }
@@ -131,6 +213,11 @@ export default function TextToAscii() {
       console.error("Error generating ASCII text:", error);
       setAsciiOutput("Error: Could not generate ASCII text");
       sounds.error();
+      analytics.trackAsciiGenerated(
+        selectedFont.value,
+        colorEffect.value,
+        false,
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -151,6 +238,7 @@ export default function TextToAscii() {
   ]);
 
   const copyToClipboard = async (format = "email") => {
+    analytics.trackExport(format === "email" ? "html" : "plain");
     try {
       // Strip ANSI codes for plain text
       const plainText = asciiOutput.replace(/\u001b\[[0-9;]*m/g, "");
@@ -199,6 +287,7 @@ export default function TextToAscii() {
   };
 
   const downloadText = () => {
+    analytics.trackExport("text");
     // Strip HTML tags and ANSI codes for plain text download
     let plainText = asciiOutput;
 
@@ -225,6 +314,7 @@ export default function TextToAscii() {
   };
 
   const downloadPNG = () => {
+    analytics.trackExport("png");
     try {
       // Get the ASCII display element
       const asciiElement = document.querySelector(".ascii-display");
@@ -428,10 +518,17 @@ export default function TextToAscii() {
       {/* ASCII FACTORY JUKEBOX - Three Dropdown Combo Machine! */}
       <div class="mb-8">
         {/* Three Dropdown Reels Side by Side */}
-        <div class={`grid grid-cols-1 md:grid-cols-3 gap-6 ${allSelected ? 'animate-wiggle' : ''}`}>
+        <div
+          class={`grid grid-cols-1 md:grid-cols-3 gap-6 ${
+            allSelected ? "animate-wiggle" : ""
+          }`}
+        >
           {/* Font Dropdown */}
           <div class="relative">
-            <label class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider" style="color: var(--color-text, #0A0A0A);">
+            <label
+              class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider"
+              style="color: var(--color-text, #0A0A0A);"
+            >
               Font
             </label>
             <div
@@ -448,8 +545,18 @@ export default function TextToAscii() {
               }}
             >
               <div class="flex items-center justify-between">
-                <span class="text-base">{FIGLET_FONTS.find(f => f.file === selectedFont.value)?.name || "Standard"}</span>
-                <span class="text-lg transition-transform" style={`color: var(--color-accent, #FF69B4); transform: rotate(${fontDropdownOpen ? '180' : '0'}deg);`}>▼</span>
+                <span class="text-base">
+                  {FIGLET_FONTS.find((f) => f.file === selectedFont.value)
+                    ?.name || "Standard"}
+                </span>
+                <span
+                  class="text-lg transition-transform"
+                  style={`color: var(--color-accent, #FF69B4); transform: rotate(${
+                    fontDropdownOpen ? "180" : "0"
+                  }deg);`}
+                >
+                  ▼
+                </span>
               </div>
             </div>
             {fontDropdownOpen && (
@@ -461,7 +568,15 @@ export default function TextToAscii() {
                   <div
                     key={font.file}
                     class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
-                    style={`background-color: ${selectedFont.value === font.file ? 'var(--color-accent, #FF69B4)' : 'transparent'}; color: ${selectedFont.value === font.file ? 'var(--color-base, #FAF9F6)' : 'var(--color-text, #0A0A0A)'};`}
+                    style={`background-color: ${
+                      selectedFont.value === font.file
+                        ? "var(--color-accent, #FF69B4)"
+                        : "transparent"
+                    }; color: ${
+                      selectedFont.value === font.file
+                        ? "var(--color-base, #FAF9F6)"
+                        : "var(--color-text, #0A0A0A)"
+                    };`}
                     onClick={() => {
                       sounds.click();
                       selectedFont.value = font.file;
@@ -470,7 +585,9 @@ export default function TextToAscii() {
                     }}
                     onMouseEnter={() => sounds.hover && sounds.hover()}
                   >
-                    {selectedFont.value === font.file && <span class="mr-2">✓</span>}
+                    {selectedFont.value === font.file && (
+                      <span class="mr-2">✓</span>
+                    )}
                     {font.name}
                   </div>
                 ))}
@@ -480,7 +597,10 @@ export default function TextToAscii() {
 
           {/* Color Dropdown */}
           <div class="relative">
-            <label class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider" style="color: var(--color-text, #0A0A0A);">
+            <label
+              class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider"
+              style="color: var(--color-text, #0A0A0A);"
+            >
               Color
             </label>
             <div
@@ -497,8 +617,18 @@ export default function TextToAscii() {
               }}
             >
               <div class="flex items-center justify-between">
-                <span class="text-base">{COLOR_EFFECTS.find(e => e.value === colorEffect.value)?.name || "Plain"}</span>
-                <span class="text-lg transition-transform" style={`color: var(--color-accent, #FF69B4); transform: rotate(${colorDropdownOpen ? '180' : '0'}deg);`}>▼</span>
+                <span class="text-base">
+                  {COLOR_EFFECTS.find((e) => e.value === colorEffect.value)
+                    ?.name || "Plain"}
+                </span>
+                <span
+                  class="text-lg transition-transform"
+                  style={`color: var(--color-accent, #FF69B4); transform: rotate(${
+                    colorDropdownOpen ? "180" : "0"
+                  }deg);`}
+                >
+                  ▼
+                </span>
               </div>
             </div>
             {colorDropdownOpen && (
@@ -510,7 +640,15 @@ export default function TextToAscii() {
                   <div
                     key={effect.value}
                     class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
-                    style={`background-color: ${colorEffect.value === effect.value ? 'var(--color-accent, #FF69B4)' : 'transparent'}; color: ${colorEffect.value === effect.value ? 'var(--color-base, #FAF9F6)' : 'var(--color-text, #0A0A0A)'};`}
+                    style={`background-color: ${
+                      colorEffect.value === effect.value
+                        ? "var(--color-accent, #FF69B4)"
+                        : "transparent"
+                    }; color: ${
+                      colorEffect.value === effect.value
+                        ? "var(--color-base, #FAF9F6)"
+                        : "var(--color-text, #0A0A0A)"
+                    };`}
                     onClick={() => {
                       sounds.click();
                       colorEffect.value = effect.value;
@@ -519,7 +657,9 @@ export default function TextToAscii() {
                     }}
                     onMouseEnter={() => sounds.hover && sounds.hover()}
                   >
-                    {colorEffect.value === effect.value && <span class="mr-2">✓</span>}
+                    {colorEffect.value === effect.value && (
+                      <span class="mr-2">✓</span>
+                    )}
                     {effect.name}
                   </div>
                 ))}
@@ -529,7 +669,10 @@ export default function TextToAscii() {
 
           {/* Border Dropdown */}
           <div class="relative">
-            <label class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider" style="color: var(--color-text, #0A0A0A);">
+            <label
+              class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider"
+              style="color: var(--color-text, #0A0A0A);"
+            >
               Border
             </label>
             <div
@@ -546,8 +689,18 @@ export default function TextToAscii() {
               }}
             >
               <div class="flex items-center justify-between">
-                <span class="text-base">{BORDER_STYLES.find(b => b.value === borderStyle.value)?.name || "None"}</span>
-                <span class="text-lg transition-transform" style={`color: var(--color-accent, #FF69B4); transform: rotate(${borderDropdownOpen ? '180' : '0'}deg);`}>▼</span>
+                <span class="text-base">
+                  {BORDER_STYLES.find((b) => b.value === borderStyle.value)
+                    ?.name || "None"}
+                </span>
+                <span
+                  class="text-lg transition-transform"
+                  style={`color: var(--color-accent, #FF69B4); transform: rotate(${
+                    borderDropdownOpen ? "180" : "0"
+                  }deg);`}
+                >
+                  ▼
+                </span>
               </div>
             </div>
             {borderDropdownOpen && (
@@ -559,7 +712,15 @@ export default function TextToAscii() {
                   <div
                     key={border.value}
                     class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
-                    style={`background-color: ${borderStyle.value === border.value ? 'var(--color-accent, #FF69B4)' : 'transparent'}; color: ${borderStyle.value === border.value ? 'var(--color-base, #FAF9F6)' : 'var(--color-text, #0A0A0A)'};`}
+                    style={`background-color: ${
+                      borderStyle.value === border.value
+                        ? "var(--color-accent, #FF69B4)"
+                        : "transparent"
+                    }; color: ${
+                      borderStyle.value === border.value
+                        ? "var(--color-base, #FAF9F6)"
+                        : "var(--color-text, #0A0A0A)"
+                    };`}
                     onClick={() => {
                       sounds.click();
                       borderStyle.value = border.value;
@@ -568,7 +729,9 @@ export default function TextToAscii() {
                     }}
                     onMouseEnter={() => sounds.hover && sounds.hover()}
                   >
-                    {borderStyle.value === border.value && <span class="mr-2">✓</span>}
+                    {borderStyle.value === border.value && (
+                      <span class="mr-2">✓</span>
+                    )}
                     {border.name}
                   </div>
                 ))}
@@ -589,34 +752,80 @@ export default function TextToAscii() {
             style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)"
           >
             <div class="flex space-x-2">
-              <div class="w-3 h-3 bg-red-500 rounded-full hover:scale-125 transition-transform cursor-pointer" title="Close (jk)"></div>
-              <div class="w-3 h-3 bg-yellow-500 rounded-full hover:scale-125 transition-transform cursor-pointer" title="Minimize (nope)"></div>
-              <div class="w-3 h-3 bg-green-500 rounded-full hover:scale-125 transition-transform cursor-pointer" title="Full screen (maybe)"></div>
+              <div
+                class="w-3 h-3 bg-red-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
+                title="Close (jk)"
+              >
+              </div>
+              <div
+                class="w-3 h-3 bg-yellow-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
+                title="Minimize (nope)"
+              >
+              </div>
+              <div
+                class="w-3 h-3 bg-green-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
+                title="Full screen (maybe)"
+              >
+              </div>
             </div>
-            <span class="text-xs font-mono opacity-60">~/output/text-art.txt</span>
+            <span class="text-xs font-mono opacity-60">
+              ~/output/text-art.txt
+            </span>
+            {!asciiOutput && (
+              <button
+                onClick={shuffleArt}
+                class="px-2 py-1 text-xs font-mono font-bold transition-all hover:opacity-70"
+                style="color: #00FF41;"
+                title="Shuffle ASCII art"
+              >
+                🎲 SHUFFLE
+              </button>
+            )}
           </div>
           <div
-            class="p-8 overflow-auto custom-scrollbar"
-            style="height: 320px;"
+            class="p-8 overflow-auto custom-scrollbar transition-all duration-500 ease-out"
+            style={asciiOutput
+              ? "height: 320px;"
+              : "min-height: 320px; max-height: 600px;"}
           >
-            {asciiOutput ? (
-              <pre
-                class="ascii-display leading-tight"
-                style="color: #00FF41; font-size: clamp(0.6rem, 1.4vw, 0.9rem); font-family: monospace;"
-                dangerouslySetInnerHTML={{
-                  __html: colorEffect.value === "none"
-                    ? asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                    : (htmlOutput ||
-                      asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")),
-                }}
-              />
-            ) : (
-              <div class="flex items-center">
-                <pre class="font-mono text-lg" style="color: #00FF41;">
-                  <span class="blinking-cursor">█</span>
-                </pre>
-              </div>
-            )}
+            {asciiOutput
+              ? (
+                <pre
+                  class="ascii-display leading-tight"
+                  style="color: #00FF41; font-size: clamp(0.6rem, 1.4vw, 0.9rem); font-family: monospace;"
+                  dangerouslySetInnerHTML={{
+                    __html: colorEffect.value === "none"
+                      ? asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                      : (htmlOutput ||
+                        asciiOutput.replace(/</g, "&lt;").replace(
+                          />/g,
+                          "&gt;",
+                        )),
+                  }}
+                />
+              )
+              : (
+                <div class="flex flex-col items-start justify-start h-full">
+                  {welcomeArt
+                    ? (
+                      <pre
+                        class="font-mono text-sm opacity-40 animate-fade-in"
+                        style="color: #00FF41; line-height: 1.2; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: -0.5px; font-weight: 600;"
+                        dangerouslySetInnerHTML={{ __html: welcomeArt }}
+                      />
+                    )
+                    : (
+                      <div class="flex items-start justify-start w-full pt-2 pl-2">
+                        <pre
+                          class="font-mono text-lg animate-loading-cursor"
+                          style="color: #00FF41;"
+                        >
+                          <span class="blinking-cursor">█</span>
+                        </pre>
+                      </div>
+                    )}
+                </div>
+              )}
           </div>
 
           {/* Floating Export Button - Appears when ASCII is ready */}
@@ -646,7 +855,11 @@ export default function TextToAscii() {
                     class="ml-2 pl-2 border-l-2 transition-transform"
                     style="border-color: currentColor;"
                   >
-                    <span style={`transform: rotate(${exportMenuOpen ? '180' : '0'}deg); display: inline-block; transition: transform 0.2s;`}>
+                    <span
+                      style={`transform: rotate(${
+                        exportMenuOpen ? "180" : "0"
+                      }deg); display: inline-block; transition: transform 0.2s;`}
+                    >
                       ▼
                     </span>
                   </button>
@@ -738,7 +951,6 @@ export default function TextToAscii() {
           </div>
         </div>
       )}
-
 
       <style>
         {`
@@ -1018,6 +1230,27 @@ export default function TextToAscii() {
 
         .animate-bounce-once {
           animation: bounceOnce 0.5s ease-out;
+        }
+
+        /* Loading cursor animation - moves right then pulses */
+        @keyframes loadingCursor {
+          0% { transform: translateX(0); }
+          50% { transform: translateX(40px); }
+          100% { transform: translateX(40px); }
+        }
+
+        .animate-loading-cursor {
+          animation: loadingCursor 1.5s ease-out;
+        }
+
+        /* Fade in animation for ASCII art */
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 0.4; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+          animation: fadeIn 0.4s ease-out;
         }
 
         /* Transform utilities */

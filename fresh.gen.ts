@@ -6,6 +6,7 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $api_enhanced_figlet from "./routes/api/enhanced-figlet.ts";
 import * as $api_joke from "./routes/api/joke.ts";
+import * as $api_random_ascii_art from "./routes/api/random-ascii-art.ts";
 import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
 import * as $Dropzone from "./islands/Dropzone.tsx";
@@ -20,6 +21,7 @@ const manifest = {
     "./routes/_app.tsx": $_app,
     "./routes/api/enhanced-figlet.ts": $api_enhanced_figlet,
     "./routes/api/joke.ts": $api_joke,
+    "./routes/api/random-ascii-art.ts": $api_random_ascii_art,
     "./routes/greet/[name].tsx": $greet_name_,
     "./routes/index.tsx": $index,
   },
