@@ -42,7 +42,7 @@ export class SimpleTypeWriter {
       }
       
       // Load the config and audio in parallel
-      const basePath = `./sounds/keyboard-packs/${pack}/`;
+      const basePath = `/sounds/keyboard-packs/${pack}/`;
       const [configResponse, audioResponse] = await Promise.all([
         fetch(basePath + 'config.json'),
         fetch(basePath + 'sound.ogg')
