@@ -200,14 +200,6 @@ export default function TextToAscii() {
         for (let y = 0; y < lines.length; y++) {
           const line = lines[y];
 
-          // Escape the entire line first
-          const escapedLine = line
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-
           // Calculate color for this line (use middle of line for consistent color)
           const color = getEffectColor(
             effect,
@@ -217,8 +209,8 @@ export default function TextToAscii() {
             lines.length,
           );
 
-          // Wrap entire line in one span
-          colorizedLines.push(`<span style="color: ${color};">${escapedLine}</span>`);
+          // Wrap entire line in one span (no HTML escaping needed - ASCII art is safe)
+          colorizedLines.push(`<span style="color: ${color};">${line}</span>`);
         }
 
         setWelcomeArtColorized(colorizedLines.join("\n"));
@@ -956,7 +948,7 @@ export default function TextToAscii() {
                     ? (
                       <pre
                         class="font-mono text-base opacity-70 animate-fade-in"
-                        style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.5px; font-weight: 700; text-shadow: 0 0 2px currentColor, 0 0 4px currentColor;"
+                        style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.5px; font-weight: 700; text-shadow: 0 0 1px currentColor, 0 0 2px currentColor;"
                         dangerouslySetInnerHTML={{
                           __html: welcomeArtColorized || welcomeArt,
                         }}
