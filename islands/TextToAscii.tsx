@@ -874,19 +874,6 @@ export default function TextToAscii() {
           </div>
         </div>
 
-        {/* Shuffle Button - Only when welcome art is shown */}
-        {!asciiOutput && welcomeArt && (
-          <div class="flex justify-end">
-            <button
-              onClick={shuffleArt}
-              class="px-4 py-2 border-4 rounded-lg font-mono font-bold transition-all hover:shadow-brutal hover:scale-105 active:scale-95"
-              style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A)"
-              title="Get a random ASCII art"
-            >
-              🎲 SHUFFLE
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Terminal Display - Always visible */}
@@ -916,15 +903,28 @@ export default function TextToAscii() {
               >
               </div>
             </div>
-            <span class="text-xs font-mono opacity-60">
-              ~/output/text-art.txt
-            </span>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-mono opacity-60">
+                ~/output/text-art.txt
+              </span>
+              {/* Shuffle button in menu bar - only for welcome art */}
+              {!asciiOutput && welcomeArt && (
+                <button
+                  onClick={shuffleArt}
+                  class="px-2 py-1 text-xs font-mono font-bold transition-all hover:scale-110 active:scale-95 opacity-70 hover:opacity-100"
+                  style="color: #00FF41"
+                  title="Get a random ASCII art"
+                >
+                  🎲
+                </button>
+              )}
+            </div>
           </div>
           <div
-            class="p-8 overflow-auto custom-scrollbar transition-all duration-500 ease-out"
+            class="p-8 overflow-auto custom-scrollbar transition-all duration-700"
             style={asciiOutput
-              ? "height: 320px;"
-              : "min-height: 320px; max-height: 600px;"}
+              ? "height: 320px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
+              : "min-height: 320px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"}
           >
             {asciiOutput
               ? (
@@ -947,8 +947,8 @@ export default function TextToAscii() {
                   {welcomeArt
                     ? (
                       <pre
-                        class="font-mono text-base opacity-70 animate-fade-in"
-                        style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.5px; font-weight: 700; text-shadow: 0 0 1px currentColor, 0 0 2px currentColor;"
+                        class="font-mono text-base opacity-85 animate-fade-in"
+                        style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
                         dangerouslySetInnerHTML={{
                           __html: welcomeArtColorized || welcomeArt,
                         }}
@@ -992,6 +992,45 @@ export default function TextToAscii() {
               </button>
 
               {/* Main Copy Button */}
+              <button
+                onClick={() => copyToClipboard("email")}
+                class={`px-6 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 ${
+                  copiedToClipboard ? "animate-bounce-once" : ""
+                }`}
+                style={copiedToClipboard
+                  ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
+                  : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
+                title="Copy to clipboard"
+              >
+                {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
+              </button>
+            </div>
+          )}
+
+          {/* Export Buttons for Welcome Art */}
+          {!asciiOutput && welcomeArt && (
+            <div class="absolute bottom-6 right-6 z-10 flex gap-3 animate-pop-in">
+              {/* Download PNG */}
+              <button
+                onClick={downloadPNG}
+                class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                title="Download as PNG image"
+              >
+                🖼️ PNG
+              </button>
+
+              {/* Download TXT */}
+              <button
+                onClick={downloadText}
+                class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                title="Download as text file"
+              >
+                💾 TXT
+              </button>
+
+              {/* Copy Button */}
               <button
                 onClick={() => copyToClipboard("email")}
                 class={`px-6 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 ${
