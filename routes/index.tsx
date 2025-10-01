@@ -1,19 +1,28 @@
+import { useSignal } from "@preact/signals";
+import TabSwitcher from "../islands/TabSwitcher.tsx";
 import TabsIsland from "../islands/TabsIsland.tsx";
 import ThemeIsland from "../islands/ThemeIsland.tsx";
 
 export default function Home() {
+  const activeTab = useSignal("image");
+
   return (
     <div
       class="min-h-screen flex flex-col"
       style="background: var(--color-base-gradient, var(--color-base, #FAF9F6))"
     >
+      {/* Floating Theme Button */}
+      <div class="fixed top-4 right-4 z-50">
+        <ThemeIsland />
+      </div>
+
       {/* Header */}
       <header
         class="border-b-4 relative"
         style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)"
       >
         <div class="max-w-6xl mx-auto px-4 py-6">
-          <div class="flex items-start justify-between">
+          <div class="flex items-center justify-between gap-8">
             <div class="flex-1">
               <a href="/" class="group">
                 <h1 class="text-5xl font-bold flex items-baseline gap-3 cursor-pointer">
@@ -32,14 +41,14 @@ export default function Home() {
                 Turn ANYTHING into text art
               </p>
             </div>
-            <ThemeIsland />
+            <TabSwitcher activeTab={activeTab} />
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
-        <TabsIsland />
+      <main class="flex-1 max-w-6xl mx-auto px-4 py-12 w-full">
+        <TabsIsland activeTab={activeTab} />
       </main>
 
       {/* Footer */}

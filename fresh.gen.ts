@@ -9,7 +9,9 @@ import * as $api_joke from "./routes/api/joke.ts";
 import * as $api_random_ascii_art from "./routes/api/random-ascii-art.ts";
 import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
+import * as $thanks from "./routes/thanks.tsx";
 import * as $Dropzone from "./islands/Dropzone.tsx";
+import * as $TabSwitcher from "./islands/TabSwitcher.tsx";
 import * as $TabsIsland from "./islands/TabsIsland.tsx";
 import * as $TextToAscii from "./islands/TextToAscii.tsx";
 import * as $ThemeIsland from "./islands/ThemeIsland.tsx";
@@ -24,9 +26,11 @@ const manifest = {
     "./routes/api/random-ascii-art.ts": $api_random_ascii_art,
     "./routes/greet/[name].tsx": $greet_name_,
     "./routes/index.tsx": $index,
+    "./routes/thanks.tsx": $thanks,
   },
   islands: {
     "./islands/Dropzone.tsx": $Dropzone,
+    "./islands/TabSwitcher.tsx": $TabSwitcher,
     "./islands/TabsIsland.tsx": $TabsIsland,
     "./islands/TextToAscii.tsx": $TextToAscii,
     "./islands/ThemeIsland.tsx": $ThemeIsland,
