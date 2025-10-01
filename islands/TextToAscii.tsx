@@ -1,7 +1,8 @@
 import { useSignal } from "@preact/signals";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState, useRef } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { analytics } from "../utils/analytics.ts";
+import { getTypeWriter } from "../utils/typewriter-sounds.ts";
 
 // Curated figlet fonts - hand-picked fonts for the ASCII Factory!
 const FIGLET_FONTS = [
@@ -46,10 +47,26 @@ const COLOR_EFFECTS = [
 ];
 
 export default function TextToAscii() {
-  // Initialize analytics on mount
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize analytics and typewriter sounds on mount
   useEffect(() => {
     analytics.init();
+
+    // Initialize typewriter sounds
+    if (typeof window !== "undefined") {
+      const typewriter = getTypeWriter();
+      // Attach to the specific input using ref
+      if (inputRef.current) {
+        const handler = (e: Event) => typewriter.play(e as KeyboardEvent);
+        inputRef.current.addEventListener("keydown", handler);
+        return () => {
+          inputRef.current?.removeEventListener("keydown", handler);
+        };
+      }
+    }
   }, []);
+
   const [asciiOutput, setAsciiOutput] = useState<string>("");
   const [htmlOutput, setHtmlOutput] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -593,10 +610,10 @@ export default function TextToAscii() {
       <div class="mb-8">
         <div class="relative">
           <input
+            ref={inputRef}
             type="text"
             value={inputText.value}
             onInput={(e) => {
-              sounds.click();
               inputText.value = (e.target as HTMLInputElement).value;
             }}
             placeholder="Type something magical... ✨"

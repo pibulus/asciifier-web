@@ -83,9 +83,24 @@ export function generateAsciifierRandomTheme(
   return randomTheme;
 }
 
+// Import vibrant themes from utils
+import { asciifierThemes } from "../utils/themes.ts";
+
+// Best light themes from the collection (handpicked for vibrancy)
+const vibrantLightThemes = [
+  asciifierThemes.find((t) => t.name === "PINK_DREAM")!,
+  asciifierThemes.find((t) => t.name === "TURQUOISE")!,
+  asciifierThemes.find((t) => t.name === "PURPLE")!,
+  asciifierThemes.find((t) => t.name === "OCEAN")!,
+  asciifierThemes.find((t) => t.name === "MINT")!,
+  asciifierThemes.find((t) => t.name === "MAGENTA")!,
+  asciifierThemes.find((t) => t.name === "TEAL")!,
+  asciifierThemes.find((t) => t.name === "RISO")!, // Risograph clash!
+];
+
 // Configuration for asciifier-web
 export const asciifierThemeConfig: ThemeSystemConfig = {
-  themes: [vintageCream, terminalDusk],
+  themes: [vintageCream, terminalDusk, ...vibrantLightThemes],
   defaultTheme: "VINTAGE CREAM",
   storageKey: "asciifier-theme",
   randomEnabled: true,
