@@ -47,8 +47,10 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main class="flex-1 max-w-6xl mx-auto px-4 py-12 w-full">
-        <TabsIsland activeTab={activeTab} />
+      <main class="flex-1 w-full px-4 py-12">
+        <div class="max-w-5xl mx-auto">
+          <TabsIsland activeTab={activeTab} />
+        </div>
       </main>
 
       {/* Footer */}

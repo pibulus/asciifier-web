@@ -356,14 +356,14 @@ export default function Dropzone() {
 
           {/* Drop Zone */}
           <div
-            class={`relative border-8 border-dashed transition-all duration-300 rounded-xl p-20 cursor-pointer group ${
+            class={`relative border-8 border-dashed transition-all duration-300 rounded-xl p-24 cursor-pointer group ${
               isDragging
                 ? "scale-105 shadow-brutal-lg rotate-1"
                 : "hover:scale-105 hover:rotate-2 shadow-brutal hover:shadow-brutal-lg"
             }`}
             style={isDragging
               ? `border-color: var(--color-accent, #FF69B4); background-color: var(--color-secondary, #FFE5B4)`
-              : `border-color: var(--color-border, #0A0A0A); background-color: var(--color-base, #FAF9F6)`}
+              : `border-color: var(--color-border, #0A0A0A); background: linear-gradient(135deg, rgba(250, 249, 246, 0.3) 0%, rgba(255, 229, 180, 0.15) 100%)`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -428,19 +428,19 @@ export default function Dropzone() {
           )}
 
           {/* Quick Start Presets */}
-          <div class="space-y-3">
+          <div class="space-y-4 max-w-3xl mx-auto">
             <p
               class="text-sm font-mono opacity-60"
               style="color: var(--color-text, #0A0A0A)"
             >
               Quick starts:
             </p>
-            <div class="flex flex-wrap gap-3 justify-center">
+            <div class="flex flex-wrap gap-4 justify-center">
               {PRESETS.map((preset, i) => (
                 <button
                   key={preset.name}
                   onClick={() => applyPreset(preset, i)}
-                  class={`group relative px-4 py-2 border-2 rounded-lg font-semibold text-sm transition-all duration-200 hover:animate-pop ${
+                  class={`group relative px-6 py-3 border-4 rounded-lg font-semibold text-sm transition-all duration-200 hover:animate-pop ${
                     selectedPreset === i
                       ? "shadow-brutal animate-pulse-soft"
                       : "shadow-brutal-sm hover:shadow-brutal"
