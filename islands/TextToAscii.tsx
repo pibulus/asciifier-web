@@ -56,14 +56,22 @@ export default function TextToAscii() {
     // Initialize typewriter sounds
     if (typeof window !== "undefined") {
       const typewriter = getTypeWriter();
-      // Attach to the specific input using ref
-      if (inputRef.current) {
-        const handler = (e: Event) => typewriter.play(e as KeyboardEvent);
-        inputRef.current.addEventListener("keydown", handler);
-        return () => {
-          inputRef.current?.removeEventListener("keydown", handler);
-        };
-      }
+
+      // Initialize the typewriter (loads sounds)
+      typewriter.init().then(() => {
+        // Attach to the specific input using ref
+        if (inputRef.current) {
+          const handler = (e: Event) => typewriter.play(e as KeyboardEvent);
+          inputRef.current.addEventListener("keydown", handler);
+
+          // Cleanup function
+          return () => {
+            inputRef.current?.removeEventListener("keydown", handler);
+          };
+        }
+      }).catch((err) => {
+        console.warn("Typewriter sounds failed to load:", err);
+      });
     }
   }, []);
 
