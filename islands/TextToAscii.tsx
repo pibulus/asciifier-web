@@ -53,43 +53,27 @@ export default function TextToAscii() {
 
     // Initialize typewriter sounds
     if (typeof window !== "undefined") {
-      console.log("🎹 Initializing typewriter sounds...");
-
       const typewriter = new SimpleTypeWriter({
         volume: 0.3,
         enabled: true,
       });
 
-      // Initialize and attach to input
       typewriter.init().then(() => {
-        console.log("🎹 Sound files loaded successfully!");
-
-        const input = document.querySelector('#ascii-text-input');
-        console.log("🎹 Input element found:", !!input);
-
         typewriter.attach('#ascii-text-input');
-        console.log("🎹 Typewriter attached to input!");
 
         // Resume audio context on first click (browser autoplay policy)
         const resumeAudio = () => {
           if (typewriter.audioContext?.state === 'suspended') {
-            typewriter.audioContext.resume().then(() => {
-              console.log("🎹 Audio context resumed!");
-            });
+            typewriter.audioContext.resume();
           }
           document.removeEventListener('click', resumeAudio);
         };
         document.addEventListener('click', resumeAudio);
       }).catch((err) => {
-        console.error("❌ Typewriter sounds failed to load:");
-        console.error("Error:", err);
+        console.warn("Typewriter sounds unavailable:", err);
       });
 
-      // Cleanup
-      return () => {
-        console.log("🎹 Cleaning up typewriter");
-        typewriter.dispose();
-      };
+      return () => typewriter.dispose();
     }
   }, []);
 
