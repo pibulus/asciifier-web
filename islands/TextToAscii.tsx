@@ -33,16 +33,18 @@ const BORDER_STYLES = [
   { name: "Block", value: "block" },
 ];
 
-// Enhanced color effects - fun ones first!
+// Enhanced color effects - ordered warm → cool → special
 const COLOR_EFFECTS = [
-  { name: "Unicorn", value: "unicorn" },
-  { name: "Cyberpunk", value: "cyberpunk" },
-  { name: "Sunrise", value: "sunrise" },
-  { name: "Vaporwave", value: "vaporwave" },
-  { name: "Fire", value: "fire" },
-  { name: "Bloody", value: "bloody" },
-  { name: "Chrome", value: "chrome" },
   { name: "Matrix", value: "none" },
+  { name: "Fire", value: "fire" },
+  { name: "Sunrise", value: "sunrise" },
+  { name: "Unicorn", value: "unicorn" },
+  { name: "Vaporwave", value: "vaporwave" },
+  { name: "Cyberpunk", value: "cyberpunk" },
+  { name: "Ocean", value: "ocean" },
+  { name: "Chrome", value: "chrome" },
+  { name: "Neon", value: "neon" },
+  { name: "Poison", value: "poison" },
 ];
 
 export default function TextToAscii() {
@@ -261,10 +263,26 @@ export default function TextToAscii() {
         const brightness = 70 + Math.sin(y * 0.3) * 20;
         return `hsl(${hue}, 30%, ${brightness}%)`;
       }
-      case "bloody": {
-        const progress = (x + y * 2) / (lineWidth + totalLines * 2);
-        const bright = 40 + (progress * 30);
-        return `hsl(0, 100%, ${bright}%)`;
+      case "ocean": {
+        const progress = y / totalLines;
+        const hue = 180 + (progress * 30); // Cyan (180) → Blue (210)
+        const sat = 70 + (progress * 20);
+        const bright = 50 + (progress * 20);
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      case "neon": {
+        const progress = (x + y) / (lineWidth + totalLines);
+        const hue = 60 + Math.sin(progress * 10) * 120; // Yellow/Green/Pink oscillation
+        const sat = 100;
+        const bright = 60 + Math.sin(progress * 8) * 15;
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      case "poison": {
+        const progress = (x + y) / (lineWidth + totalLines);
+        const hue = 90 + (progress * 30); // Lime green (90) → Yellow-green (120)
+        const sat = 90 + Math.sin(x * 0.5) * 10;
+        const bright = 45 + (progress * 20);
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
       }
       default:
         return "#00FF41";

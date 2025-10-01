@@ -243,12 +243,6 @@ function getEffectColor(
       const cyberpunkHue = 320 - (cyberpunkProgress * 140); // Pink (320) → Purple (280) → Cyan (180)
       return `hsl(${cyberpunkHue}, 100%, 65%)`;
 
-    case "bloody":
-      // Bloody - brighter blood red gradient
-      const bloodyProgress = (x + y * 2) / (lineWidth + totalLines * 2);
-      const bloodyBright = 40 + (bloodyProgress * 30); // Mid red to bright red
-      return `hsl(0, 100%, ${bloodyBright}%)`;
-
     case "vaporwave":
       // Vaporwave - nostalgic 80s/90s aesthetic with pink, cyan, purple
       const vaporProgress = y / totalLines;
@@ -256,6 +250,30 @@ function getEffectColor(
       const vaporSat = 80 + Math.sin((x + y) * 0.3) * 15;
       const vaporBright = 65 + Math.sin(x * 0.4) * 10;
       return `hsl(${vaporHue}, ${vaporSat}%, ${vaporBright}%)`;
+
+    case "ocean":
+      // Ocean - calming blue/cyan gradient
+      const oceanProgress = y / totalLines;
+      const oceanHue = 180 + (oceanProgress * 30); // Cyan (180) → Blue (210)
+      const oceanSat = 70 + (oceanProgress * 20);
+      const oceanBright = 50 + (oceanProgress * 20);
+      return `hsl(${oceanHue}, ${oceanSat}%, ${oceanBright}%)`;
+
+    case "neon":
+      // Neon - bright electric oscillating colors
+      const neonProgress = (x + y) / (lineWidth + totalLines);
+      const neonHue = 60 + Math.sin(neonProgress * 10) * 120; // Yellow/Green/Pink oscillation
+      const neonSat = 100;
+      const neonBright = 60 + Math.sin(neonProgress * 8) * 15;
+      return `hsl(${neonHue}, ${neonSat}%, ${neonBright}%)`;
+
+    case "poison":
+      // Poison - toxic radioactive green
+      const poisonProgress = (x + y) / (lineWidth + totalLines);
+      const poisonHue = 90 + (poisonProgress * 30); // Lime green (90) → Yellow-green (120)
+      const poisonSat = 90 + Math.sin(x * 0.5) * 10;
+      const poisonBright = 45 + (poisonProgress * 20);
+      return `hsl(${poisonHue}, ${poisonSat}%, ${poisonBright}%)`;
 
     case "none":
     default:
