@@ -14,16 +14,18 @@ web APIs to create rich, colorful ASCII art experiences.
 
 ### The Rainbow Wizard Architecture™
 
-This project pioneered a revolutionary approach: **Server-side terminal tools →
-API endpoints → Rich browser UI**
+This project pioneered a revolutionary approach: **Server-side ASCII generation →
+Custom HSL color effects → Rich browser UI**
 
 **Why This Is Genius:**
 
-- Terminal tools (figlet, lolcat) run natively on server
-- ANSI color codes converted to HTML for browser display
+- **Figlet** runs server-side for ASCII art generation
+- **Custom HSL gradients** (NOT lolcat) create vibrant color effects
+- Effects like "unicorn", "fire", "cyberpunk" use pure HSL color math
+- Colors converted to HTML `<span style="color: ...">` for browsers
 - Rich Gmail paste compatibility with embedded styling
-- No client-side CLI emulation needed
-- Full power of terminal tools in web browsers
+- No terminal dependency for colors - works perfectly in browsers
+- Full power of figlet + mathematical color beauty
 
 ### Tech Stack
 
@@ -104,16 +106,18 @@ deno task preview
 
 ### Core Endpoints
 
-- **POST /api/figlet**: Text → ASCII art with fonts + colors
-- **POST /api/colorize**: Apply lolcat rainbow effects
-- **GET /api/joke**: Random programming jokes
+- **POST /api/enhanced-figlet**: Text → ASCII art with fonts + HSL color effects
+- **GET /api/random-ascii-art**: Random ASCII art from curated collection
+- **POST /api/image-to-ascii**: Image → ASCII art (via ImageProcessor)
 
 ### Revolutionary Approach
 
-- Terminal tools run server-side in Deno runtime
-- ANSI color codes converted to HTML spans
+- **Figlet** runs server-side in Deno runtime
+- **Custom HSL math** generates color gradients (lines 169-265 in enhanced-figlet.ts)
+- Effects: unicorn, fire, cyberpunk, sunrise, vaporwave, angel, chrome
 - Rich clipboard formats for Gmail pasting
 - Full font selection without client-side dependencies
+- Random ASCII art can be colorized on-the-fly in browser
 
 ## 🚀 Deployment & Production
 

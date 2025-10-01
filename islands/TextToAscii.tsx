@@ -58,6 +58,10 @@ export default function TextToAscii() {
   const [welcomeArt, setWelcomeArt] = useState<string>("");
   const [artCache, setArtCache] = useState<string[]>([]);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
+  const [welcomeArtColorized, setWelcomeArtColorized] = useState<string>("");
+  const [selectedWelcomeColor, setSelectedWelcomeColor] = useState<string>(
+    "none",
+  );
 
   // Dropdown states
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
@@ -115,6 +119,7 @@ export default function TextToAscii() {
     sounds.click();
     setIsLoadingArt(true);
     setWelcomeArt(""); // Clear current art to show loading cursor
+    setSelectedWelcomeColor("none"); // Reset color selection
 
     // Brief loading delay for satisfaction
     setTimeout(() => {
@@ -122,6 +127,7 @@ export default function TextToAscii() {
         // Use next cached piece
         const [_current, ...rest] = artCache;
         setWelcomeArt(rest[0]); // Already trimmed and escaped
+        setWelcomeArtColorized(""); // Clear colorized version
         setArtCache(rest);
         setIsLoadingArt(false);
         // Prefetch one more to keep cache full
@@ -133,6 +139,100 @@ export default function TextToAscii() {
         prefetchArt(3).then(() => setIsLoadingArt(false));
       }
     }, 300); // 300ms loading delay
+  };
+
+  // Apply color effect to welcome art
+  const applyColorToWelcomeArt = async (effect: string) => {
+    setSelectedWelcomeColor(effect);
+    sounds.click();
+
+    if (effect === "none" || !welcomeArt) {
+      setWelcomeArtColorized("");
+      return;
+    }
+
+    try {
+      // Use the same colorization API
+      const response = await fetch("/api/enhanced-figlet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: "TEMP", // Dummy text, we'll replace with art
+          effect,
+          color: "#00FF41",
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        // Apply the color effect to our ASCII art manually
+        // This is a simple approach - just wrap each non-space char in a colored span
+        const lines = welcomeArt.split("\n");
+        const colorizedLines: string[] = [];
+
+        for (let y = 0; y < lines.length; y++) {
+          const line = lines[y];
+          let colorizedLine = "";
+
+          for (let x = 0; x < line.length; x++) {
+            const char = line[x];
+            if (char === " " || char === "") {
+              colorizedLine += char;
+            } else {
+              const color = getEffectColor(effect, x, y, line.length, lines.length);
+              colorizedLine += `<span style="color: ${color};">${char}</span>`;
+            }
+          }
+          colorizedLines.push(colorizedLine);
+        }
+
+        setWelcomeArtColorized(colorizedLines.join("\n"));
+      }
+    } catch (error) {
+      console.error("Failed to colorize welcome art:", error);
+    }
+  };
+
+  // Color effect calculation (same as server-side)
+  const getEffectColor = (
+    effect: string,
+    x: number,
+    y: number,
+    lineWidth: number,
+    totalLines: number,
+  ): string => {
+    switch (effect) {
+      case "unicorn": {
+        const hue = (x * 360 / lineWidth) % 360;
+        return `hsl(${hue}, 85%, 75%)`;
+      }
+      case "fire": {
+        const hue = 60 - (y * 60 / totalLines);
+        const sat = 100 - (y * 20 / totalLines);
+        return `hsl(${hue}, ${sat}%, 50%)`;
+      }
+      case "cyberpunk": {
+        const progress = (x + y) / (lineWidth + totalLines);
+        const hue = 320 - (progress * 140);
+        return `hsl(${hue}, 100%, 65%)`;
+      }
+      case "sunrise": {
+        const progress = y / totalLines;
+        const hue = 330 + (progress * 60);
+        const sat = 85 + (progress * 15);
+        const bright = 60 + (progress * 20);
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      case "vaporwave": {
+        const progress = y / totalLines;
+        const hue = 280 + (progress * 80);
+        const sat = 80 + Math.sin((x + y) * 0.3) * 15;
+        const bright = 65 + Math.sin(x * 0.4) * 10;
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      default:
+        return "#00FF41";
+    }
   };
 
   // Load and prefetch ASCII art on mount
@@ -771,15 +871,35 @@ export default function TextToAscii() {
             <span class="text-xs font-mono opacity-60">
               ~/output/text-art.txt
             </span>
-            {!asciiOutput && (
-              <button
-                onClick={shuffleArt}
-                class="px-2 py-1 text-xs font-mono font-bold transition-all hover:opacity-70"
-                style="color: #00FF41;"
-                title="Shuffle ASCII art"
-              >
-                🎲 SHUFFLE
-              </button>
+            {!asciiOutput && welcomeArt && (
+              <div class="flex gap-2 items-center">
+                {/* Color picker for random art */}
+                <select
+                  value={selectedWelcomeColor}
+                  onChange={(e) =>
+                    applyColorToWelcomeArt(
+                      (e.target as HTMLSelectElement).value,
+                    )}
+                  class="px-2 py-1 text-xs font-mono font-bold rounded border-2 transition-all"
+                  style="background-color: rgba(0,0,0,0.3); color: #00FF41; border-color: #00FF41;"
+                  title="Apply color effect"
+                >
+                  <option value="none">Plain</option>
+                  <option value="unicorn">Unicorn</option>
+                  <option value="cyberpunk">Cyberpunk</option>
+                  <option value="sunrise">Sunrise</option>
+                  <option value="vaporwave">Vaporwave</option>
+                  <option value="fire">Fire</option>
+                </select>
+                <button
+                  onClick={shuffleArt}
+                  class="px-2 py-1 text-xs font-mono font-bold transition-all hover:opacity-70"
+                  style="color: #00FF41;"
+                  title="Shuffle ASCII art"
+                >
+                  🎲 SHUFFLE
+                </button>
+              </div>
             )}
           </div>
           <div
@@ -811,7 +931,9 @@ export default function TextToAscii() {
                       <pre
                         class="font-mono text-sm opacity-40 animate-fade-in"
                         style="color: #00FF41; line-height: 1.2; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: -0.5px; font-weight: 600;"
-                        dangerouslySetInnerHTML={{ __html: welcomeArt }}
+                        dangerouslySetInnerHTML={{
+                          __html: welcomeArtColorized || welcomeArt,
+                        }}
                       />
                     )
                     : (
