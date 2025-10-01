@@ -947,7 +947,7 @@ export default function TextToAscii() {
                   {welcomeArt
                     ? (
                       <pre
-                        class="font-mono text-base opacity-85 animate-fade-in"
+                        class="ascii-display font-mono text-base opacity-85 animate-fade-in"
                         style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
                         dangerouslySetInnerHTML={{
                           __html: welcomeArtColorized || welcomeArt,
