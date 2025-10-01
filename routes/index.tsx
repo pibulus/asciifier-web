@@ -57,7 +57,7 @@ export default function Home() {
               </span>
             </div>
             <a
-              href="https://ko-fi.com/YOUR_KOFI_USERNAME"
+              href="https://ko-fi.com/madebypablo"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2 px-3 py-1.5 rounded border-2 transition-all hover:scale-105 font-bold"
