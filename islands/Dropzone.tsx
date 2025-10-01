@@ -352,12 +352,6 @@ export default function Dropzone() {
             >
               Turn any image into ASCII art
             </h2>
-            <p
-              class="opacity-80 font-mono text-sm"
-              style="color: var(--color-text, #0A0A0A)"
-            >
-              Works with memes, selfies, and bad screenshots
-            </p>
           </div>
 
           {/* Drop Zone */}
@@ -365,7 +359,7 @@ export default function Dropzone() {
             class={`relative border-8 border-dashed transition-all duration-300 rounded-xl p-20 cursor-pointer group ${
               isDragging
                 ? "scale-105 shadow-brutal-lg rotate-1"
-                : "hover:scale-102 shadow-brutal hover:shadow-brutal-lg"
+                : "hover:scale-105 hover:rotate-2 shadow-brutal hover:shadow-brutal-lg"
             }`}
             style={isDragging
               ? `border-color: var(--color-accent, #FF69B4); background-color: var(--color-secondary, #FFE5B4)`
@@ -406,44 +400,32 @@ export default function Dropzone() {
             </div>
           </div>
 
-          {/* Camera Capture Button (Mobile-first) */}
-          <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-center">
-            <button
-              onClick={() => cameraInputRef.current?.click()}
-              class={`group px-6 py-4 border-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-brutal hover:shadow-brutal-lg hover:scale-105 active:scale-95 ${
-                isMobile ? "animate-pulse-soft" : ""
-              }`}
-              style={`background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)`}
-            >
-              <div class="flex items-center justify-center gap-3">
-                <span class="text-3xl">📷</span>
-                <div class="text-left">
-                  <div class="font-mono font-bold">
-                    {isMobile ? "TAKE PHOTO" : "CAMERA"}
-                  </div>
-                  <div class="text-xs opacity-80">
-                    {isMobile ? "instant ASCII" : "use your camera"}
+          {/* Camera Capture Button (Mobile-only) */}
+          {isMobile && (
+            <div class="flex flex-col gap-3 items-stretch justify-center">
+              <button
+                onClick={() => cameraInputRef.current?.click()}
+                class="group px-6 py-4 border-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-brutal hover:shadow-brutal-lg hover:scale-105 active:scale-95 animate-pulse-soft"
+                style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
+              >
+                <div class="flex items-center justify-center gap-3">
+                  <span class="text-3xl">📷</span>
+                  <div class="text-left">
+                    <div class="font-mono font-bold">TAKE PHOTO</div>
+                    <div class="text-xs opacity-80">instant ASCII</div>
                   </div>
                 </div>
-              </div>
-            </button>
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              class="hidden"
-              onChange={handleCameraCapture}
-            />
-            {!isMobile && (
-              <span
-                class="text-sm font-mono opacity-60"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                or choose from your library ↑
-              </span>
-            )}
-          </div>
+              </button>
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                class="hidden"
+                onChange={handleCameraCapture}
+              />
+            </div>
+          )}
 
           {/* Quick Start Presets */}
           <div class="space-y-3">

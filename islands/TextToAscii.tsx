@@ -828,74 +828,42 @@ export default function TextToAscii() {
               )}
           </div>
 
-          {/* Floating Export Button - Appears when ASCII is ready */}
+          {/* Floating Export Buttons - Appears when ASCII is ready */}
           {asciiOutput && (
-            <div class="absolute bottom-6 left-6 z-10 animate-pop-in">
-              <div class="relative">
-                {/* Main Copy Button */}
-                <button
-                  onClick={() => copyToClipboard("email")}
-                  class={`px-6 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 flex items-center gap-2 ${
-                    copiedToClipboard ? "animate-bounce-once" : ""
-                  }`}
-                  style={copiedToClipboard
-                    ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
-                    : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
-                >
-                  <span class="text-base">
-                    {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
-                  </span>
-                  {/* Dropdown Arrow */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      sounds.click();
-                      setExportMenuOpen(!exportMenuOpen);
-                    }}
-                    class="ml-2 pl-2 border-l-2 transition-transform"
-                    style="border-color: currentColor;"
-                  >
-                    <span
-                      style={`transform: rotate(${
-                        exportMenuOpen ? "180" : "0"
-                      }deg); display: inline-block; transition: transform 0.2s;`}
-                    >
-                      ▼
-                    </span>
-                  </button>
-                </button>
+            <div class="absolute bottom-6 right-6 z-10 flex gap-3 animate-pop-in">
+              {/* Download PNG */}
+              <button
+                onClick={downloadPNG}
+                class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                title="Download as PNG image"
+              >
+                🖼️ PNG
+              </button>
 
-                {/* Export Options Menu */}
-                {exportMenuOpen && (
-                  <div
-                    class="absolute bottom-full mb-2 left-0 border-4 rounded-2xl shadow-brutal-lg overflow-hidden animate-slide-up-fast"
-                    style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); min-width: 200px;"
-                  >
-                    <button
-                      onClick={() => {
-                        downloadText();
-                        setExportMenuOpen(false);
-                      }}
-                      class="w-full px-5 py-3 font-mono font-bold text-left transition-all hover:pl-7"
-                      style="background-color: transparent; color: var(--color-text, #0A0A0A);"
-                      onMouseEnter={() => sounds.hover && sounds.hover()}
-                    >
-                      💾 Download TXT
-                    </button>
-                    <button
-                      onClick={() => {
-                        downloadPNG();
-                        setExportMenuOpen(false);
-                      }}
-                      class="w-full px-5 py-3 font-mono font-bold text-left transition-all hover:pl-7 border-t-2"
-                      style="background-color: transparent; color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
-                      onMouseEnter={() => sounds.hover && sounds.hover()}
-                    >
-                      🖼️ Download PNG
-                    </button>
-                  </div>
-                )}
-              </div>
+              {/* Download TXT */}
+              <button
+                onClick={downloadText}
+                class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                title="Download as text file"
+              >
+                💾 TXT
+              </button>
+
+              {/* Main Copy Button */}
+              <button
+                onClick={() => copyToClipboard("email")}
+                class={`px-6 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 ${
+                  copiedToClipboard ? "animate-bounce-once" : ""
+                }`}
+                style={copiedToClipboard
+                  ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
+                  : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
+                title="Copy to clipboard"
+              >
+                {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
+              </button>
             </div>
           )}
         </div>
