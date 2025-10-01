@@ -49,11 +49,23 @@ export default function Home() {
         class="border-t-4 py-4"
         style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)"
       >
-        <div class="max-w-4xl mx-auto text-center">
-          <div class="text-center text-xs font-mono opacity-60">
-            <span style="color: var(--color-text, #0A0A0A)">
-              Made with care by Pablo
-            </span>
+        <div class="max-w-4xl mx-auto px-4">
+          <div class="flex items-center justify-between text-xs font-mono">
+            <div class="opacity-60">
+              <span style="color: var(--color-text, #0A0A0A)">
+                Made with care by Pablo
+              </span>
+            </div>
+            <a
+              href="https://ko-fi.com/YOUR_KOFI_USERNAME"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 px-3 py-1.5 rounded border-2 transition-all hover:scale-105 font-bold"
+              style="color: var(--color-accent, #FF69B4); border-color: var(--color-accent, #FF69B4); background-color: var(--color-base, #FAF9F6)"
+            >
+              <span>☕</span>
+              <span>Support</span>
+            </a>
           </div>
         </div>
       </footer>
