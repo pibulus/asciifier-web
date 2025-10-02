@@ -62,6 +62,9 @@ export function WelcomeModal() {
       <div
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
         style="background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px);"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="welcome-modal-title"
       >
         {/* Modal */}
         <div
@@ -91,6 +94,7 @@ export function WelcomeModal() {
           >
             {/* Headline */}
             <h1
+              id="welcome-modal-title"
               class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center leading-tight tracking-tight"
               style="color: var(--color-text, #0A0A0A)"
             >
@@ -125,6 +129,7 @@ export function WelcomeModal() {
               onClick={markWelcomeSeen}
               class="w-full px-6 py-4 border-3 rounded-xl font-mono font-bold text-base sm:text-lg transition-all hover:scale-105 shadow-brutal-sm active:scale-[0.98]"
               style="background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
+              aria-label="Close welcome message and start using ASCIIFIER"
             >
               Let's get weird
             </button>

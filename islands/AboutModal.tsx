@@ -61,6 +61,9 @@ export function AboutModal() {
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
         style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);"
         onClick={closeAboutModal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="about-modal-title"
       >
         {/* Modal */}
         <div
@@ -74,6 +77,7 @@ export function AboutModal() {
           >
             <div class="flex items-start justify-between mb-2">
               <h2
+                id="about-modal-title"
                 class="text-3xl font-bold font-mono"
                 style="color: var(--color-text, #0A0A0A)"
               >
@@ -83,7 +87,7 @@ export function AboutModal() {
                 onClick={closeAboutModal}
                 class="text-3xl leading-none font-bold transition-transform hover:scale-110"
                 style="color: var(--color-text, #0A0A0A)"
-                aria-label="Close"
+                aria-label="Close about dialog"
               >
                 ×
               </button>
