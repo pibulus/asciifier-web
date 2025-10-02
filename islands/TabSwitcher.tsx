@@ -48,6 +48,24 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
         >
           ✨ TEXT → ASCII
         </button>
+        <div
+          class="w-0.5"
+          style="background-color: var(--color-border, #0A0A0A)"
+        >
+        </div>
+        <button
+          onClick={() => handleTabChange("gallery")}
+          class={`px-6 py-3 font-mono font-bold transition-all duration-200 ${
+            activeTab.value === "gallery"
+              ? "shadow-brutal-inset"
+              : "hover:animate-pop hover:scale-105"
+          }`}
+          style={activeTab.value === "gallery"
+            ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6)"
+            : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A)"}
+        >
+          🎨 GALLERY
+        </button>
       </div>
 
       <style>
