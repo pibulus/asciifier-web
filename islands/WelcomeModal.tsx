@@ -91,33 +91,24 @@ export function WelcomeModal() {
           >
             {/* Headline */}
             <h1
-              class="text-3xl sm:text-4xl font-bold font-mono text-center leading-tight"
+              class="text-3xl sm:text-4xl font-bold font-mono text-center leading-relaxed"
               style="color: var(--color-text, #0A0A0A)"
             >
-              Text art lives here. <br />
-              Make yours real quick.
+              type it in
+              <br />
+              watch it bloom
+              <br />
+              text becomes art
             </h1>
 
             {/* Features */}
-            <div class="space-y-3">
-              <p
-                class="text-base sm:text-lg font-mono font-medium"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                🎨 <strong>Text → Art</strong> — 17 fonts, 10 color effects
-              </p>
-              <p
-                class="text-base sm:text-lg font-mono font-medium"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                🖼️ <strong>Images → ASCII</strong> — Upload and transform
-              </p>
-              <p
-                class="text-base sm:text-lg font-mono font-medium"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                📚 <strong>Gallery</strong> — Explore classic internet art
-              </p>
+            <div
+              class="text-base sm:text-lg font-mono leading-relaxed text-center space-y-1"
+              style="color: var(--color-text, #0A0A0A)"
+            >
+              <p>17 fonts, 10 color effects</p>
+              <p>drop images, get ASCII</p>
+              <p>gallery of internet classics</p>
             </div>
 
             {/* Action */}
@@ -126,15 +117,17 @@ export function WelcomeModal() {
               class="w-full px-6 py-4 border-3 rounded-xl font-mono font-bold text-lg transition-all hover:scale-105 shadow-brutal-sm"
               style="background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
             >
-              Let's make some art 🚀
+              make art
             </button>
 
             {/* Tagline */}
             <p
-              class="text-xl sm:text-2xl font-bold font-mono text-center pt-2"
+              class="text-lg sm:text-xl font-bold font-mono text-center pt-2 leading-relaxed"
               style="color: var(--color-accent, #FF69B4)"
             >
-              Fast, fun, free forever.
+              quick hands
+              <br />
+              soft pixels
             </p>
           </div>
         </div>

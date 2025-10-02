@@ -92,7 +92,7 @@ export function AboutModal() {
               class="text-lg font-mono font-bold"
               style="color: var(--color-accent, #FF69B4)"
             >
-              Text art machine built with speed & soul 🌈
+              text art machine with speed and soul
             </p>
           </div>
 
@@ -101,32 +101,38 @@ export function AboutModal() {
             class="p-8 border-4 rounded-b-3xl shadow-brutal-xl space-y-6"
             style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
           >
-            {/* Quick intro */}
+            {/* Intro - rhythmic */}
             <p
-              class="text-lg font-mono leading-relaxed"
+              class="text-lg font-mono leading-relaxed text-center"
               style="color: var(--color-text, #0A0A0A)"
             >
-              Built this to showcase rapid dev with Deno/Fresh.
-              Text art studio in days, not weeks.
+              text art studio
+              <br />
+              built in days, not weeks
+              <br />
+              Deno + Fresh + Figlet
             </p>
 
-            {/* Stack */}
+            {/* What it does */}
             <div
-              class="font-mono text-sm space-y-1 py-4 px-4 border-2 rounded-xl"
+              class="font-mono text-sm leading-relaxed py-4 px-4 border-2 rounded-xl text-center"
               style="color: var(--color-text, #0A0A0A); background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A)"
             >
-              <div><strong>Stack:</strong> Deno + Fresh + Figlet</div>
-              <div><strong>Colors:</strong> Custom HSL gradient math</div>
-              <div><strong>Design:</strong> Pastel-punk brutalism</div>
+              <p>server-side figlet</p>
+              <p>custom HSL gradients</p>
+              <p>pastel-punk brutalism</p>
             </div>
 
-            {/* Philosophy */}
+            {/* Philosophy - soft closer style */}
             <p
-              class="text-base font-mono leading-relaxed"
+              class="text-base font-mono leading-relaxed text-center"
               style="color: var(--color-text, #0A0A0A)"
             >
-              80/20 principle. Essential features that spark joy.
-              No tracking. No subscriptions. Works offline.
+              no tracking
+              <br />
+              no subscriptions
+              <br />
+              works offline
             </p>
 
             {/* Links */}
@@ -139,7 +145,7 @@ export function AboutModal() {
                   class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
                 >
-                  🌐 Portfolio
+                  portfolio
                 </a>
                 <a
                   href="https://github.com/pibulus/asciifier-web"
@@ -148,7 +154,7 @@ export function AboutModal() {
                   class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
                 >
-                  💻 Source
+                  source
                 </a>
                 <a
                   href="https://linkedin.com/in/pabloalvarado"
@@ -157,24 +163,20 @@ export function AboutModal() {
                   class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
                 >
-                  💼 Connect
+                  connect
                 </a>
               </div>
             </div>
 
-            {/* Footer */}
+            {/* Footer - clean, simple */}
             <div class="pt-4 text-center border-t-2" style="border-color: var(--color-border, #0A0A0A)">
               <p
-                class="text-sm font-mono"
+                class="text-sm font-mono opacity-60"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                Made by Pablo 🎸
-              </p>
-              <p
-                class="text-xs font-mono opacity-60 mt-1"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                Melbourne → Ethical tech with personality
+                made by pablo
+                <br />
+                Melbourne
               </p>
             </div>
           </div>
@@ -233,7 +235,7 @@ interface AboutLinkProps {
 }
 
 export function AboutLink({
-  label = "Made with care by Pablo",
+  label = "made by pablo",
   className = "",
 }: AboutLinkProps) {
   return (
