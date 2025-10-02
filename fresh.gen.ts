@@ -10,6 +10,7 @@ import * as $api_random_ascii_art from "./routes/api/random-ascii-art.ts";
 import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
 import * as $thanks from "./routes/thanks.tsx";
+import * as $AboutModal from "./islands/AboutModal.tsx";
 import * as $Dropzone from "./islands/Dropzone.tsx";
 import * as $KofiModal from "./islands/KofiModal.tsx";
 import * as $TabSwitcher from "./islands/TabSwitcher.tsx";
@@ -30,6 +31,7 @@ const manifest = {
     "./routes/thanks.tsx": $thanks,
   },
   islands: {
+    "./islands/AboutModal.tsx": $AboutModal,
     "./islands/Dropzone.tsx": $Dropzone,
     "./islands/KofiModal.tsx": $KofiModal,
     "./islands/TabSwitcher.tsx": $TabSwitcher,

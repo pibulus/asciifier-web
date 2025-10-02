@@ -1,5 +1,6 @@
 import { type PageProps } from "$fresh/server.ts";
 import { KofiModal } from "../islands/KofiModal.tsx";
+import { AboutModal } from "../islands/AboutModal.tsx";
 
 export default function App({ Component }: PageProps) {
   // Pass env vars to client for analytics (only public keys)
@@ -93,6 +94,9 @@ export default function App({ Component }: PageProps) {
           title="Support Free ASCII Magic ☕"
           description="Your support keeps this tool free, ad-free, and open for everyone!"
         />
+
+        {/* About modal */}
+        <AboutModal />
       </body>
     </html>
   );

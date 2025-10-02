@@ -3,6 +3,7 @@ import TabSwitcher from "../islands/TabSwitcher.tsx";
 import TabsIsland from "../islands/TabsIsland.tsx";
 import ThemeIsland from "../islands/ThemeIsland.tsx";
 import { KofiButton } from "../islands/KofiModal.tsx";
+import { AboutLink } from "../islands/AboutModal.tsx";
 
 export default function Home() {
   const activeTab = useSignal("image");
@@ -62,9 +63,7 @@ export default function Home() {
         <div class="max-w-4xl mx-auto px-4">
           <div class="flex items-center justify-between text-xs font-mono">
             <div class="opacity-60">
-              <span style="color: var(--color-text, #0A0A0A)">
-                Made with care by Pablo
-              </span>
+              <AboutLink label="Made with care by Pablo" />
             </div>
             <KofiButton size="sm" label="☕ Support" />
           </div>
