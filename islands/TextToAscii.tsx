@@ -289,10 +289,50 @@ export default function TextToAscii() {
     }
   };
 
+  // Hero gallery for welcome screen (curated examples)
+  const [heroGalleryIndex, setHeroGalleryIndex] = useState(0);
+  const [showHeroGallery, setShowHeroGallery] = useState(true);
+
+  const HERO_GALLERY = [
+    `       .
+.>   )\\;'a__
+(  _ _)/ /-." ~~
+ \`( )_ )/
+  <_  <_`,
+    ` /\\_/\\
+( o o )
+==_Y_==
+  \`-'`,
+    `   |\\---/|
+   | ,_, |
+    \\_\`_/-..----.
+ ___/ \`   ' ,""+ \\
+(___...'   __\\    |\`.___.';
+  (___,'(___,\`___()/'.....+`,
+  ];
+
   // Load and prefetch ASCII art on mount
   useEffect(() => {
     prefetchArt(3);
   }, []);
+
+  // Hero gallery auto-rotation (every 3 seconds)
+  useEffect(() => {
+    if (!showHeroGallery || !welcomeArt) return;
+
+    const interval = setInterval(() => {
+      setHeroGalleryIndex((prev) => (prev + 1) % HERO_GALLERY.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [showHeroGallery, welcomeArt]);
+
+  // Hide hero gallery once random art loads
+  useEffect(() => {
+    if (welcomeArt) {
+      setTimeout(() => setShowHeroGallery(false), 500);
+    }
+  }, [welcomeArt]);
 
   // Check if all three dropdowns have been changed from default
   useEffect(() => {
@@ -980,6 +1020,36 @@ export default function TextToAscii() {
                           __html: welcomeArtColorized || welcomeArt,
                         }}
                       />
+                    )
+                    : showHeroGallery
+                    ? (
+                      <div class="flex flex-col items-center justify-center w-full h-full space-y-4">
+                        <pre
+                          class="ascii-display font-mono text-sm opacity-70 animate-fade-in"
+                          style="color: #00FF41; line-height: 1.2; white-space: pre; text-align: center;"
+                        >
+                          {HERO_GALLERY[heroGalleryIndex]}
+                        </pre>
+                        <div class="flex gap-2">
+                          {HERO_GALLERY.map((_, idx) => (
+                            <div
+                              key={idx}
+                              class="w-2 h-2 rounded-full transition-all"
+                              style={{
+                                backgroundColor: idx === heroGalleryIndex
+                                  ? "#00FF41"
+                                  : "rgba(0, 255, 65, 0.3)",
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <p
+                          class="text-xs font-mono opacity-50"
+                          style="color: #00FF41"
+                        >
+                          Loading ASCII magic...
+                        </p>
+                      </div>
                     )
                     : (
                       <div class="flex items-start justify-start w-full pt-2 pl-2">
