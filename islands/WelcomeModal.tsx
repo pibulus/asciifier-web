@@ -91,43 +91,50 @@ export function WelcomeModal() {
           >
             {/* Headline */}
             <h1
-              class="text-3xl sm:text-4xl font-bold font-mono text-center leading-relaxed"
+              class="text-3xl sm:text-4xl md:text-5xl font-extrabold font-mono text-center leading-tight tracking-tight"
               style="color: var(--color-text, #0A0A0A)"
             >
-              type it in
-              <br />
-              watch it bloom
-              <br />
-              text becomes art
+              ASCIIFIER's the move. <br />
+              Paint with letters.
             </h1>
 
             {/* Features */}
-            <div
-              class="text-base sm:text-lg font-mono leading-relaxed text-center space-y-1"
-              style="color: var(--color-text, #0A0A0A)"
-            >
-              <p>17 fonts, 10 color effects</p>
-              <p>drop images, get ASCII</p>
-              <p>gallery of internet classics</p>
+            <div class="space-y-3 sm:space-y-4">
+              <p
+                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
+                style="color: var(--color-text, #0A0A0A)"
+              >
+                🎨 <strong>Type or upload</strong> — Turn anything into text art in seconds.
+              </p>
+              <p
+                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
+                style="color: var(--color-text, #0A0A0A)"
+              >
+                🌈 <strong>17 fonts, 10 color effects</strong> — Rainbow, fire, ocean, matrix, more.
+              </p>
+              <p
+                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
+                style="color: var(--color-text, #0A0A0A)"
+              >
+                📚 <strong>Gallery of classics</strong> — Dragons, Homer, Escher. Ready to use.
+              </p>
             </div>
 
             {/* Action */}
             <button
               onClick={markWelcomeSeen}
-              class="w-full px-6 py-4 border-3 rounded-xl font-mono font-bold text-lg transition-all hover:scale-105 shadow-brutal-sm"
+              class="w-full px-6 py-4 border-3 rounded-xl font-mono font-bold text-base sm:text-lg transition-all hover:scale-105 shadow-brutal-sm active:scale-[0.98]"
               style="background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
             >
-              make art
+              Type it, paint it, share it.
             </button>
 
             {/* Tagline */}
             <p
-              class="text-lg sm:text-xl font-bold font-mono text-center pt-2 leading-relaxed"
+              class="text-base sm:text-lg md:text-xl font-bold text-center pt-2"
               style="color: var(--color-accent, #FF69B4)"
             >
-              quick hands
-              <br />
-              soft pixels
+              It's quick, it's free, it's freaky nostalgic.
             </p>
           </div>
         </div>

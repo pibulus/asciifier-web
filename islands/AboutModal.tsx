@@ -92,7 +92,7 @@ export function AboutModal() {
               class="text-lg font-mono font-bold"
               style="color: var(--color-accent, #FF69B4)"
             >
-              text art machine with speed and soul
+              A love letter to text art 🌈
             </p>
           </div>
 
@@ -101,42 +101,44 @@ export function AboutModal() {
             class="p-8 border-4 rounded-b-3xl shadow-brutal-xl space-y-6"
             style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
           >
-            {/* Intro - rhythmic */}
+            {/* Story */}
             <p
-              class="text-lg font-mono leading-relaxed text-center"
+              class="text-base sm:text-lg leading-relaxed"
               style="color: var(--color-text, #0A0A0A)"
             >
-              text art studio
-              <br />
-              built in days, not weeks
-              <br />
-              Deno + Fresh + Figlet
+              I'm Pablo. I build tools with personality.
+              This one celebrates ASCII art—the OG way we made the internet beautiful
+              before we had images.
             </p>
 
-            {/* What it does */}
+            {/* What it's for */}
             <div
-              class="font-mono text-sm leading-relaxed py-4 px-4 border-2 rounded-xl text-center"
-              style="color: var(--color-text, #0A0A0A); background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A)"
+              class="py-4 px-4 border-2 rounded-xl space-y-2"
+              style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A)"
             >
-              <p>server-side figlet</p>
-              <p>custom HSL gradients</p>
-              <p>pastel-punk brutalism</p>
+              <p
+                class="text-sm sm:text-base font-medium"
+                style="color: var(--color-text, #0A0A0A)"
+              >
+                Make signatures for forums. Turn your face into ASCII.
+                Explore the gallery of internet classics. Export and share anywhere.
+              </p>
+              <p
+                class="text-sm sm:text-base font-medium"
+                style="color: var(--color-text, #0A0A0A)"
+              >
+                It's quick, it's fun, and it works forever. Free.
+              </p>
             </div>
-
-            {/* Philosophy - soft closer style */}
-            <p
-              class="text-base font-mono leading-relaxed text-center"
-              style="color: var(--color-text, #0A0A0A)"
-            >
-              no tracking
-              <br />
-              no subscriptions
-              <br />
-              works offline
-            </p>
 
             {/* Links */}
             <div class="pt-2">
+              <p
+                class="text-sm font-medium mb-3 text-center"
+                style="color: var(--color-text, #0A0A0A)"
+              >
+                Check out more of my work:
+              </p>
               <div class="flex flex-wrap gap-3 justify-center">
                 <a
                   href="https://pibul.us"
@@ -145,7 +147,7 @@ export function AboutModal() {
                   class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
                 >
-                  portfolio
+                  🌐 Portfolio
                 </a>
                 <a
                   href="https://github.com/pibulus/asciifier-web"
@@ -154,7 +156,7 @@ export function AboutModal() {
                   class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
                 >
-                  source
+                  💻 GitHub
                 </a>
                 <a
                   href="https://linkedin.com/in/pabloalvarado"
@@ -163,20 +165,18 @@ export function AboutModal() {
                   class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
                 >
-                  connect
+                  💼 LinkedIn
                 </a>
               </div>
             </div>
 
-            {/* Footer - clean, simple */}
+            {/* Footer */}
             <div class="pt-4 text-center border-t-2" style="border-color: var(--color-border, #0A0A0A)">
               <p
-                class="text-sm font-mono opacity-60"
+                class="text-xs opacity-60"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                made by pablo
-                <br />
-                Melbourne
+                Made in Melbourne with care 🎸
               </p>
             </div>
           </div>
@@ -235,7 +235,7 @@ interface AboutLinkProps {
 }
 
 export function AboutLink({
-  label = "made by pablo",
+  label = "Made by Pablo 🎸",
   className = "",
 }: AboutLinkProps) {
   return (
