@@ -101,109 +101,37 @@ export function AboutModal() {
             class="p-8 border-4 rounded-b-3xl shadow-brutal-xl space-y-6"
             style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
           >
-            {/* The Story */}
-            <div class="space-y-3">
-              <h3
-                class="text-xl font-bold font-mono"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                The Idea 💡
-              </h3>
-              <p
-                class="text-base font-mono leading-relaxed"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                I wanted to prove how fast I could build high-quality,
-                interactive experiences with my Deno/Fresh development system.
-                So I built <strong>ASCIIFIER</strong>: a full-featured text art
-                studio that lets you create your own ASCII art AND explore a
-                curated library of classic pieces from internet culture.
-              </p>
+            {/* Quick intro */}
+            <p
+              class="text-lg font-mono leading-relaxed"
+              style="color: var(--color-text, #0A0A0A)"
+            >
+              Built this to showcase rapid dev with Deno/Fresh.
+              Text art studio in days, not weeks.
+            </p>
+
+            {/* Stack */}
+            <div
+              class="font-mono text-sm space-y-1 py-4 px-4 border-2 rounded-xl"
+              style="color: var(--color-text, #0A0A0A); background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A)"
+            >
+              <div><strong>Stack:</strong> Deno + Fresh + Figlet</div>
+              <div><strong>Colors:</strong> Custom HSL gradient math</div>
+              <div><strong>Design:</strong> Pastel-punk brutalism</div>
             </div>
 
-            {/* The Tech */}
-            <div class="space-y-3">
-              <h3
-                class="text-xl font-bold font-mono"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                The Stack 🛠️
-              </h3>
-              <div
-                class="font-mono text-sm space-y-1"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                <div>
-                  <strong>Framework:</strong> Deno + Fresh (Islands
-                  architecture)
-                </div>
-                <div>
-                  <strong>ASCII Engine:</strong> Figlet (server-side generation)
-                </div>
-                <div>
-                  <strong>Colors:</strong> Custom HSL gradient math
-                </div>
-                <div>
-                  <strong>Design:</strong> Pastel-punk brutalism with CSS custom
-                  properties
-                </div>
-                <div>
-                  <strong>Deploy:</strong> Deno Deploy (edge runtime)
-                </div>
-              </div>
-            </div>
-
-            {/* The Features */}
-            <div class="space-y-3">
-              <h3
-                class="text-xl font-bold font-mono"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                What It Does ✨
-              </h3>
-              <ul
-                class="font-mono text-sm space-y-2 list-disc list-inside"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                <li>Convert images to ASCII art with multiple character styles</li>
-                <li>
-                  Generate text art with 17+ fonts and 10 color gradient effects
-                </li>
-                <li>Explore curated ASCII art library with theme filters</li>
-                <li>Export as PNG, TXT, HTML with preserved colors</li>
-                <li>3 dynamic themes (Vintage, Dark, Retro)</li>
-                <li>Typewriter keyboard sounds for immersion</li>
-              </ul>
-            </div>
-
-            {/* The Philosophy */}
-            <div class="space-y-3">
-              <h3
-                class="text-xl font-bold font-mono"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                The Philosophy 🎸
-              </h3>
-              <p
-                class="text-base font-mono leading-relaxed"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                Built with the <strong>80/20 principle</strong>: essential
-                features that spark joy, compression over complexity, tools with
-                personality. No tracking, no subscriptions, just pure creative
-                utility that works offline.
-              </p>
-            </div>
+            {/* Philosophy */}
+            <p
+              class="text-base font-mono leading-relaxed"
+              style="color: var(--color-text, #0A0A0A)"
+            >
+              80/20 principle. Essential features that spark joy.
+              No tracking. No subscriptions. Works offline.
+            </p>
 
             {/* Links */}
-            <div class="pt-4 border-t-2" style="border-color: var(--color-border, #0A0A0A)">
-              <h3
-                class="text-xl font-bold font-mono mb-4"
-                style="color: var(--color-text, #0A0A0A)"
-              >
-                Connect 🔗
-              </h3>
-              <div class="flex flex-wrap gap-3">
+            <div class="pt-2">
+              <div class="flex flex-wrap gap-3 justify-center">
                 <a
                   href="https://pibul.us"
                   target="_blank"
@@ -220,7 +148,7 @@ export function AboutModal() {
                   class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
                 >
-                  💻 GitHub
+                  💻 Source
                 </a>
                 <a
                   href="https://linkedin.com/in/pabloalvarado"
@@ -229,24 +157,24 @@ export function AboutModal() {
                   class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
                 >
-                  💼 LinkedIn
+                  💼 Connect
                 </a>
               </div>
             </div>
 
-            {/* Made with love */}
-            <div class="pt-4 text-center">
+            {/* Footer */}
+            <div class="pt-4 text-center border-t-2" style="border-color: var(--color-border, #0A0A0A)">
               <p
-                class="text-sm font-mono opacity-60"
+                class="text-sm font-mono"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                Made with care by Pablo 🎸
+                Made by Pablo 🎸
               </p>
               <p
                 class="text-xs font-mono opacity-60 mt-1"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                Melbourne → Building ethical tech with personality
+                Melbourne → Ethical tech with personality
               </p>
             </div>
           </div>

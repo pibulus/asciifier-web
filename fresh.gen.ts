@@ -18,6 +18,8 @@ import * as $TabSwitcher from "./islands/TabSwitcher.tsx";
 import * as $TabsIsland from "./islands/TabsIsland.tsx";
 import * as $TextToAscii from "./islands/TextToAscii.tsx";
 import * as $ThemeIsland from "./islands/ThemeIsland.tsx";
+import * as $WelcomeChecker from "./islands/WelcomeChecker.tsx";
+import * as $WelcomeModal from "./islands/WelcomeModal.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -40,6 +42,8 @@ const manifest = {
     "./islands/TabsIsland.tsx": $TabsIsland,
     "./islands/TextToAscii.tsx": $TextToAscii,
     "./islands/ThemeIsland.tsx": $ThemeIsland,
+    "./islands/WelcomeChecker.tsx": $WelcomeChecker,
+    "./islands/WelcomeModal.tsx": $WelcomeModal,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
