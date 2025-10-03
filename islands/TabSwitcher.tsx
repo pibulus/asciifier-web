@@ -12,7 +12,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
   };
 
   return (
-    <div class="flex">
+    <div class="flex mt-4 sm:mt-6">
       <div
         class="flex border-3 sm:border-4 rounded-lg overflow-hidden shadow-brutal"
         style="border-color: var(--color-border, #0A0A0A)"

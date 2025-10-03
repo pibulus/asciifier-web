@@ -48,14 +48,8 @@ export function MagicDropdown({
 
   return (
     <div class="relative">
-      <label
-        class="block mb-1 sm:mb-2 px-1 sm:px-2 font-mono font-bold text-xs sm:text-sm uppercase tracking-wider"
-        style="color: var(--color-text, #0A0A0A);"
-      >
-        {label}
-      </label>
       <div
-        class={`magic-select ${width} px-2 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4 border-3 sm:border-4 rounded-xl sm:rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5`}
+        class={`magic-select ${width} px-2 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4 border-3 sm:border-4 rounded-xl sm:rounded-2xl font-mono font-bold cursor-pointer transition-all shadow-brutal hover:shadow-brutal-lg hover:-translate-y-0.5`}
         style={changed
           ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
           : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
@@ -67,6 +61,7 @@ export function MagicDropdown({
       >
         <div class="flex items-center justify-between">
           <span class="text-xs sm:text-sm md:text-base truncate">
+            <span class="opacity-60 mr-1">{label}:</span>
             {selectedOption?.name || "Select..."}
           </span>
           <span

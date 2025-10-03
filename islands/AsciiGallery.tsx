@@ -575,9 +575,7 @@ export default function AsciiGallery() {
           </div>
           <div
             class="p-4 sm:p-6 md:p-8 overflow-auto custom-scrollbar transition-all duration-700"
-            style={currentArt
-              ? "height: auto; min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
-              : "min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"}
+            style="height: 400px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
           >
             {isLoadingArt && !currentArt
               ? (
