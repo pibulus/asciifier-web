@@ -696,7 +696,7 @@ export default function TextToAscii() {
           />
           <div class="absolute right-4 sm:right-6 md:right-8 top-1/2 -translate-y-1/2">
             <span
-              class="font-mono font-bold text-sm sm:text-base md:text-lg"
+              class="font-mono font-black text-base sm:text-lg md:text-xl"
               style="color: var(--color-accent, #FF69B4)"
             >
               {inputText.value.length}/20
@@ -707,9 +707,9 @@ export default function TextToAscii() {
 
       {/* ASCII FACTORY JUKEBOX - Three Dropdown Combo Machine! */}
       <div class="mb-8">
-        {/* Three Dropdown Reels - Horizontal on all screens */}
+        {/* Three Dropdown Reels - Stacked on mobile, horizontal on tablet+ */}
         <div
-          class={`grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 ${
+          class={`grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 ${
             allSelected ? "animate-wiggle" : ""
           }`}
         >

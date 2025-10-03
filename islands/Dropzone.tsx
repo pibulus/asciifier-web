@@ -426,7 +426,7 @@ export default function Dropzone() {
                 {isDragging ? "Yeah! Drop it!" : "Drop zone"}
               </h3>
               <p
-                class="opacity-60 text-sm font-mono"
+                class="opacity-70 text-base sm:text-sm font-mono"
                 style="color: var(--color-text, #0A0A0A)"
               >
                 JPG PNG GIF WebP • 10MB max
@@ -464,17 +464,17 @@ export default function Dropzone() {
           {/* Quick Start Presets */}
           <div class="space-y-4 max-w-3xl mx-auto">
             <p
-              class="text-sm font-mono opacity-60"
+              class="text-base sm:text-sm font-mono opacity-70"
               style="color: var(--color-text, #0A0A0A)"
             >
               Quick starts:
             </p>
-            <div class="flex flex-wrap gap-4 justify-center">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
               {PRESETS.map((preset, i) => (
                 <button
                   key={preset.name}
                   onClick={() => applyPreset(preset, i)}
-                  class={`group relative px-6 py-3 border-4 rounded-lg font-semibold text-sm transition-all duration-200 hover:animate-pop ${
+                  class={`group relative px-6 py-4 border-4 rounded-lg font-semibold text-base transition-all duration-200 hover:animate-pop ${
                     selectedPreset === i
                       ? "shadow-brutal animate-pulse-soft"
                       : "shadow-brutal-sm hover:shadow-brutal"
@@ -519,12 +519,12 @@ export default function Dropzone() {
               >
                 CHARACTER STYLE
               </label>
-              <div class="grid grid-cols-2 gap-2 mb-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                 {PRESETS.map((preset, i) => (
                   <button
                     key={preset.name}
                     onClick={() => applyPreset(preset, i)}
-                    class={`px-2 py-1.5 border-2 rounded text-xs font-bold transition-all duration-200 ${
+                    class={`px-4 py-3 sm:px-2 sm:py-1.5 border-2 rounded text-sm sm:text-xs font-bold transition-all duration-200 ${
                       selectedPreset === i
                         ? "shadow-brutal-sm animate-pulse-soft"
                         : "hover:animate-spring hover:shadow-brutal-sm active:scale-95"

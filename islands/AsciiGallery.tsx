@@ -702,7 +702,7 @@ export default function AsciiGallery() {
       {/* Info */}
       <div class="text-center">
         <p
-          class="text-sm font-mono opacity-60"
+          class="text-sm sm:text-base font-mono opacity-80"
           style="color: var(--color-text, #0A0A0A)"
         >
           Art sourced from asciiart.eu archive

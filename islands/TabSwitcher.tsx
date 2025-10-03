@@ -19,7 +19,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
       >
         <button
           onClick={() => handleTabChange("image")}
-          class={`px-2 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-xs sm:text-sm md:text-base transition-all duration-200 ${
+          class={`px-4 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-sm sm:text-sm md:text-base transition-all duration-200 ${
             activeTab.value === "image"
               ? "shadow-brutal-inset"
               : "hover:animate-pop hover:scale-105"
@@ -28,7 +28,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
             ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6)"
             : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A)"}
         >
-          <span class="sm:hidden">📸</span>
+          <span class="sm:hidden">📸 IMAGE</span>
           <span class="hidden sm:inline md:hidden">IMAGE</span>
           <span class="hidden md:inline">📸 IMAGE → ASCII</span>
         </button>
@@ -39,7 +39,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
         </div>
         <button
           onClick={() => handleTabChange("text")}
-          class={`px-2 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-xs sm:text-sm md:text-base transition-all duration-200 ${
+          class={`px-4 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-sm sm:text-sm md:text-base transition-all duration-200 ${
             activeTab.value === "text"
               ? "shadow-brutal-inset"
               : "hover:animate-pop hover:scale-105"
@@ -48,7 +48,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
             ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6)"
             : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A)"}
         >
-          <span class="sm:hidden">✨</span>
+          <span class="sm:hidden">✨ TEXT</span>
           <span class="hidden sm:inline md:hidden">TEXT</span>
           <span class="hidden md:inline">✨ TEXT → ASCII</span>
         </button>
@@ -59,7 +59,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
         </div>
         <button
           onClick={() => handleTabChange("gallery")}
-          class={`px-2 py-2 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-xs sm:text-sm md:text-base transition-all duration-200 ${
+          class={`px-4 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-sm sm:text-sm md:text-base transition-all duration-200 ${
             activeTab.value === "gallery"
               ? "shadow-brutal-inset"
               : "hover:animate-pop hover:scale-105"
@@ -68,7 +68,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
             ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6)"
             : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A)"}
         >
-          <span class="sm:hidden">🎨</span>
+          <span class="sm:hidden">🎨 GALLERY</span>
           <span class="hidden sm:inline md:hidden">GALLERY</span>
           <span class="hidden md:inline">🎨 GALLERY</span>
         </button>
