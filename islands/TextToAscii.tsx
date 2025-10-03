@@ -706,9 +706,9 @@ export default function TextToAscii() {
 
       {/* ASCII FACTORY JUKEBOX - Three Dropdown Combo Machine! */}
       <div class="mb-8">
-        {/* Three Dropdown Reels Side by Side */}
+        {/* Three Dropdown Reels - Horizontal on all screens */}
         <div
-          class={`grid grid-cols-1 md:grid-cols-3 gap-6 ${
+          class={`grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 ${
             allSelected ? "animate-wiggle" : ""
           }`}
         >
