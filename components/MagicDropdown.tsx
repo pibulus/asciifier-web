@@ -1,0 +1,113 @@
+import { useState } from "preact/hooks";
+import { sounds } from "../utils/sounds.ts";
+
+/**
+ * 🎨 Magic Dropdown Component
+ *
+ * Reusable dropdown with TextToAscii's signature styling:
+ * - Checkmarks for selected items
+ * - Hover shift animation
+ * - Rotating arrow
+ * - Color indication when changed
+ * - Sound effects
+ *
+ * Built by Pablo for consistent UX 🎸
+ */
+
+interface Option {
+  name: string;
+  value: string;
+}
+
+interface MagicDropdownProps {
+  label: string;
+  options: Option[];
+  value: string;
+  onChange: (value: string) => void;
+  changed?: boolean;
+  width?: string;
+}
+
+export function MagicDropdown({
+  label,
+  options,
+  value,
+  onChange,
+  changed = false,
+  width = "w-full",
+}: MagicDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleSelect = (optionValue: string) => {
+    sounds.click();
+    onChange(optionValue);
+    setIsOpen(false);
+  };
+
+  const selectedOption = options.find((o) => o.value === value);
+
+  return (
+    <div class="relative">
+      <label
+        class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider"
+        style="color: var(--color-text, #0A0A0A);"
+      >
+        {label}
+      </label>
+      <div
+        class={`magic-select ${width} px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5`}
+        style={changed
+          ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+          : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
+        onClick={(e) => {
+          e.stopPropagation();
+          sounds.click();
+          setIsOpen(!isOpen);
+        }}
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-base">
+            {selectedOption?.name || "Select..."}
+          </span>
+          <span
+            class="text-lg transition-transform"
+            style={`color: var(--color-accent, #FF69B4); transform: rotate(${
+              isOpen ? "180" : "0"
+            }deg);`}
+          >
+            ▼
+          </span>
+        </div>
+      </div>
+      {isOpen && (
+        <div
+          class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden dropdown-scrollbar animate-dropdown-open"
+          style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 400px; overflow-y: auto;"
+        >
+          {options.map((option) => (
+            <div
+              key={option.value}
+              class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
+              style={`background-color: ${
+                value === option.value
+                  ? "var(--color-accent, #FF69B4)"
+                  : "transparent"
+              }; color: ${
+                value === option.value
+                  ? "var(--color-base, #FAF9F6)"
+                  : "var(--color-text, #0A0A0A)"
+              };`}
+              onClick={() => handleSelect(option.value)}
+              onMouseEnter={() => sounds.hover && sounds.hover()}
+            >
+              {value === option.value && (
+                <span class="mr-2">✓</span>
+              )}
+              {option.name}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

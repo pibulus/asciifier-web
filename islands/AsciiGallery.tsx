@@ -1,27 +1,14 @@
 import { useEffect, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { analytics } from "../utils/analytics.ts";
+import { COLOR_EFFECTS } from "../utils/constants.ts";
+import { MagicDropdown } from "../components/MagicDropdown.tsx";
 
 // Available categories from the API
 const CATEGORIES = [
   { name: "Dragons", value: "mythology/dragons" },
   { name: "Escher Art", value: "art-and-design/escher" },
   { name: "The Simpsons", value: "cartoons/simpsons" },
-];
-
-// Color effects matching TextToAscii
-const COLOR_EFFECTS = [
-  { name: "Plain", value: "none" },
-  { name: "Matrix", value: "matrix" },
-  { name: "Fire", value: "fire" },
-  { name: "Sunrise", value: "sunrise" },
-  { name: "Unicorn", value: "unicorn" },
-  { name: "Vaporwave", value: "vaporwave" },
-  { name: "Cyberpunk", value: "cyberpunk" },
-  { name: "Ocean", value: "ocean" },
-  { name: "Chrome", value: "chrome" },
-  { name: "Neon", value: "neon" },
-  { name: "Poison", value: "poison" },
 ];
 
 interface AsciiArt {
@@ -39,14 +26,27 @@ export default function AsciiGallery() {
   const [selectedColor, setSelectedColor] = useState<string>("none");
   const [colorizedArt, setColorizedArt] = useState<string>("");
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
-  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-  const [colorDropdownOpen, setColorDropdownOpen] = useState(false);
+  const [artCache, setArtCache] = useState<string[]>([]);
+  const [isLoadingArt, setIsLoadingArt] = useState(false);
 
   // Load initial random art on mount
   useEffect(() => {
     analytics.init();
-    fetchRandomArt();
+    prefetchArt(3);
   }, []);
+
+  // When category changes (but not on initial mount)
+  const [hasInitialized, setHasInitialized] = useState(false);
+  useEffect(() => {
+    if (hasInitialized) {
+      setArtCache([]);
+      setCurrentArt("");
+      setColorizedArt("");
+      prefetchArt(3);
+    } else {
+      setHasInitialized(true);
+    }
+  }, [selectedCategory]);
 
   // Apply colorization when color effect changes
   useEffect(() => {
@@ -57,64 +57,300 @@ export default function AsciiGallery() {
     }
   }, [currentArt, selectedColor]);
 
-  const fetchRandomArt = async () => {
-    setIsLoading(true);
-    sounds.click();
-
+  // Function to fetch a single piece of ASCII art
+  const fetchSingleArt = async (): Promise<string | null> => {
     try {
-      const response = await fetch("/api/random-ascii-art");
+      const url = `/api/random-ascii-art?category=${encodeURIComponent(selectedCategory)}`;
+      const response = await fetch(url);
       const data: AsciiArt = await response.json();
 
       if (data.art) {
-        setCurrentArt(data.art);
-        analytics.track("gallery_shuffle", {
-          category: selectedCategory,
-        });
+        if (typeof analytics?.track === "function") {
+          analytics.track("gallery_fetch", {
+            category: selectedCategory,
+          });
+        }
+        return data.art;
       }
+      return null;
     } catch (error) {
       console.error("Failed to fetch ASCII art:", error);
-      setCurrentArt("Error loading ASCII art. Try again!");
-    } finally {
-      setIsLoading(false);
+      return null;
     }
   };
 
-  const applyColorEffect = async (art: string, effect: string) => {
-    try {
-      const response = await fetch("/api/enhanced-figlet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: art,
-          colorEffect: effect,
-          justColorize: true,
-        }),
-      });
+  // Prefetch multiple pieces for smooth shuffling
+  const prefetchArt = async (count: number) => {
+    setIsLoadingArt(true);
+    const fetches = Array(count).fill(null).map(() => fetchSingleArt());
+    const results = await Promise.all(fetches);
+    const validArt = results.filter((art): art is string => art !== null);
 
-      const data = await response.json();
-      if (data.htmlOutput) {
-        setColorizedArt(data.htmlOutput);
-      }
-    } catch (error) {
-      console.error("Failed to colorize art:", error);
+    if (validArt.length > 0) {
+      setArtCache(validArt);
+      setCurrentArt(validArt[0]);
+      setColorizedArt("");
     }
+    setIsLoadingArt(false);
+  };
+
+  // Shuffle through cached art
+  const shuffleArt = () => {
+    sounds.click();
+
+    if (artCache.length > 1) {
+      // Don't clear currentArt to prevent size jump
+      setIsLoadingArt(true);
+
+      // Brief delay for visual feedback
+      setTimeout(() => {
+        // Rotate cache
+        const [_current, ...rest] = artCache;
+        setCurrentArt(rest[0]);
+        setColorizedArt(""); // Clear colorized version for fresh color application
+        setArtCache(rest);
+        setIsLoadingArt(false);
+
+        // Prefetch one more to keep cache full
+        fetchSingleArt().then((art) => {
+          if (art) setArtCache((prev) => [...prev, art]);
+        });
+      }, 200); // Shorter delay since we're not clearing content
+    } else {
+      // Fetch fresh if cache empty
+      setIsLoadingArt(true);
+      prefetchArt(3);
+    }
+  };
+
+  // Color effect calculation (same as TextToAscii)
+  const getEffectColor = (
+    effect: string,
+    x: number,
+    y: number,
+    lineWidth: number,
+    totalLines: number,
+  ): string => {
+    switch (effect) {
+      case "unicorn": {
+        const hue = (x * 360 / lineWidth) % 360;
+        return `hsl(${hue}, 95%, 65%)`;
+      }
+      case "fire": {
+        const hue = 60 - (y * 60 / totalLines);
+        const sat = 100 - (y * 20 / totalLines);
+        return `hsl(${hue}, ${sat}%, 55%)`;
+      }
+      case "cyberpunk": {
+        const progress = (x + y) / (lineWidth + totalLines);
+        const hue = 320 - (progress * 140);
+        return `hsl(${hue}, 100%, 60%)`;
+      }
+      case "sunrise": {
+        const progress = y / totalLines;
+        const hue = 330 + (progress * 60);
+        const sat = 85 + (progress * 15);
+        const bright = 60 + (progress * 20);
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      case "vaporwave": {
+        const progress = y / totalLines;
+        const hue = 280 + (progress * 80);
+        const sat = 80 + Math.sin((x + y) * 0.3) * 15;
+        const bright = 65 + Math.sin(x * 0.4) * 10;
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      case "chrome": {
+        const hue = 200 + Math.sin(x * 0.2) * 60;
+        const brightness = 70 + Math.sin(y * 0.3) * 20;
+        return `hsl(${hue}, 30%, ${brightness}%)`;
+      }
+      case "ocean": {
+        const progress = y / totalLines;
+        const hue = 180 + (progress * 30);
+        const sat = 70 + (progress * 20);
+        const bright = 50 + (progress * 20);
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      case "neon": {
+        const progress = (x + y) / (lineWidth + totalLines);
+        const hue = 60 + Math.sin(progress * 10) * 120;
+        const sat = 100;
+        const bright = 60 + Math.sin(progress * 8) * 15;
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      case "poison": {
+        const progress = (x + y) / (lineWidth + totalLines);
+        const hue = 90 + (progress * 30);
+        const sat = 90 + Math.sin(x * 0.5) * 10;
+        const bright = 45 + (progress * 20);
+        return `hsl(${hue}, ${sat}%, ${bright}%)`;
+      }
+      default:
+        return "#00FF41";
+    }
+  };
+
+  const applyColorEffect = (art: string, effect: string) => {
+    if (effect === "none" || !art) {
+      setColorizedArt("");
+      return;
+    }
+
+    // Apply color effect client-side like TextToAscii does
+    const lines = art.split("\n");
+    const colorizedLines: string[] = [];
+
+    for (let y = 0; y < lines.length; y++) {
+      const line = lines[y];
+
+      // Calculate color for this line
+      const color = getEffectColor(
+        effect,
+        Math.floor(line.length / 2),
+        y,
+        line.length,
+        lines.length,
+      );
+
+      // Wrap entire line in colored span
+      colorizedLines.push(`<span style="color: ${color};">${line}</span>`);
+    }
+
+    setColorizedArt(colorizedLines.join("\n"));
   };
 
   const handleCopy = async () => {
-    const textToCopy = currentArt;
     sounds.pop();
 
     try {
-      await navigator.clipboard.writeText(textToCopy);
+      // Strip HTML if colorized to get plain text
+      let plainText = currentArt;
+      if (selectedColor !== "none" && colorizedArt) {
+        plainText = colorizedArt.replace(/<[^>]*>/g, "");
+      }
+
+      await navigator.clipboard.writeText(plainText);
       setCopiedToClipboard(true);
-      analytics.track("gallery_copy", {
-        category: selectedCategory,
-        colorEffect: selectedColor,
-      });
+
+      if (typeof analytics?.track === "function") {
+        analytics.track("gallery_copy", {
+          category: selectedCategory,
+          colorEffect: selectedColor,
+        });
+      }
 
       setTimeout(() => setCopiedToClipboard(false), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
+    }
+  };
+
+  const downloadText = () => {
+    sounds.pop();
+
+    // Strip HTML if colorized to get plain text
+    let plainText = currentArt;
+    if (selectedColor !== "none" && colorizedArt) {
+      plainText = colorizedArt.replace(/<[^>]*>/g, "");
+    }
+
+    const blob = new Blob([plainText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ascii-art.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+    sounds.success();
+  };
+
+  const downloadPNG = () => {
+    sounds.pop();
+    try {
+      // Get the ASCII display element
+      const asciiElement = document.querySelector(".ascii-display");
+      if (!asciiElement) {
+        console.error("ASCII display element not found");
+        return;
+      }
+
+      // Create canvas for rendering
+      const fontSize = 12;
+      const charWidth = fontSize * 0.6;
+      const lineHeight = fontSize * 1.2;
+      const padding = 40;
+
+      // Split text into lines for dimensions
+      const lines = currentArt.split("\n");
+      const maxLineLength = Math.max(...lines.map(l => l.length));
+
+      const canvasWidth = (maxLineLength * charWidth) + (padding * 2);
+      const canvasHeight = (lines.length * lineHeight) + (padding * 2);
+
+      // Create high-DPI canvas
+      const canvas = document.createElement("canvas");
+      const scale = 2;
+      canvas.width = canvasWidth * scale;
+      canvas.height = canvasHeight * scale;
+      canvas.style.width = canvasWidth + "px";
+      canvas.style.height = canvasHeight + "px";
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Scale for high DPI
+      ctx.scale(scale, scale);
+
+      // Background
+      ctx.fillStyle = "#0A0A0A";
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+      // Font setup
+      ctx.font = `${fontSize}px monospace`;
+      ctx.textBaseline = "top";
+
+      // Draw text
+      if (selectedColor !== "none" && colorizedArt) {
+        // Draw with colors
+        const colorLines = colorizedArt.split("\n");
+        colorLines.forEach((line, y) => {
+          // Parse color from span if present
+          const colorMatch = line.match(/style="color:\s*([^"]+)"/);
+          const textMatch = line.match(/>([^<]*)</);
+
+          if (colorMatch && textMatch) {
+            ctx.fillStyle = colorMatch[1];
+            ctx.fillText(textMatch[1], padding, padding + (y * lineHeight));
+          } else {
+            // Fallback to plain text
+            const plainText = line.replace(/<[^>]*>/g, "");
+            ctx.fillStyle = "#00FF41";
+            ctx.fillText(plainText, padding, padding + (y * lineHeight));
+          }
+        });
+      } else {
+        // Draw plain text
+        ctx.fillStyle = "#00FF41";
+        lines.forEach((line, y) => {
+          ctx.fillText(line, padding, padding + (y * lineHeight));
+        });
+      }
+
+      // Download
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "ascii-art.png";
+          a.click();
+          URL.revokeObjectURL(url);
+          sounds.success();
+        }
+      });
+    } catch (error) {
+      console.error("Failed to create PNG:", error);
     }
   };
 
@@ -143,98 +379,22 @@ export default function AsciiGallery() {
       {/* Controls */}
       <div class="flex flex-wrap items-center justify-center gap-4">
         {/* Category Selector */}
-        <div class="relative">
-          <label
-            class="block text-xs font-mono font-bold mb-2 uppercase tracking-wide"
-            style="color: var(--color-text, #0A0A0A)"
-          >
-            THEME
-          </label>
-          <button
-            onClick={() => {
-              setCategoryDropdownOpen(!categoryDropdownOpen);
-              setColorDropdownOpen(false);
-            }}
-            class="w-48 px-4 py-3 border-4 rounded-lg font-mono font-bold text-left flex items-center justify-between shadow-brutal transition-all hover:scale-105"
-            style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-          >
-            <span>
-              {CATEGORIES.find((c) => c.value === selectedCategory)?.name}
-            </span>
-            <span class="text-lg">▼</span>
-          </button>
-
-          {categoryDropdownOpen && (
-            <div
-              class="absolute top-full mt-2 w-48 border-4 rounded-lg shadow-brutal overflow-hidden z-10"
-              style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-            >
-              {CATEGORIES.map((category) => (
-                <button
-                  key={category.value}
-                  onClick={() => {
-                    setSelectedCategory(category.value);
-                    setCategoryDropdownOpen(false);
-                    sounds.click();
-                  }}
-                  class="w-full px-4 py-3 font-mono font-bold text-left hover:bg-opacity-80 transition-colors"
-                  style={selectedCategory === category.value
-                    ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6)"
-                    : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A)"}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <MagicDropdown
+          label="Theme"
+          options={CATEGORIES}
+          value={selectedCategory}
+          onChange={setSelectedCategory}
+          width="w-64"
+        />
 
         {/* Color Effect Selector */}
-        <div class="relative">
-          <label
-            class="block text-xs font-mono font-bold mb-2 uppercase tracking-wide"
-            style="color: var(--color-text, #0A0A0A)"
-          >
-            COLOR
-          </label>
-          <button
-            onClick={() => {
-              setColorDropdownOpen(!colorDropdownOpen);
-              setCategoryDropdownOpen(false);
-            }}
-            class="w-48 px-4 py-3 border-4 rounded-lg font-mono font-bold text-left flex items-center justify-between shadow-brutal transition-all hover:scale-105"
-            style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-          >
-            <span>
-              {COLOR_EFFECTS.find((c) => c.value === selectedColor)?.name}
-            </span>
-            <span class="text-lg">▼</span>
-          </button>
-
-          {colorDropdownOpen && (
-            <div
-              class="absolute top-full mt-2 w-48 border-4 rounded-lg shadow-brutal overflow-hidden z-10 max-h-80 overflow-y-auto"
-              style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-            >
-              {COLOR_EFFECTS.map((effect) => (
-                <button
-                  key={effect.value}
-                  onClick={() => {
-                    setSelectedColor(effect.value);
-                    setColorDropdownOpen(false);
-                    sounds.click();
-                  }}
-                  class="w-full px-4 py-3 font-mono font-bold text-left hover:bg-opacity-80 transition-colors"
-                  style={selectedColor === effect.value
-                    ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6)"
-                    : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A)"}
-                >
-                  {effect.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <MagicDropdown
+          label="Color"
+          options={COLOR_EFFECTS}
+          value={selectedColor}
+          onChange={setSelectedColor}
+          width="w-64"
+        />
 
         {/* Shuffle Button */}
         <div>
@@ -245,56 +405,125 @@ export default function AsciiGallery() {
             _
           </label>
           <button
-            onClick={fetchRandomArt}
-            disabled={isLoading}
+            onClick={shuffleArt}
+            disabled={isLoadingArt}
             class="px-6 py-3 border-4 rounded-lg font-mono font-bold shadow-brutal transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
           >
-            {isLoading ? "🎲 Loading..." : "🎲 Shuffle"}
+            {isLoadingArt ? "🎲 Loading..." : "🎲 Shuffle"}
           </button>
         </div>
       </div>
 
-      {/* ASCII Art Display */}
-      <div
-        class="border-4 rounded-2xl p-6 shadow-brutal-xl overflow-hidden"
-        style="background-color: #0A0A0A; border-color: var(--color-border, #0A0A0A)"
-      >
-        {/* Terminal Window Dots */}
-        <div class="flex gap-2 mb-4">
-          <div class="w-3 h-3 rounded-full bg-red-500"></div>
-          <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div class="w-3 h-3 rounded-full bg-green-500"></div>
-        </div>
-
-        {/* ASCII Art */}
+      {/* Terminal Display - matching TextToAscii exactly */}
+      <div class="mb-10">
         <div
-          class="font-mono text-xs leading-tight overflow-x-auto"
-          style="color: #00FF00; white-space: pre; min-height: 400px"
+          class="rounded-3xl border-4 shadow-brutal overflow-hidden relative"
+          style="background-color: #000000; border-color: var(--color-border, #0A0A0A);"
         >
-          {isLoading ? (
-            <div class="flex items-center justify-center h-96">
-              <div class="animate-pulse">Loading ASCII magic...</div>
+          <div
+            class="px-4 py-3 border-b-4 flex items-center justify-between"
+            style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)"
+          >
+            <div class="flex space-x-2">
+              <div
+                class="w-3 h-3 bg-red-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
+                title="Close (jk)"
+              >
+              </div>
+              <div
+                class="w-3 h-3 bg-yellow-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
+                title="Minimize (nope)"
+              >
+              </div>
+              <div
+                class="w-3 h-3 bg-green-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
+                title="Full screen (maybe)"
+              >
+              </div>
             </div>
-          ) : selectedColor !== "none" && colorizedArt ? (
-            <div
-              dangerouslySetInnerHTML={{ __html: colorizedArt }}
-            />
-          ) : (
-            currentArt
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-mono opacity-60" style="color: #00FF41">
+                ~/gallery/ascii-art.txt
+              </span>
+              {/* Shuffle button in menu bar */}
+              {currentArt && (
+                <button
+                  onClick={shuffleArt}
+                  class="px-2 py-1 text-xs font-mono font-bold transition-all hover:scale-110 active:scale-95 opacity-70 hover:opacity-100"
+                  style="color: #00FF41"
+                  title="Get a random ASCII art"
+                >
+                  🎲
+                </button>
+              )}
+            </div>
+          </div>
+          <div
+            class="p-8 overflow-auto custom-scrollbar transition-all duration-700"
+            style={currentArt ? "height: auto; min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);" : "min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"}
+          >
+            {isLoadingArt && !currentArt ? (
+              <div class="flex items-center justify-center h-96">
+                <div class="animate-pulse font-mono" style="color: #00FF41">
+                  Loading ASCII magic...
+                </div>
+              </div>
+            ) : selectedColor !== "none" && colorizedArt ? (
+              <pre
+                class="ascii-display font-mono text-base opacity-85"
+                style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
+                dangerouslySetInnerHTML={{ __html: colorizedArt }}
+              />
+            ) : (
+              <pre
+                class="ascii-display font-mono text-base opacity-85"
+                style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
+              >
+                {currentArt}
+              </pre>
+            )}
+          </div>
+
+          {/* Export Buttons - positioned absolute like TextToAscii */}
+          {currentArt && (
+            <div class="absolute bottom-6 right-6 z-10 flex gap-3 animate-pop-in">
+              {/* Download PNG */}
+              <button
+                onClick={downloadPNG}
+                class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                title="Download as PNG image"
+              >
+                🖼️ PNG
+              </button>
+
+              {/* Download TXT */}
+              <button
+                onClick={downloadText}
+                class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                title="Download as text file"
+              >
+                💾 TXT
+              </button>
+
+              {/* Main Copy Button */}
+              <button
+                onClick={handleCopy}
+                class={`px-6 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 ${
+                  copiedToClipboard ? "animate-bounce-once" : ""
+                }`}
+                style={copiedToClipboard
+                  ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
+                  : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
+                title="Copy to clipboard"
+              >
+                {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
+              </button>
+            </div>
           )}
         </div>
-      </div>
-
-      {/* Export Buttons */}
-      <div class="flex items-center justify-center gap-4">
-        <button
-          onClick={handleCopy}
-          class="inline-flex items-center gap-2 px-6 py-3 border-4 rounded-xl font-mono font-bold shadow-brutal transition-all hover:scale-105"
-          style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-        >
-          {copiedToClipboard ? "✓ Copied!" : "📋 COPY"}
-        </button>
       </div>
 
       {/* Info */}

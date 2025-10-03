@@ -3,26 +3,28 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { analytics } from "../utils/analytics.ts";
 import { SimpleTypeWriter } from "../utils/simple-typewriter.js";
+import { COLOR_EFFECTS } from "../utils/constants.ts";
+import { MagicDropdown } from "../components/MagicDropdown.tsx";
 
 // Curated figlet fonts - hand-picked fonts for the ASCII Factory!
 const FIGLET_FONTS = [
-  { name: "Standard", file: "Standard" },
-  { name: "Doom", file: "Doom" },
-  { name: "Slant", file: "Slant" },
-  { name: "Shadow", file: "Shadow" },
-  { name: "Ghost", file: "Ghost" },
-  { name: "Bloody", file: "Bloody" },
-  { name: "Colossal", file: "Colossal" },
-  { name: "Isometric3", file: "Isometric3" },
-  { name: "Poison", file: "Poison" },
-  { name: "Speed", file: "Speed" },
-  { name: "Star Wars", file: "Star Wars" },
-  { name: "Small", file: "Small" },
-  { name: "Chunky", file: "Chunky" },
-  { name: "Larry 3D", file: "Larry 3D" },
-  { name: "Banner", file: "Banner" },
-  { name: "Block", file: "Block" },
-  { name: "Big", file: "Big" },
+  { name: "Standard", value: "Standard" },
+  { name: "Doom", value: "Doom" },
+  { name: "Slant", value: "Slant" },
+  { name: "Shadow", value: "Shadow" },
+  { name: "Ghost", value: "Ghost" },
+  { name: "Bloody", value: "Bloody" },
+  { name: "Colossal", value: "Colossal" },
+  { name: "Isometric3", value: "Isometric3" },
+  { name: "Poison", value: "Poison" },
+  { name: "Speed", value: "Speed" },
+  { name: "Star Wars", value: "Star Wars" },
+  { name: "Small", value: "Small" },
+  { name: "Chunky", value: "Chunky" },
+  { name: "Larry 3D", value: "Larry 3D" },
+  { name: "Banner", value: "Banner" },
+  { name: "Block", value: "Block" },
+  { name: "Big", value: "Big" },
 ];
 
 // Border styles for ASCII art
@@ -33,19 +35,6 @@ const BORDER_STYLES = [
   { name: "Block", value: "block" },
 ];
 
-// Enhanced color effects - ordered warm → cool → special
-const COLOR_EFFECTS = [
-  { name: "Matrix", value: "none" },
-  { name: "Fire", value: "fire" },
-  { name: "Sunrise", value: "sunrise" },
-  { name: "Unicorn", value: "unicorn" },
-  { name: "Vaporwave", value: "vaporwave" },
-  { name: "Cyberpunk", value: "cyberpunk" },
-  { name: "Ocean", value: "ocean" },
-  { name: "Chrome", value: "chrome" },
-  { name: "Neon", value: "neon" },
-  { name: "Poison", value: "poison" },
-];
 
 export default function TextToAscii() {
   // Initialize analytics and typewriter sounds on mount
@@ -725,220 +714,40 @@ export default function TextToAscii() {
           }`}
         >
           {/* Font Dropdown */}
-          <div class="relative">
-            <label
-              class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider"
-              style="color: var(--color-text, #0A0A0A);"
-            >
-              Font
-            </label>
-            <div
-              class="magic-select w-full px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5"
-              style={fontChanged
-                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
-                : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
-              onClick={(e) => {
-                e.stopPropagation();
-                sounds.click();
-                setFontDropdownOpen(!fontDropdownOpen);
-                setColorDropdownOpen(false);
-                setBorderDropdownOpen(false);
-              }}
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-base">
-                  {FIGLET_FONTS.find((f) => f.file === selectedFont.value)
-                    ?.name || "Standard"}
-                </span>
-                <span
-                  class="text-lg transition-transform"
-                  style={`color: var(--color-accent, #FF69B4); transform: rotate(${
-                    fontDropdownOpen ? "180" : "0"
-                  }deg);`}
-                >
-                  ▼
-                </span>
-              </div>
-            </div>
-            {fontDropdownOpen && (
-              <div
-                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden dropdown-scrollbar animate-dropdown-open"
-                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 400px; overflow-y: auto;"
-              >
-                {FIGLET_FONTS.map((font) => (
-                  <div
-                    key={font.file}
-                    class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
-                    style={`background-color: ${
-                      selectedFont.value === font.file
-                        ? "var(--color-accent, #FF69B4)"
-                        : "transparent"
-                    }; color: ${
-                      selectedFont.value === font.file
-                        ? "var(--color-base, #FAF9F6)"
-                        : "var(--color-text, #0A0A0A)"
-                    };`}
-                    onClick={() => {
-                      sounds.click();
-                      selectedFont.value = font.file;
-                      setFontChanged(true);
-                      setFontDropdownOpen(false);
-                    }}
-                    onMouseEnter={() => sounds.hover && sounds.hover()}
-                  >
-                    {selectedFont.value === font.file && (
-                      <span class="mr-2">✓</span>
-                    )}
-                    {font.name}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <MagicDropdown
+            label="Font"
+            options={FIGLET_FONTS}
+            value={selectedFont.value}
+            onChange={(value) => {
+              selectedFont.value = value;
+              setFontChanged(true);
+            }}
+            changed={fontChanged}
+          />
 
           {/* Color Dropdown */}
-          <div class="relative">
-            <label
-              class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider"
-              style="color: var(--color-text, #0A0A0A);"
-            >
-              Color
-            </label>
-            <div
-              class="magic-select w-full px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5"
-              style={colorChanged
-                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
-                : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
-              onClick={(e) => {
-                e.stopPropagation();
-                sounds.click();
-                setColorDropdownOpen(!colorDropdownOpen);
-                setFontDropdownOpen(false);
-                setBorderDropdownOpen(false);
-              }}
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-base">
-                  {COLOR_EFFECTS.find((e) => e.value === colorEffect.value)
-                    ?.name || "Plain"}
-                </span>
-                <span
-                  class="text-lg transition-transform"
-                  style={`color: var(--color-accent, #FF69B4); transform: rotate(${
-                    colorDropdownOpen ? "180" : "0"
-                  }deg);`}
-                >
-                  ▼
-                </span>
-              </div>
-            </div>
-            {colorDropdownOpen && (
-              <div
-                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden dropdown-scrollbar animate-dropdown-open"
-                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 400px; overflow-y: auto;"
-              >
-                {COLOR_EFFECTS.map((effect) => (
-                  <div
-                    key={effect.value}
-                    class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
-                    style={`background-color: ${
-                      colorEffect.value === effect.value
-                        ? "var(--color-accent, #FF69B4)"
-                        : "transparent"
-                    }; color: ${
-                      colorEffect.value === effect.value
-                        ? "var(--color-base, #FAF9F6)"
-                        : "var(--color-text, #0A0A0A)"
-                    };`}
-                    onClick={() => {
-                      sounds.click();
-                      colorEffect.value = effect.value;
-                      setColorChanged(true);
-                      setColorDropdownOpen(false);
-                    }}
-                    onMouseEnter={() => sounds.hover && sounds.hover()}
-                  >
-                    {colorEffect.value === effect.value && (
-                      <span class="mr-2">✓</span>
-                    )}
-                    {effect.name}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <MagicDropdown
+            label="Color"
+            options={COLOR_EFFECTS}
+            value={colorEffect.value}
+            onChange={(value) => {
+              colorEffect.value = value;
+              setColorChanged(true);
+            }}
+            changed={colorChanged}
+          />
 
           {/* Border Dropdown */}
-          <div class="relative">
-            <label
-              class="block mb-2 px-2 font-mono font-bold text-sm uppercase tracking-wider"
-              style="color: var(--color-text, #0A0A0A);"
-            >
-              Border
-            </label>
-            <div
-              class="magic-select w-full px-5 py-4 border-4 rounded-2xl font-mono font-bold cursor-pointer transition-all hover:shadow-brutal hover:-translate-y-0.5"
-              style={borderChanged
-                ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
-                : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
-              onClick={(e) => {
-                e.stopPropagation();
-                sounds.click();
-                setBorderDropdownOpen(!borderDropdownOpen);
-                setFontDropdownOpen(false);
-                setColorDropdownOpen(false);
-              }}
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-base">
-                  {BORDER_STYLES.find((b) => b.value === borderStyle.value)
-                    ?.name || "None"}
-                </span>
-                <span
-                  class="text-lg transition-transform"
-                  style={`color: var(--color-accent, #FF69B4); transform: rotate(${
-                    borderDropdownOpen ? "180" : "0"
-                  }deg);`}
-                >
-                  ▼
-                </span>
-              </div>
-            </div>
-            {borderDropdownOpen && (
-              <div
-                class="absolute z-20 w-full mt-1 border-4 rounded-2xl shadow-brutal-lg overflow-hidden dropdown-scrollbar animate-dropdown-open"
-                style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 400px; overflow-y: auto;"
-              >
-                {BORDER_STYLES.map((border) => (
-                  <div
-                    key={border.value}
-                    class="px-5 py-3 font-mono font-bold cursor-pointer transition-all hover:pl-7"
-                    style={`background-color: ${
-                      borderStyle.value === border.value
-                        ? "var(--color-accent, #FF69B4)"
-                        : "transparent"
-                    }; color: ${
-                      borderStyle.value === border.value
-                        ? "var(--color-base, #FAF9F6)"
-                        : "var(--color-text, #0A0A0A)"
-                    };`}
-                    onClick={() => {
-                      sounds.click();
-                      borderStyle.value = border.value;
-                      setBorderChanged(true);
-                      setBorderDropdownOpen(false);
-                    }}
-                    onMouseEnter={() => sounds.hover && sounds.hover()}
-                  >
-                    {borderStyle.value === border.value && (
-                      <span class="mr-2">✓</span>
-                    )}
-                    {border.name}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <MagicDropdown
+            label="Border"
+            options={BORDER_STYLES}
+            value={borderStyle.value}
+            onChange={(value) => {
+              borderStyle.value = value;
+              setBorderChanged(true);
+            }}
+            changed={borderChanged}
+          />
         </div>
 
       </div>

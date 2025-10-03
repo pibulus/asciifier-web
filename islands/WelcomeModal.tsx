@@ -26,10 +26,24 @@ export function checkWelcomeStatus() {
 }
 
 export function markWelcomeSeen() {
-  if (typeof localStorage !== "undefined") {
-    localStorage.setItem(WELCOME_SEEN_KEY, "true");
+  // Start fade out animation
+  const modal = document.querySelector('.animate-welcome-in');
+  if (modal) {
+    modal.classList.add('animate-welcome-out');
   }
-  welcomeModalOpen.value = false;
+
+  // Trigger brightness splash
+  document.body.classList.add("brightness-splash");
+
+  // Wait for animations to complete before closing modal
+  setTimeout(() => {
+    document.body.classList.remove("brightness-splash");
+    welcomeModalOpen.value = false;
+
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(WELCOME_SEEN_KEY, "true");
+    }
+  }, 600);
 }
 
 export function WelcomeModal() {
@@ -71,20 +85,17 @@ export function WelcomeModal() {
           class="relative w-full max-w-2xl animate-welcome-in"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* ASCII Art with Sunset Gradient */}
+          {/* Logo Image Header */}
           <div
-            class="p-8 border-4 rounded-3xl text-center shadow-brutal-xl mb-4"
+            class="p-6 border-4 rounded-3xl text-center shadow-brutal-xl mb-4 overflow-hidden"
             style="background: linear-gradient(135deg, #FFB6C1 0%, #FFA07A 25%, #FF8C94 50%, #9B6B9E 75%, #6B4D8A 100%); border-color: var(--color-border, #0A0A0A)"
           >
-            <pre
-              class="font-mono text-xs sm:text-sm md:text-base lg:text-lg font-bold leading-tight select-none"
-              style="color: #0A0A0A; text-shadow: 1px 1px 0px rgba(255,255,255,0.3)"
-            >
-{`
-   ▄▀█ █▀ █▀▀ █ █ █▀▀ █ █▀▀ █▀█
-   █▀█ ▄█ █▄▄ █ █ █▀  █ ██▄ █▀▄
-`}
-            </pre>
+            <img
+              src="/asciifier-logo.png"
+              alt="ASCIIFIER - Text Art Machine"
+              class="w-full h-auto"
+              style="image-rendering: crisp-edges; image-rendering: pixelated;"
+            />
           </div>
 
           {/* Content */}
@@ -98,8 +109,8 @@ export function WelcomeModal() {
               class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center leading-tight tracking-tight"
               style="color: var(--color-text, #0A0A0A)"
             >
-              Text art's back. <br />
-              Make yours weird.
+              Turn anything into <br />
+              glorious text art
             </h1>
 
             {/* Features */}
@@ -131,7 +142,7 @@ export function WelcomeModal() {
               style="background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
               aria-label="Close welcome message and start using ASCIIFIER"
             >
-              Let's get weird
+              Start creating
             </button>
 
             {/* Tagline */}
@@ -139,7 +150,7 @@ export function WelcomeModal() {
               class="text-base sm:text-lg md:text-xl font-bold text-center pt-2"
               style="color: var(--color-accent, #FF69B4)"
             >
-              Quick. Free. Freaky nostalgic.
+              Quick. Free. Nostalgic.
             </p>
           </div>
         </div>
@@ -158,8 +169,39 @@ export function WelcomeModal() {
             }
           }
 
+          @keyframes welcome-out {
+            0% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+            }
+            100% {
+              opacity: 0;
+              transform: scale(0.95) translateY(-20px);
+            }
+          }
+
+          @keyframes brightness-flash {
+            0% {
+              filter: brightness(1);
+            }
+            30% {
+              filter: brightness(1.6);
+            }
+            100% {
+              filter: brightness(1);
+            }
+          }
+
           .animate-welcome-in {
             animation: welcome-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+          }
+
+          .animate-welcome-out {
+            animation: welcome-out 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+          }
+
+          .brightness-splash {
+            animation: brightness-flash 0.6s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
           }
 
           .shadow-brutal-xl {
