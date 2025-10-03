@@ -59,22 +59,20 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main class="flex-1 w-full px-4 py-12">
-        <div class="max-w-5xl mx-auto">
+      <main class="flex-1 w-full px-4 py-12 flex items-center justify-center">
+        <div class="max-w-5xl w-full">
           <TabsIsland activeTab={activeTab} />
         </div>
       </main>
 
       {/* Footer */}
       <footer
-        class="border-t-4 py-4"
+        class="border-t-4 py-6"
         style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)"
       >
         <div class="max-w-4xl mx-auto px-4">
-          <div class="flex items-center justify-between text-xs font-mono">
-            <div class="opacity-60">
-              <AboutLink label="Made with care by Pablo" />
-            </div>
+          <div class="flex items-center justify-center gap-4">
+            <AboutLink label="Made by Pablo 🎸" />
             <KofiButton size="sm" label="☕ Support" />
           </div>
         </div>

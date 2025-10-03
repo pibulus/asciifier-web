@@ -100,9 +100,7 @@ export function MagicDropdown({
               onClick={() => handleSelect(option.value)}
               onMouseEnter={() => sounds.hover && sounds.hover()}
             >
-              {value === option.value && (
-                <span class="mr-2">✓</span>
-              )}
+              {value === option.value && <span class="mr-2">✓</span>}
               {option.name}
             </div>
           ))}

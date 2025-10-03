@@ -60,7 +60,9 @@ export default function AsciiGallery() {
   // Function to fetch a single piece of ASCII art
   const fetchSingleArt = async (): Promise<string | null> => {
     try {
-      const url = `/api/random-ascii-art?category=${encodeURIComponent(selectedCategory)}`;
+      const url = `/api/random-ascii-art?category=${
+        encodeURIComponent(selectedCategory)
+      }`;
       const response = await fetch(url);
       const data: AsciiArt = await response.json();
 
@@ -220,40 +222,67 @@ export default function AsciiGallery() {
     setColorizedArt(colorizedLines.join("\n"));
   };
 
-  const handleCopy = async () => {
-    sounds.pop();
-
+  const copyToClipboard = async (format = "email") => {
+    analytics.trackExport(format === "email" ? "html" : "plain");
     try {
-      // Strip HTML if colorized to get plain text
-      let plainText = currentArt;
-      if (selectedColor !== "none" && colorizedArt) {
-        plainText = colorizedArt.replace(/<[^>]*>/g, "");
+      // Strip ANSI codes for plain text
+      const plainText = currentArt.replace(/\u001b\[[0-9;]*m/g, "");
+
+      let textToCopy = plainText;
+      let htmlToCopy = "";
+
+      if (format === "email") {
+        // Rich HTML for email (Gmail, Outlook, etc.)
+        htmlToCopy = colorizedArt && colorizedArt.includes("<span")
+          ? `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0; background: black; color: white; padding: 8px; border-radius: 4px;">${colorizedArt}</pre>`
+          : `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${plainText}</pre>`;
+        textToCopy = plainText;
+      } else if (format === "message") {
+        // Wrapped in backticks for messaging apps (Discord, WhatsApp, Slack)
+        textToCopy = `\`\`\`\n${plainText}\n\`\`\``;
+        htmlToCopy = `<pre>${textToCopy}</pre>`;
+      } else {
+        // Plain text
+        textToCopy = plainText;
       }
 
-      await navigator.clipboard.writeText(plainText);
-      setCopiedToClipboard(true);
-
-      if (typeof analytics?.track === "function") {
-        analytics.track("gallery_copy", {
-          category: selectedCategory,
-          colorEffect: selectedColor,
+      // Try modern clipboard API with both formats
+      if (navigator.clipboard && navigator.clipboard.write && htmlToCopy) {
+        const clipboardItem = new ClipboardItem({
+          "text/plain": new Blob([textToCopy], { type: "text/plain" }),
+          "text/html": new Blob([htmlToCopy], { type: "text/html" }),
         });
+        await navigator.clipboard.write([clipboardItem]);
+      } else {
+        // Fallback for older browsers - just plain text
+        await navigator.clipboard.writeText(textToCopy);
       }
 
-      setTimeout(() => setCopiedToClipboard(false), 2000);
+      setCopiedToClipboard(true);
+      sounds.copy();
+      setTimeout(() => {
+        setCopiedToClipboard(false);
+      }, 2000);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      sounds.error();
+      alert("Copy failed. Try again.");
     }
   };
 
   const downloadText = () => {
-    sounds.pop();
-
-    // Strip HTML if colorized to get plain text
+    analytics.trackExport("text");
+    // Strip HTML tags and ANSI codes for plain text download
     let plainText = currentArt;
-    if (selectedColor !== "none" && colorizedArt) {
-      plainText = colorizedArt.replace(/<[^>]*>/g, "");
+
+    // If it contains HTML, extract just the text
+    if (colorizedArt && colorizedArt.includes("<span")) {
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = colorizedArt;
+      plainText = tempDiv.textContent || tempDiv.innerText || "";
     }
+
+    // Also strip any remaining ANSI codes
+    plainText = plainText.replace(/\u001b\[[0-9;]*m/g, "");
 
     const blob = new Blob([plainText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -266,7 +295,7 @@ export default function AsciiGallery() {
   };
 
   const downloadPNG = () => {
-    sounds.pop();
+    analytics.trackExport("png");
     try {
       // Get the ASCII display element
       const asciiElement = document.querySelector(".ascii-display");
@@ -275,82 +304,166 @@ export default function AsciiGallery() {
         return;
       }
 
-      // Create canvas for rendering
+      // Parse HTML to extract text and colors character by character
+      type CharData = { char: string; color: string };
+      type LineData = { chars: CharData[] };
+      const lines: LineData[] = [];
+      let currentLine: CharData[] = [];
+
+      // Function to extract color from a span element
+      const getColorFromElement = (element: Element): string => {
+        if (element.tagName === "SPAN") {
+          const style = (element as HTMLElement).style.color;
+          if (style) return style;
+        }
+        return "#00FF41"; // Default green
+      };
+
+      // Process HTML content recursively
+      const processNode = (node: Node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent || "";
+          const parentColor = node.parentElement
+            ? getColorFromElement(node.parentElement)
+            : "#00FF41";
+
+          for (const char of text) {
+            if (char === "\n") {
+              if (currentLine.length > 0) {
+                lines.push({ chars: currentLine });
+                currentLine = [];
+              }
+            } else {
+              currentLine.push({ char, color: parentColor });
+            }
+          }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          const element = node as HTMLElement;
+
+          if (element.tagName === "BR") {
+            if (currentLine.length > 0) {
+              lines.push({ chars: currentLine });
+              currentLine = [];
+            }
+          } else if (
+            element.tagName === "SPAN" && element.childNodes.length === 1 &&
+            element.childNodes[0].nodeType === Node.TEXT_NODE
+          ) {
+            // Direct span with text
+            const text = element.textContent || "";
+            const color = getColorFromElement(element);
+
+            for (const char of text) {
+              if (char === "\n") {
+                if (currentLine.length > 0) {
+                  lines.push({ chars: currentLine });
+                  currentLine = [];
+                }
+              } else {
+                currentLine.push({ char, color });
+              }
+            }
+          } else {
+            // Recursively process children
+            for (const child of Array.from(node.childNodes)) {
+              processNode(child);
+            }
+          }
+        }
+      };
+
+      // Process all child nodes
+      Array.from(asciiElement.childNodes).forEach(processNode);
+
+      // Add remaining line
+      if (currentLine.length > 0) {
+        lines.push({ chars: currentLine });
+      }
+
+      // Keep only non-empty lines
+      const nonEmptyLines = lines.filter((line) =>
+        line.chars.some((c) => c.char.trim().length > 0)
+      );
+
+      if (nonEmptyLines.length === 0) {
+        console.error("No ASCII text found");
+        return;
+      }
+
+      // Calculate canvas dimensions
       const fontSize = 12;
       const charWidth = fontSize * 0.6;
       const lineHeight = fontSize * 1.2;
       const padding = 40;
 
-      // Split text into lines for dimensions
-      const lines = currentArt.split("\n");
-      const maxLineLength = Math.max(...lines.map(l => l.length));
+      // Find the maximum line width
+      const maxLineLength = Math.max(
+        ...nonEmptyLines.map((line) => line.chars.length),
+      );
 
       const canvasWidth = (maxLineLength * charWidth) + (padding * 2);
-      const canvasHeight = (lines.length * lineHeight) + (padding * 2);
+      const canvasHeight = (nonEmptyLines.length * lineHeight) + (padding * 2);
 
       // Create high-DPI canvas
       const canvas = document.createElement("canvas");
       const scale = 2;
       canvas.width = canvasWidth * scale;
       canvas.height = canvasHeight * scale;
-      canvas.style.width = canvasWidth + "px";
-      canvas.style.height = canvasHeight + "px";
 
       const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+      if (!ctx) {
+        console.error("Could not get canvas context");
+        return;
+      }
 
       // Scale for high DPI
       ctx.scale(scale, scale);
 
-      // Background
-      ctx.fillStyle = "#0A0A0A";
+      // Fill black background
+      ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-      // Font setup
+      // Set font
       ctx.font = `${fontSize}px monospace`;
+      ctx.textAlign = "left";
       ctx.textBaseline = "top";
 
-      // Draw text
-      if (selectedColor !== "none" && colorizedArt) {
-        // Draw with colors
-        const colorLines = colorizedArt.split("\n");
-        colorLines.forEach((line, y) => {
-          // Parse color from span if present
-          const colorMatch = line.match(/style="color:\s*([^"]+)"/);
-          const textMatch = line.match(/>([^<]*)</);
+      // Draw each character with its exact color
+      nonEmptyLines.forEach((line, lineIndex) => {
+        const y = padding + (lineIndex * lineHeight);
 
-          if (colorMatch && textMatch) {
-            ctx.fillStyle = colorMatch[1];
-            ctx.fillText(textMatch[1], padding, padding + (y * lineHeight));
-          } else {
-            // Fallback to plain text
-            const plainText = line.replace(/<[^>]*>/g, "");
-            ctx.fillStyle = "#00FF41";
-            ctx.fillText(plainText, padding, padding + (y * lineHeight));
-          }
-        });
-      } else {
-        // Draw plain text
-        ctx.fillStyle = "#00FF41";
-        lines.forEach((line, y) => {
-          ctx.fillText(line, padding, padding + (y * lineHeight));
-        });
-      }
+        line.chars.forEach((charData, charIndex) => {
+          const x = padding + (charIndex * charWidth);
 
-      // Download
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "ascii-art.png";
-          a.click();
-          URL.revokeObjectURL(url);
-          sounds.success();
-        }
+          // Use the exact color from the HTML
+          ctx.fillStyle = charData.color;
+          ctx.fillText(charData.char, x, y);
+        });
       });
+
+      // Create filename
+      const filename = "ascii-art";
+
+      // Convert canvas to blob and download
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          console.error("Failed to create blob");
+          sounds.error();
+          alert("Failed to generate PNG. Please try again.");
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${filename}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+        sounds.success();
+      }, "image/png");
     } catch (error) {
-      console.error("Failed to create PNG:", error);
+      console.error("Error generating PNG:", error);
+      sounds.error();
+      alert("Failed to export as PNG. Please try again.");
     }
   };
 
@@ -461,28 +574,34 @@ export default function AsciiGallery() {
           </div>
           <div
             class="p-8 overflow-auto custom-scrollbar transition-all duration-700"
-            style={currentArt ? "height: auto; min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);" : "min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"}
+            style={currentArt
+              ? "height: auto; min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
+              : "min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"}
           >
-            {isLoadingArt && !currentArt ? (
-              <div class="flex items-center justify-center h-96">
-                <div class="animate-pulse font-mono" style="color: #00FF41">
-                  Loading ASCII magic...
+            {isLoadingArt && !currentArt
+              ? (
+                <div class="flex items-center justify-center h-96">
+                  <div class="animate-pulse font-mono" style="color: #00FF41">
+                    Loading ASCII magic...
+                  </div>
                 </div>
-              </div>
-            ) : selectedColor !== "none" && colorizedArt ? (
-              <pre
-                class="ascii-display font-mono text-base opacity-85"
-                style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
-                dangerouslySetInnerHTML={{ __html: colorizedArt }}
-              />
-            ) : (
-              <pre
-                class="ascii-display font-mono text-base opacity-85"
-                style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
-              >
+              )
+              : selectedColor !== "none" && colorizedArt
+              ? (
+                <pre
+                  class="ascii-display font-mono text-base opacity-85"
+                  style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
+                  dangerouslySetInnerHTML={{ __html: colorizedArt }}
+                />
+              )
+              : (
+                <pre
+                  class="ascii-display font-mono text-base opacity-85"
+                  style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
+                >
                 {currentArt}
-              </pre>
-            )}
+                </pre>
+              )}
           </div>
 
           {/* Export Buttons - positioned absolute like TextToAscii */}
@@ -510,7 +629,7 @@ export default function AsciiGallery() {
 
               {/* Main Copy Button */}
               <button
-                onClick={handleCopy}
+                onClick={() => copyToClipboard("email")}
                 class={`px-6 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 ${
                   copiedToClipboard ? "animate-bounce-once" : ""
                 }`}
@@ -535,6 +654,78 @@ export default function AsciiGallery() {
           Art sourced from asciiart.eu archive
         </p>
       </div>
+
+      <style>
+        {`
+        /* Pop-in animation for export buttons */
+        @keyframes popIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.8) translateY(10px);
+          }
+          60% {
+            transform: scale(1.05) translateY(0);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+
+        .animate-pop-in {
+          animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Bounce once animation for copy success */
+        @keyframes bounceOnce {
+          0%, 100% { transform: translateY(0); }
+          25% { transform: translateY(-10px); }
+          50% { transform: translateY(0); }
+          75% { transform: translateY(-5px); }
+        }
+
+        .animate-bounce-once {
+          animation: bounceOnce 0.5s ease-out;
+        }
+
+        /* Brutal shadows - chunky and bold */
+        .shadow-brutal-lg {
+          box-shadow: 6px 6px 0 var(--color-border, #0A0A0A);
+        }
+
+        .shadow-brutal-xl {
+          box-shadow: 8px 8px 0 var(--color-border, #0A0A0A);
+        }
+
+        .hover\\:shadow-brutal-xl:hover {
+          box-shadow: 8px 8px 0 var(--color-border, #0A0A0A);
+        }
+
+        /* Transform utilities */
+        .hover\\:-translate-y-1:hover {
+          transform: translateY(-4px);
+        }
+
+        .active\\:translate-y-0:active {
+          transform: translateY(0);
+        }
+
+        /* Custom Scrollbar for output terminal */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 12px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #1a1a1a;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #00FF41;
+          border-radius: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #00CC33;
+        }
+      `}
+      </style>
     </div>
   );
 }

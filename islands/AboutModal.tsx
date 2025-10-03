@@ -110,9 +110,9 @@ export function AboutModal() {
               class="text-base sm:text-lg leading-relaxed"
               style="color: var(--color-text, #0A0A0A)"
             >
-              I'm Pablo. I build tools with personality.
-              This one celebrates ASCII art—the OG way we made the internet beautiful
-              before we had images.
+              I'm Pablo. I build tools with personality. This one celebrates
+              ASCII art—the OG way we made the internet beautiful before we had
+              images.
             </p>
 
             {/* What it's for */}
@@ -124,8 +124,8 @@ export function AboutModal() {
                 class="text-sm sm:text-base font-medium"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                Make signatures for forums. Turn your face into ASCII.
-                Explore the gallery of internet classics. Export and share anywhere.
+                Make signatures for forums. Turn your face into ASCII. Explore
+                the gallery of internet classics. Export and share anywhere.
               </p>
               <p
                 class="text-sm sm:text-base font-medium"
@@ -175,7 +175,10 @@ export function AboutModal() {
             </div>
 
             {/* Footer */}
-            <div class="pt-4 text-center border-t-2" style="border-color: var(--color-border, #0A0A0A)">
+            <div
+              class="pt-4 text-center border-t-2"
+              style="border-color: var(--color-border, #0A0A0A)"
+            >
               <p
                 class="text-xs opacity-60"
                 style="color: var(--color-text, #0A0A0A)"
@@ -245,8 +248,8 @@ export function AboutLink({
   return (
     <button
       onClick={openAboutModal}
-      class={`font-mono hover:opacity-100 transition-opacity underline ${className}`}
-      style="color: var(--color-text, #0A0A0A)"
+      class={`px-4 py-2 border-2 rounded-xl font-mono font-bold transition-all hover:scale-105 hover:shadow-juicy active:scale-95 ${className}`}
+      style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
     >
       {label}
     </button>

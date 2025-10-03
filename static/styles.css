@@ -67,4 +67,9 @@
   .smooth-scroll {
     scroll-behavior: smooth;
   }
+
+  /* Juicy button shadow - subtle but classy */
+  .shadow-juicy {
+    box-shadow: 3px 3px 0 var(--color-border, #0a0a0a);
+  }
 }

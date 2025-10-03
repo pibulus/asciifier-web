@@ -27,9 +27,9 @@ export function checkWelcomeStatus() {
 
 export function markWelcomeSeen() {
   // Start fade out animation
-  const modal = document.querySelector('.animate-welcome-in');
+  const modal = document.querySelector(".animate-welcome-in");
   if (modal) {
-    modal.classList.add('animate-welcome-out');
+    modal.classList.add("animate-welcome-out");
   }
 
   // Trigger brightness splash
@@ -119,19 +119,22 @@ export function WelcomeModal() {
                 class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                🎨 <strong>Type anything or drop an image</strong> — Watch it transform into glorious ASCII.
+                🎨 <strong>Type anything or drop an image</strong>{" "}
+                — Watch it transform into glorious ASCII.
               </p>
               <p
                 class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                🌈 <strong>17 fonts, 10 color effects</strong> — Go rainbow, fire, ocean, matrix, cyberpunk.
+                🌈 <strong>17 fonts, 10 color effects</strong>{" "}
+                — Go rainbow, fire, ocean, matrix, cyberpunk.
               </p>
               <p
                 class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                📚 <strong>Gallery full of classics</strong> — Dragons, Homer Simpson, Escher stairs. Copy and go.
+                📚 <strong>Gallery full of classics</strong>{" "}
+                — Dragons, Homer Simpson, Escher stairs. Copy and go.
               </p>
             </div>
 

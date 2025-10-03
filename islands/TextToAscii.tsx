@@ -35,7 +35,6 @@ const BORDER_STYLES = [
   { name: "Block", value: "block" },
 ];
 
-
 export default function TextToAscii() {
   // Initialize analytics and typewriter sounds on mount
   useEffect(() => {
@@ -749,7 +748,6 @@ export default function TextToAscii() {
             changed={borderChanged}
           />
         </div>
-
       </div>
 
       {/* Terminal Display - Always visible */}
