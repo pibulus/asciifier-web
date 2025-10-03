@@ -9,7 +9,9 @@
       "mcp__context7__get-library-docs",
       "Bash(bash:*)",
       "Bash(git checkout:*)",
-      "Bash(deno task:*)"
+      "Bash(deno task:*)",
+      "Bash(cat:*)",
+      "WebFetch(domain:jsr.io)"
     ],
     "deny": [],
     "ask": []

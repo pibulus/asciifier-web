@@ -1,5 +1,3 @@
-import posthog from "posthog-js";
-
 /**
  * 🔮 Privacy-Focused Analytics Service
  *
@@ -11,16 +9,17 @@ import posthog from "posthog-js";
  *
  * Analytics are OPTIONAL - only loads if POSTHOG_KEY is configured
  *
- * Based on shared module pattern from SoftStack apps
+ * Uses dynamic import to prevent connection attempts without API keys
  */
 
 class AnalyticsService {
   private isInitialized = false;
+  private posthog: any = null;
   private eventQueue: Array<
     { eventName: string; properties: Record<string, any> }
   > = [];
 
-  init() {
+  async init() {
     if (this.isInitialized || typeof window === "undefined") return;
 
     // Get keys from window.ENV (set by Fresh in _app.tsx)
@@ -33,19 +32,28 @@ class AnalyticsService {
       return;
     }
 
-    posthog.init(key, {
-      api_host: host,
-      person_profiles: "identified_only",
-      capture_pageview: true,
-      capture_pageleave: true,
-      disable_session_recording: true,
-      disable_survey_popups: true,
-      property_blacklist: ["$current_url", "$referrer"],
-      loaded: () => {
-        this.isInitialized = true;
-        this.processQueue();
-      },
-    });
+    try {
+      // Dynamic import - only loads PostHog when we have API keys
+      const posthogModule = await import("posthog-js");
+      this.posthog = posthogModule.default;
+
+      this.posthog.init(key, {
+        api_host: host,
+        person_profiles: "identified_only",
+        capture_pageview: true,
+        capture_pageleave: true,
+        disable_session_recording: true,
+        disable_survey_popups: true,
+        property_blacklist: ["$current_url", "$referrer"],
+        loaded: () => {
+          this.isInitialized = true;
+          this.processQueue();
+        },
+      });
+    } catch (error) {
+      console.warn("PostHog failed to load:", error);
+      this.isInitialized = true; // Prevent retry loops
+    }
   }
 
   private trackEvent(eventName: string, properties: Record<string, any> = {}) {
@@ -53,17 +61,17 @@ class AnalyticsService {
 
     const event = { eventName, properties };
 
-    if (this.isInitialized) {
-      posthog.capture(eventName, properties);
+    if (this.isInitialized && this.posthog) {
+      this.posthog.capture(eventName, properties);
     } else {
       this.eventQueue.push(event);
     }
   }
 
   private processQueue() {
-    while (this.eventQueue.length > 0) {
+    while (this.eventQueue.length > 0 && this.posthog) {
       const { eventName, properties } = this.eventQueue.shift()!;
-      posthog.capture(eventName, properties);
+      this.posthog.capture(eventName, properties);
     }
   }
 

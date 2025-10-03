@@ -28,6 +28,7 @@ export default function AsciiGallery() {
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [artCache, setArtCache] = useState<string[]>([]);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
+  const [mobileExportOpen, setMobileExportOpen] = useState(false);
 
   // Load initial random art on mount
   useEffect(() => {
@@ -573,7 +574,7 @@ export default function AsciiGallery() {
             </div>
           </div>
           <div
-            class="p-8 overflow-auto custom-scrollbar transition-all duration-700"
+            class="p-4 sm:p-6 md:p-8 overflow-auto custom-scrollbar transition-all duration-700"
             style={currentArt
               ? "height: auto; min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
               : "min-height: 400px; max-height: 600px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"}
@@ -606,41 +607,94 @@ export default function AsciiGallery() {
 
           {/* Export Buttons - positioned absolute like TextToAscii */}
           {currentArt && (
-            <div class="absolute bottom-6 right-6 z-10 flex gap-3 animate-pop-in">
-              {/* Download PNG */}
-              <button
-                onClick={downloadPNG}
-                class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
-                style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
-                title="Download as PNG image"
-              >
-                🖼️ PNG
-              </button>
+            <>
+              {/* Mobile: Single Export Dropdown */}
+              <div class="sm:hidden absolute bottom-6 right-6 z-10 animate-pop-in">
+                <div class="relative">
+                  <button
+                    onClick={() => {
+                      sounds.click();
+                      setMobileExportOpen(!mobileExportOpen);
+                    }}
+                    class="px-4 py-3 border-3 rounded-xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl active:scale-95"
+                    style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+                  >
+                    📤 Export
+                  </button>
+                  {mobileExportOpen && (
+                    <div
+                      class="absolute bottom-full right-0 mb-2 border-3 rounded-xl overflow-hidden shadow-brutal-lg animate-dropdown-open"
+                      style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+                    >
+                      <button
+                        onClick={() => {
+                          downloadPNG();
+                          setMobileExportOpen(false);
+                        }}
+                        class="w-full px-4 py-3 font-mono font-bold text-left hover:bg-opacity-80 transition-colors"
+                        style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A);"
+                      >
+                        🖼️ PNG
+                      </button>
+                      <button
+                        onClick={() => {
+                          downloadText();
+                          setMobileExportOpen(false);
+                        }}
+                        class="w-full px-4 py-3 font-mono font-bold text-left hover:bg-opacity-80 transition-colors border-t-2"
+                        style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                      >
+                        💾 TXT
+                      </button>
+                      <button
+                        onClick={() => {
+                          copyToClipboard("email");
+                          setMobileExportOpen(false);
+                        }}
+                        class="w-full px-4 py-3 font-mono font-bold text-left hover:bg-opacity-80 transition-colors border-t-2"
+                        style={copiedToClipboard
+                          ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
+                          : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
+                      >
+                        {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-              {/* Download TXT */}
-              <button
-                onClick={downloadText}
-                class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
-                style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
-                title="Download as text file"
-              >
-                💾 TXT
-              </button>
-
-              {/* Main Copy Button */}
-              <button
-                onClick={() => copyToClipboard("email")}
-                class={`px-6 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 ${
-                  copiedToClipboard ? "animate-bounce-once" : ""
-                }`}
-                style={copiedToClipboard
-                  ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
-                  : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
-                title="Copy to clipboard"
-              >
-                {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
-              </button>
-            </div>
+              {/* Desktop: Three Button Layout */}
+              <div class="hidden sm:flex absolute bottom-6 right-6 z-10 gap-3 animate-pop-in">
+                <button
+                  onClick={downloadPNG}
+                  class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                  style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                  title="Download as PNG image"
+                >
+                  🖼️ PNG
+                </button>
+                <button
+                  onClick={downloadText}
+                  class="px-5 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0"
+                  style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+                  title="Download as text file"
+                >
+                  💾 TXT
+                </button>
+                <button
+                  onClick={() => copyToClipboard("email")}
+                  class={`px-6 py-3 border-4 rounded-2xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl hover:-translate-y-1 active:translate-y-0 ${
+                    copiedToClipboard ? "animate-bounce-once" : ""
+                  }`}
+                  style={copiedToClipboard
+                    ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
+                    : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
+                  title="Copy to clipboard"
+                >
+                  {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>

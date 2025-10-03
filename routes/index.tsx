@@ -33,11 +33,11 @@ export default function Home() {
         class="border-b-4 relative"
         style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)"
       >
-        <div class="max-w-6xl mx-auto px-4 py-6">
-          <div class="flex items-center justify-between gap-8">
+        <div class="max-w-6xl mx-auto px-4 py-4 sm:py-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-8">
             <div class="flex-1">
               <a href="/" class="group">
-                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold flex items-baseline gap-3 cursor-pointer">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold flex items-baseline gap-3 cursor-pointer">
                   <span
                     class="tracking-tight"
                     style="color: var(--color-text, #0A0A0A)"
@@ -47,7 +47,7 @@ export default function Home() {
                 </h1>
               </a>
               <p
-                class="mt-2 text-sm md:text-lg lg:text-xl font-mono font-bold"
+                class="mt-1 sm:mt-2 text-xs sm:text-sm md:text-lg lg:text-xl font-mono font-bold"
                 style="color: var(--color-accent, #FF69B4)"
               >
                 Turn ANYTHING into text art
