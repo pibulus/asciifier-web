@@ -345,12 +345,46 @@ export default function Dropzone() {
       {!imageLoaded && (
         <div class="text-center space-y-6">
           {/* Friendly greeting */}
-          <div class="space-y-2">
-            <h2
-              class="text-3xl font-bold"
-              style="color: var(--color-text, #0A0A0A)"
-            >
-              Turn any image into ASCII art
+          <div class="space-y-3">
+            <h2 class="text-4xl md:text-5xl font-black leading-tight wavy-dropzone-title">
+              <span
+                class="block mb-2"
+                style="color: var(--color-text, #0A0A0A);"
+              >
+                <span style="--char-index: 0">T</span>
+                <span style="--char-index: 1">u</span>
+                <span style="--char-index: 2">r</span>
+                <span style="--char-index: 3">n</span>
+                <span style="--char-index: 4"> </span>
+                <span style="--char-index: 5">a</span>
+                <span style="--char-index: 6">n</span>
+                <span style="--char-index: 7">y</span>
+                <span style="--char-index: 8"> </span>
+                <span style="--char-index: 9">i</span>
+                <span style="--char-index: 10">m</span>
+                <span style="--char-index: 11">a</span>
+                <span style="--char-index: 12">g</span>
+                <span style="--char-index: 13">e</span>
+              </span>
+              <span
+                class="block"
+                style="color: var(--color-accent, #FF69B4);"
+              >
+                <span style="--char-index: 0">i</span>
+                <span style="--char-index: 1">n</span>
+                <span style="--char-index: 2">t</span>
+                <span style="--char-index: 3">o</span>
+                <span style="--char-index: 4"> </span>
+                <span style="--char-index: 5">A</span>
+                <span style="--char-index: 6">S</span>
+                <span style="--char-index: 7">C</span>
+                <span style="--char-index: 8">I</span>
+                <span style="--char-index: 9">I</span>
+                <span style="--char-index: 10"> </span>
+                <span style="--char-index: 11">a</span>
+                <span style="--char-index: 12">r</span>
+                <span style="--char-index: 13">t</span>
+              </span>
             </h2>
           </div>
 

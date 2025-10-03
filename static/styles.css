@@ -72,4 +72,41 @@
   .shadow-juicy {
     box-shadow: 3px 3px 0 var(--color-border, #0a0a0a);
   }
+
+  /* Wavy title animation - subtle wave effect */
+  .wavy-title span {
+    display: inline-block;
+    animation: wave 3s ease-in-out infinite;
+    animation-delay: calc(var(--char-index) * 0.1s);
+  }
+
+  /* Wavy dropzone title - more engaging wave */
+  .wavy-dropzone-title span span {
+    display: inline-block;
+    animation: dropzoneWave 2.5s ease-in-out infinite;
+    animation-delay: calc(var(--char-index) * 0.08s);
+  }
+
+  @keyframes wave {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes dropzoneWave {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    25% {
+      transform: translateY(-6px) rotate(-1deg);
+    }
+    75% {
+      transform: translateY(-6px) rotate(1deg);
+    }
+  }
 }
