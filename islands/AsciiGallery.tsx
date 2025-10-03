@@ -473,7 +473,7 @@ export default function AsciiGallery() {
     : currentArt;
 
   return (
-    <div class="space-y-6">
+    <div class="max-w-6xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
       <div class="text-center space-y-2">
         <h2

@@ -460,46 +460,6 @@ export default function Dropzone() {
               />
             </div>
           )}
-
-          {/* Quick Start Presets */}
-          <div class="space-y-4 max-w-3xl mx-auto">
-            <p
-              class="text-base sm:text-sm font-mono opacity-70"
-              style="color: var(--color-text, #0A0A0A)"
-            >
-              Quick starts:
-            </p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-              {PRESETS.map((preset, i) => (
-                <button
-                  key={preset.name}
-                  onClick={() => applyPreset(preset, i)}
-                  class={`group relative px-6 py-4 border-4 rounded-lg font-semibold text-base transition-all duration-200 hover:animate-pop ${
-                    selectedPreset === i
-                      ? "shadow-brutal animate-pulse-soft"
-                      : "shadow-brutal-sm hover:shadow-brutal"
-                  }`}
-                  style={selectedPreset === i
-                    ? `background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)`
-                    : `background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)`}
-                  title={imageLoaded
-                    ? `Press ${i + 1} to apply`
-                    : "Select preset before uploading"}
-                >
-                  <div>
-                    <span class="font-mono font-bold">{preset.name}</span>
-                    <span class="block text-xs opacity-60">{preset.vibe}</span>
-                  </div>
-                  <span
-                    class="absolute -top-2 -right-2 text-xs px-1.5 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity font-mono"
-                    style="background-color: var(--color-text, #0A0A0A); color: var(--color-base, #FAF9F6)"
-                  >
-                    {i + 1}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       )}
 
