@@ -346,7 +346,7 @@ export default function Dropzone() {
         <div class="text-center space-y-6">
           {/* Friendly greeting */}
           <div class="space-y-3">
-            <h2 class="text-4xl md:text-5xl font-black leading-tight wavy-dropzone-title">
+            <h2 class="text-2xl md:text-4xl lg:text-5xl font-black leading-tight wavy-dropzone-title">
               <span
                 class="block mb-2"
                 style="color: var(--color-text, #0A0A0A);"
@@ -390,7 +390,7 @@ export default function Dropzone() {
 
           {/* Drop Zone */}
           <div
-            class={`relative border-8 border-dashed transition-all duration-300 rounded-xl p-24 cursor-pointer group ${
+            class={`relative border-4 md:border-8 border-dashed transition-all duration-300 rounded-xl p-12 md:p-16 lg:p-24 cursor-pointer group ${
               isDragging
                 ? "scale-105 shadow-brutal-lg rotate-1"
                 : "hover:scale-105 hover:rotate-2 shadow-brutal hover:shadow-brutal-lg"

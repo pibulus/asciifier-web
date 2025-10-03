@@ -37,7 +37,7 @@ export default function Home() {
           <div class="flex items-center justify-between gap-8">
             <div class="flex-1">
               <a href="/" class="group">
-                <h1 class="text-5xl font-bold flex items-baseline gap-3 cursor-pointer">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold flex items-baseline gap-3 cursor-pointer">
                   <span
                     class="tracking-tight"
                     style="color: var(--color-text, #0A0A0A)"
@@ -47,7 +47,7 @@ export default function Home() {
                 </h1>
               </a>
               <p
-                class="mt-3 text-xl font-mono font-bold"
+                class="mt-2 text-sm md:text-lg lg:text-xl font-mono font-bold"
                 style="color: var(--color-accent, #FF69B4)"
               >
                 Turn ANYTHING into text art
@@ -59,7 +59,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main class="flex-1 w-full px-4 py-12 flex items-center justify-center">
+      <main class="flex-1 w-full px-4 py-6 md:py-12 flex items-center justify-center">
         <div class="max-w-5xl w-full">
           <TabsIsland activeTab={activeTab} />
         </div>

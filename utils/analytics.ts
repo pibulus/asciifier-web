@@ -1,7 +1,5 @@
-import posthog from "posthog-js";
-
 /**
- * Privacy-Focused PostHog Analytics Service
+ * Privacy-Focused Analytics Service
  *
  * PRIVACY POLICY:
  * - NO personal data tracked (no text content, no images)
@@ -9,16 +7,15 @@ import posthog from "posthog-js";
  * - Error messages sanitized to remove potential personal data
  * - All data anonymized for product improvement only
  *
- * Based on implementation by Dennis for ZipList
+ * Analytics are OPTIONAL - only loads if POSTHOG_KEY is configured
  */
 
 class AnalyticsService {
   private isInitialized = false;
-  private eventQueue: Array<
-    { eventName: string; properties: Record<string, any> }
-  > = [];
+  private isEnabled = false;
+  private posthog: any = null;
 
-  init() {
+  async init() {
     if (this.isInitialized || typeof window === "undefined") return;
 
     // Get keys from window.ENV (set by Fresh in _app.tsx)
@@ -26,41 +23,46 @@ class AnalyticsService {
     const host = (window as any).ENV?.POSTHOG_HOST || "https://app.posthog.com";
 
     if (!key) {
-      console.warn("PostHog key not found - analytics disabled");
+      // Silently disable analytics - no warnings needed for local dev
+      this.isEnabled = false;
+      this.isInitialized = true;
       return;
     }
 
-    posthog.init(key, {
-      api_host: host,
-      person_profiles: "identified_only",
-      capture_pageview: true,
-      capture_pageleave: true,
-      disable_session_recording: true, // Privacy: no session recordings
-      disable_survey_popups: true,
-      property_blacklist: ["$current_url", "$referrer"],
-      loaded: () => {
-        this.isInitialized = true;
-        this.processQueue();
-      },
-    });
-  }
+    try {
+      // Only import posthog-js if we have a key
+      const posthogModule = await import("posthog-js");
+      this.posthog = posthogModule.default;
 
-  private trackEvent(eventName: string, properties: Record<string, any> = {}) {
-    if (typeof window === "undefined") return;
-
-    const event = { eventName, properties };
-
-    if (this.isInitialized) {
-      posthog.capture(eventName, properties);
-    } else {
-      this.eventQueue.push(event);
+      this.posthog.init(key, {
+        api_host: host,
+        person_profiles: "identified_only",
+        capture_pageview: true,
+        capture_pageleave: true,
+        disable_session_recording: true,
+        disable_survey_popups: true,
+        property_blacklist: ["$current_url", "$referrer"],
+        loaded: () => {
+          this.isEnabled = true;
+          this.isInitialized = true;
+        },
+      });
+    } catch (error) {
+      // Silently fail if posthog can't load
+      this.isEnabled = false;
+      this.isInitialized = true;
     }
   }
 
-  private processQueue() {
-    while (this.eventQueue.length > 0) {
-      const { eventName, properties } = this.eventQueue.shift()!;
-      posthog.capture(eventName, properties);
+  private trackEvent(eventName: string, properties: Record<string, any> = {}) {
+    if (!this.isEnabled || !this.posthog || typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      this.posthog.capture(eventName, properties);
+    } catch (error) {
+      // Silently ignore tracking errors
     }
   }
 
