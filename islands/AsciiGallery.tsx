@@ -69,11 +69,7 @@ export default function AsciiGallery() {
       const data: AsciiArt = await response.json();
 
       if (data.art) {
-        if (typeof analytics?.track === "function") {
-          analytics.track("gallery_fetch", {
-            category: selectedCategory,
-          });
-        }
+        analytics.trackRandomAscii(selectedCategory);
         return data.art;
       }
       return null;
