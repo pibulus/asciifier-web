@@ -90,7 +90,7 @@ export function TerminalDisplay({
   };
 
   const handleDownloadPNG = () => {
-    downloadPNG(".ascii-display", filename, visualEffect);
+    downloadPNG(".ascii-display", filename);
   };
 
   const hasContent = Boolean(content);
