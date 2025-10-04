@@ -94,12 +94,151 @@ export function downloadText(
 }
 
 /**
- * Download ASCII art as a PNG image
- * Renders the art to a canvas with proper colors and exports as image
+ * Apply visual effects to canvas context based on effect type
+ */
+function applyCanvasEffect(
+  ctx: CanvasRenderingContext2D,
+  effect: string = "neon",
+): void {
+  // Reset any previous filters
+  ctx.filter = "none";
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = "transparent";
+
+  switch (effect) {
+    case "none":
+      // No effects
+      break;
+
+    case "neon":
+      // Bright triple-layer glow
+      ctx.filter = "saturate(2.2) brightness(1.2)";
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = "currentColor";
+      break;
+
+    case "retro":
+      // CRT-style with blur and contrast
+      ctx.filter = "saturate(1.4) contrast(1.2) blur(0.3px)";
+      ctx.shadowBlur = 3;
+      ctx.shadowColor = "currentColor";
+      break;
+
+    case "thermal":
+      // Heat vision with hue shift
+      ctx.filter = "saturate(2) contrast(1.8) brightness(1.3) hue-rotate(20deg)";
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "#ff6600";
+      break;
+
+    case "hologram":
+      // Iridescent shimmer
+      ctx.filter = "saturate(1.8) brightness(1.5)";
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = "#00ffff";
+      ctx.globalAlpha = 0.9;
+      break;
+
+    case "glitch":
+    case "cyberpunk":
+      // Chromatic aberration effects handled separately in rendering
+      ctx.filter = "saturate(2.5) contrast(1.5)";
+      break;
+
+    default:
+      // Default to neon
+      ctx.filter = "saturate(2.2) brightness(1.2)";
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = "currentColor";
+  }
+}
+
+/**
+ * Render character with chromatic aberration effect
+ */
+function drawChromaticChar(
+  ctx: CanvasRenderingContext2D,
+  char: string,
+  x: number,
+  y: number,
+  baseColor: string,
+  effect: string,
+): void {
+  const originalGlobalAlpha = ctx.globalAlpha;
+
+  if (effect === "glitch") {
+    // Heavy chromatic aberration - 4 color layers
+    // Magenta left
+    ctx.fillStyle = "#ff00ff";
+    ctx.globalAlpha = 0.6;
+    ctx.fillText(char, x - 3, y);
+
+    // Cyan right
+    ctx.fillStyle = "#00ffff";
+    ctx.globalAlpha = 0.6;
+    ctx.fillText(char, x + 3, y);
+
+    // Red left (inner)
+    ctx.fillStyle = "#ff0000";
+    ctx.globalAlpha = 0.4;
+    ctx.fillText(char, x - 2, y);
+
+    // Green right (inner)
+    ctx.fillStyle = "#00ff00";
+    ctx.globalAlpha = 0.4;
+    ctx.fillText(char, x + 2, y);
+
+    // Base color on top
+    ctx.fillStyle = baseColor;
+    ctx.globalAlpha = 0.8;
+    ctx.fillText(char, x, y);
+  } else if (effect === "cyberpunk") {
+    // Subtle chromatic aberration
+    // Magenta left
+    ctx.fillStyle = "#ff00ff";
+    ctx.globalAlpha = 0.5;
+    ctx.fillText(char, x - 1, y);
+
+    // Cyan right
+    ctx.fillStyle = "#00ffff";
+    ctx.globalAlpha = 0.5;
+    ctx.fillText(char, x + 1, y);
+
+    // Base color on top
+    ctx.fillStyle = baseColor;
+    ctx.globalAlpha = 0.9;
+    ctx.fillText(char, x, y);
+  } else if (effect === "hologram") {
+    // Rainbow shimmer layers
+    ctx.fillStyle = "#00ffff";
+    ctx.globalAlpha = 0.3;
+    ctx.fillText(char, x, y);
+
+    ctx.fillStyle = "#ff00ff";
+    ctx.globalAlpha = 0.3;
+    ctx.fillText(char, x, y);
+
+    // Base color on top
+    ctx.fillStyle = baseColor;
+    ctx.globalAlpha = 0.7;
+    ctx.fillText(char, x, y);
+  } else {
+    // Normal rendering
+    ctx.fillStyle = baseColor;
+    ctx.fillText(char, x, y);
+  }
+
+  ctx.globalAlpha = originalGlobalAlpha;
+}
+
+/**
+ * Download ASCII art as a PNG image with visual effects
+ * Renders the art to a canvas with proper colors and effects, then exports as image
  */
 export function downloadPNG(
   asciiElementSelector: string = ".ascii-display",
   filename: string = "ascii-art",
+  visualEffect: string = "neon",
 ): void {
   analytics.trackExport("png");
 
@@ -235,16 +374,36 @@ export function downloadPNG(
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
 
-    // Draw each character with its exact color
+    // Apply visual effects to context
+    applyCanvasEffect(ctx, visualEffect);
+
+    // Determine if we need chromatic rendering
+    const needsChromatic = visualEffect === "glitch" ||
+      visualEffect === "cyberpunk" || visualEffect === "hologram";
+
+    // Draw each character with its exact color and effects
     nonEmptyLines.forEach((line, lineIndex) => {
       const y = padding + (lineIndex * lineHeight);
 
       line.chars.forEach((charData, charIndex) => {
         const x = padding + (charIndex * charWidth);
 
-        // Use the exact color from the HTML
-        ctx.fillStyle = charData.color;
-        ctx.fillText(charData.char, x, y);
+        // Apply effect-specific rendering
+        if (needsChromatic) {
+          drawChromaticChar(ctx, charData.char, x, y, charData.color, visualEffect);
+        } else {
+          // Standard rendering with applied effects
+          ctx.fillStyle = charData.color;
+          ctx.fillText(charData.char, x, y);
+
+          // For neon/thermal effects, draw multiple passes for stronger glow
+          if (visualEffect === "neon") {
+            ctx.fillText(charData.char, x, y);
+            ctx.fillText(charData.char, x, y);
+          } else if (visualEffect === "thermal") {
+            ctx.fillText(charData.char, x, y);
+          }
+        }
       });
     });
 
