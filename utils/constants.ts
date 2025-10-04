@@ -19,3 +19,14 @@ export const COLOR_EFFECTS = [
   { name: "Neon", value: "neon" },
   { name: "Poison", value: "poison" },
 ];
+
+// Visual effects for ASCII art display - CSS filter combinations
+export const VISUAL_EFFECTS = [
+  { name: "None", value: "none" },
+  { name: "Neon", value: "neon" },
+  { name: "Glitch", value: "glitch" },
+  { name: "Thermal", value: "thermal" },
+  { name: "Hologram", value: "hologram" },
+  { name: "Retro", value: "retro" },
+  { name: "Cyberpunk", value: "cyberpunk" },
+];

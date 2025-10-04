@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { analytics } from "../utils/analytics.ts";
-import { COLOR_EFFECTS } from "../utils/constants.ts";
+import { COLOR_EFFECTS, VISUAL_EFFECTS } from "../utils/constants.ts";
 import { MagicDropdown } from "../components/MagicDropdown.tsx";
 import { TerminalDisplay } from "../components/TerminalDisplay.tsx";
 import { applyColorToArt } from "../utils/colorEffects.ts";
@@ -26,6 +26,7 @@ export default function AsciiGallery() {
     CATEGORIES[0].value,
   );
   const [selectedColor, setSelectedColor] = useState<string>("none");
+  const [selectedEffect, setSelectedEffect] = useState<string>("neon");
   const [colorizedArt, setColorizedArt] = useState<string>("");
   const [artCache, setArtCache] = useState<string[]>([]);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
@@ -126,24 +127,8 @@ export default function AsciiGallery() {
 
   return (
     <div class="max-w-6xl mx-auto px-4 py-8 space-y-6">
-      {/* Header */}
-      <div class="text-center space-y-2">
-        <h2
-          class="text-3xl font-bold font-mono"
-          style="color: var(--color-text, #0A0A0A)"
-        >
-          🎨 ASCII Art Gallery
-        </h2>
-        <p
-          class="text-lg font-mono"
-          style="color: var(--color-text, #0A0A0A); opacity: 0.7"
-        >
-          Explore classic ASCII art from the archives
-        </p>
-      </div>
-
-      {/* Controls - Grid layout matching Text view */}
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 max-w-4xl mx-auto px-4">
+      {/* Controls - Three Dropdown Layout matching Text view */}
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-8">
         {/* Category Selector */}
         <MagicDropdown
           label="Theme"
@@ -160,23 +145,16 @@ export default function AsciiGallery() {
           onChange={setSelectedColor}
         />
 
-        {/* Shuffle Button */}
-        <div>
-          <label
-            class="block text-xs font-mono font-bold mb-2 uppercase tracking-wide opacity-0"
-            style="color: var(--color-text, #0A0A0A)"
-          >
-            _
-          </label>
-          <button
-            onClick={shuffleArt}
-            disabled={isLoadingArt}
-            class="w-full px-6 py-3 sm:py-4 border-3 sm:border-4 rounded-xl sm:rounded-2xl font-mono font-bold shadow-brutal transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-          >
-            {isLoadingArt ? "🎲 Loading..." : "🎲 Shuffle"}
-          </button>
-        </div>
+        {/* Visual Effect Selector */}
+        <MagicDropdown
+          label="Effects"
+          options={VISUAL_EFFECTS}
+          value={selectedEffect}
+          onChange={(value) => {
+            sounds.click();
+            setSelectedEffect(value);
+          }}
+        />
       </div>
 
       {/* Terminal Display */}
@@ -191,6 +169,7 @@ export default function AsciiGallery() {
           onShuffle={shuffleArt}
           showShuffleButton={Boolean(currentArt)}
           terminalPath="~/gallery/ascii-art.txt"
+          visualEffect={selectedEffect}
         />
       </div>
 

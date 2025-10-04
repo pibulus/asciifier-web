@@ -7,6 +7,40 @@ import { useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { copyToClipboard, downloadPNG, downloadText } from "../utils/exportUtils.ts";
 
+/**
+ * Get CSS filter string for visual effects
+ */
+function getVisualEffectStyle(effect?: string): string {
+  let css = "";
+  switch (effect) {
+    case "none":
+      css = "filter: none; text-shadow: none;";
+      break;
+    case "neon":
+      css = "filter: saturate(2.2) brightness(1.2); text-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor;";
+      break;
+    case "glitch":
+      css = "filter: saturate(2.5) contrast(1.5); text-shadow: -3px 0 4px #ff00ff, 3px 0 4px #00ffff, -2px 0 2px #ff0000, 2px 0 2px #00ff00;";
+      break;
+    case "thermal":
+      css = "filter: saturate(2) contrast(1.8) brightness(1.3) hue-rotate(20deg); text-shadow: 0 0 10px #ff6600, 0 0 20px #ff3300;";
+      break;
+    case "hologram":
+      css = "filter: saturate(1.8) brightness(1.5); text-shadow: 0 0 10px currentColor, 0 0 20px #00ffff, 0 0 30px #ff00ff; opacity: 0.9;";
+      break;
+    case "retro":
+      css = "filter: saturate(1.4) contrast(1.2) blur(0.3px); text-shadow: 0 0 2px currentColor, 0 0 4px currentColor;";
+      break;
+    case "cyberpunk":
+      css = "filter: saturate(2) contrast(1.3); text-shadow: -1px 0 2px #ff00ff, 1px 0 2px #00ffff, 0 0 8px currentColor;";
+      break;
+    default:
+      // Default to neon if not specified
+      css = "filter: saturate(2.2) brightness(1.2); text-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor;";
+  }
+  return css;
+}
+
 interface TerminalDisplayProps {
   /** Plain text content to display */
   content: string;
@@ -22,6 +56,8 @@ interface TerminalDisplayProps {
   terminalPath?: string;
   /** Whether to show shuffle button in menu bar */
   showShuffleButton?: boolean;
+  /** Visual effect to apply (glow, saturation, etc.) */
+  visualEffect?: string;
 }
 
 export function TerminalDisplay({
@@ -32,6 +68,7 @@ export function TerminalDisplay({
   onShuffle,
   terminalPath = "~/output/text-art.txt",
   showShuffleButton = false,
+  visualEffect = "subtle",
 }: TerminalDisplayProps) {
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [mobileExportOpen, setMobileExportOpen] = useState(false);
@@ -123,7 +160,7 @@ export function TerminalDisplay({
           ? (
             <pre
               class="ascii-display font-mono text-base opacity-85"
-              style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
+              style={`color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; ${getVisualEffectStyle(visualEffect)}`}
               dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
           )
@@ -131,7 +168,7 @@ export function TerminalDisplay({
           ? (
             <pre
               class="ascii-display font-mono text-base opacity-85"
-              style="color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; text-shadow: 0 0 1px currentColor; filter: saturate(1.3);"
+              style={`color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; ${getVisualEffectStyle(visualEffect)}`}
             >
               {content}
             </pre>
