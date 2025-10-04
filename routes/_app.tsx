@@ -13,12 +13,26 @@ export default function App({ Component }: PageProps) {
     <html lang="en">
       <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
         <title>ASCIIFIER • Text Art Machine</title>
         <meta
           name="description"
           content="Drop a pic. Get ASCII magic. 12 styles, live preview, $0 forever. No scale, no BS."
         />
+
+        {/* PWA & iOS App Meta Tags */}
+        <meta name="application-name" content="Asciifier" />
+        <meta name="apple-mobile-web-app-title" content="Asciifier" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#FF69B4" />
 
         {/* Open Graph */}
         <meta property="og:title" content="ASCIIFIER • Pics to Text Art" />
@@ -27,6 +41,12 @@ export default function App({ Component }: PageProps) {
           content="The text art machine that actually slaps. Drop image, get ASCII."
         />
         <meta property="og:type" content="website" />
+
+        {/* PWA Manifest */}
+        <link rel="manifest" href="/manifest.json" />
+
+        {/* iOS Icon Support */}
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
 
         {/* Favicon */}
         <link
@@ -97,6 +117,21 @@ export default function App({ Component }: PageProps) {
 
         {/* About modal */}
         <AboutModal />
+
+        {/* Service Worker Registration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('🎨 SW registered:', registration.scope))
+                    .catch(error => console.log('SW registration failed:', error));
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
