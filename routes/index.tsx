@@ -12,7 +12,7 @@ export default function Home() {
 
   return (
     <div
-      class="min-h-screen flex flex-col"
+      class="min-h-[100dvh] flex flex-col"
       style="background: var(--color-base-gradient, var(--color-base, #FAF9F6))"
     >
       {/* Check if first visit and show welcome */}
@@ -30,7 +30,7 @@ export default function Home() {
 
       {/* Header */}
       <header
-        class="border-b-4 relative"
+        class="border-b-4 relative flex-shrink-0"
         style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)"
       >
         <div class="max-w-6xl mx-auto px-4 py-4 sm:py-6">
@@ -59,7 +59,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main class="flex-1 w-full px-4 py-6 md:py-12 flex items-center justify-center">
+      <main class="flex-1 w-full px-4 py-6 md:py-8 flex items-center justify-center overflow-auto">
         <div class="max-w-5xl w-full">
           <TabsIsland activeTab={activeTab} />
         </div>
@@ -67,7 +67,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer
-        class="border-t-4 py-6"
+        class="border-t-4 py-6 flex-shrink-0"
         style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)"
       >
         <div class="max-w-4xl mx-auto px-4">

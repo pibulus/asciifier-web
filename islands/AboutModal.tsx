@@ -154,22 +154,13 @@ export function AboutModal() {
                   🌐 Portfolio
                 </a>
                 <a
-                  href="https://github.com/pibulus/asciifier-web"
+                  href="https://github.com/pibulus"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
                 >
                   💻 GitHub
-                </a>
-                <a
-                  href="https://linkedin.com/in/pabloalvarado"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
-                  style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
-                >
-                  💼 LinkedIn
                 </a>
               </div>
             </div>
@@ -248,7 +239,7 @@ export function AboutLink({
   return (
     <button
       onClick={openAboutModal}
-      class={`px-4 py-2 border-2 rounded-xl font-mono font-bold transition-all hover:scale-105 hover:shadow-juicy active:scale-95 ${className}`}
+      class={`px-3 py-2 text-sm border-3 rounded-xl font-mono font-bold shadow-brutal transition-all hover:scale-105 active:scale-95 ${className}`}
       style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
     >
       {label}

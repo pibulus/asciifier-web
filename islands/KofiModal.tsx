@@ -215,7 +215,7 @@ export function KofiButton({
   return (
     <button
       onClick={openKofiModal}
-      class={`inline-flex items-center gap-2 border-4 rounded-xl font-mono font-bold shadow-brutal transition-all hover:scale-105 ${
+      class={`inline-flex items-center gap-2 border-3 rounded-xl font-mono font-bold shadow-brutal transition-all hover:scale-105 ${
         sizeClasses[size]
       }`}
       style={`${
