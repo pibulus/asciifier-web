@@ -89,8 +89,8 @@ export function TerminalDisplay({
     downloadText(content, htmlContent || "", filename);
   };
 
-  const handleDownloadPNG = () => {
-    downloadPNG(".ascii-display", filename);
+  const handleDownloadPNG = async () => {
+    await downloadPNG(".ascii-display", filename);
   };
 
   const hasContent = Boolean(content);
