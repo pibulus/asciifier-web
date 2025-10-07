@@ -62,7 +62,14 @@ export default function TextToAscii() {
         document.addEventListener("click", resumeAudio);
 
         // Auto-type demo text on first load to show off the magic!
-        const autoTypeDemoText = "magic ✨";
+        const demoTexts = [
+          "magic ✨",
+          "rainbow 🌈",
+          "ascii vibes",
+          "terminal wizard",
+          "text art 🎨"
+        ];
+        const autoTypeDemoText = demoTexts[Math.floor(Math.random() * demoTexts.length)];
         let charIndex = 0;
 
         const typeNextChar = () => {
