@@ -1,6 +1,7 @@
 import { type PageProps } from "$fresh/server.ts";
 import { KofiModal } from "../islands/KofiModal.tsx";
 import { AboutModal } from "../islands/AboutModal.tsx";
+import { ToastContainer } from "../components/Toast.tsx";
 
 export default function App({ Component }: PageProps) {
   // Pass env vars to client for analytics (only public keys)
@@ -41,6 +42,21 @@ export default function App({ Component }: PageProps) {
           content="The text art machine that actually slaps. Drop image, get ASCII."
         />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://asciifier.app" />
+        <meta property="og:image" content="https://asciifier.app/asciifier-logo.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="ASCIIFIER - Turn anything into text art" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="ASCIIFIER • Pics to Text Art" />
+        <meta
+          name="twitter:description"
+          content="The text art machine that actually slaps. Drop image, get ASCII."
+        />
+        <meta name="twitter:image" content="https://asciifier.app/asciifier-logo.png" />
+        <meta name="twitter:image:alt" content="ASCIIFIER - Turn anything into text art" />
 
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
@@ -107,6 +123,9 @@ export default function App({ Component }: PageProps) {
           }}
         />
         <Component />
+
+        {/* Toast notifications */}
+        <ToastContainer />
 
         {/* Ko-fi donation modal */}
         <KofiModal

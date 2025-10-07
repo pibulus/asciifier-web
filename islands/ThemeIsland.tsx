@@ -111,6 +111,7 @@ export default function ThemeIsland() {
       <button
         onClick={() => setShowPicker(!showPicker)}
         onMouseEnter={() => sounds.hover()}
+        aria-label="Open theme picker"
         class="group relative px-4 py-2 rounded-lg font-mono text-xs font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop transition-all active:scale-95"
         style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border: 2px solid var(--color-border, #0A0A0A)"
         title="Change theme"
@@ -174,6 +175,7 @@ export default function ThemeIsland() {
             {/* Smart Random Theme Button - smaller and elegant */}
             <button
               onClick={generateRandomTheme}
+              aria-label="Generate random theme"
               class="w-full px-3 py-1.5 rounded-lg text-xs font-mono hover:scale-[1.02] transition-all"
               style="background: linear-gradient(90deg, #FFE8CC 0%, #FFD3B6 50%, #FFBFA0 100%); color: #2C2825; border: 2px solid #2C2825;"
             >
@@ -209,6 +211,7 @@ export default function ThemeIsland() {
                   max="0.5"
                   step="0.01"
                   value={grainLevel}
+                  aria-label="Adjust grain texture intensity"
                   onInput={(e) =>
                     setGrainLevel(
                       parseFloat((e.target as HTMLInputElement).value),
@@ -242,6 +245,7 @@ export default function ThemeIsland() {
                   max="0.2"
                   step="0.01"
                   value={scanLevel}
+                  aria-label="Adjust scanline intensity"
                   onInput={(e) =>
                     setScanLevel(
                       parseFloat((e.target as HTMLInputElement).value),

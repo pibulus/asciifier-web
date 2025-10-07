@@ -12,6 +12,7 @@ import {
 import { sounds } from "../utils/sounds.ts";
 import { easterEggs } from "../utils/easter-eggs.ts";
 import { analytics } from "../utils/analytics.ts";
+import { showToast } from "../components/Toast.tsx";
 
 // Preset configurations for quick starts
 const PRESETS = [
@@ -201,7 +202,8 @@ export default function Dropzone() {
       analytics.trackImageConverted(file.size, true);
     } catch (error) {
       console.error("Error processing image:", error);
-      alert("Failed to process image. Please try another file.");
+      showToast("Failed to process image. Please try another file.", "error");
+      sounds.error();
       analytics.trackImageConverted(
         file.size,
         false,
