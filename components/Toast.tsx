@@ -2,7 +2,7 @@
 // TOAST NOTIFICATION - Better than alert()
 // ===================================================================
 
-import { useSignal } from "@preact/signals";
+import { signal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
 
 interface ToastProps {
@@ -89,7 +89,7 @@ interface ToastMessage {
   type: "error" | "success" | "info";
 }
 
-export const toastMessages = useSignal<ToastMessage[]>([]);
+export const toastMessages = signal<ToastMessage[]>([]);
 
 export function ToastContainer() {
   return (
