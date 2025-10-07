@@ -17,7 +17,7 @@ function getVisualEffectStyle(effect?: string): string {
       css = "filter: none; text-shadow: none;";
       break;
     case "neon":
-      css = "filter: saturate(2.2) brightness(1.2); text-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor;";
+      css = "filter: saturate(2.2) brightness(1.2); text-shadow: 0 0 4px currentColor, 0 0 8px currentColor, 0 0 12px currentColor;";
       break;
     case "glitch":
       css = "filter: saturate(2.5) contrast(1.5); text-shadow: -3px 0 4px #ff00ff, 3px 0 4px #00ffff, -2px 0 2px #ff0000, 2px 0 2px #00ff00;";
@@ -36,7 +36,7 @@ function getVisualEffectStyle(effect?: string): string {
       break;
     default:
       // Default to neon if not specified
-      css = "filter: saturate(2.2) brightness(1.2); text-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor;";
+      css = "filter: saturate(2.2) brightness(1.2); text-shadow: 0 0 4px currentColor, 0 0 8px currentColor, 0 0 12px currentColor;";
   }
   return css;
 }

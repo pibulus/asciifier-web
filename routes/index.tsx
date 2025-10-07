@@ -8,7 +8,7 @@ import { WelcomeModal } from "../islands/WelcomeModal.tsx";
 import WelcomeChecker from "../islands/WelcomeChecker.tsx";
 
 export default function Home() {
-  const activeTab = useSignal("image");
+  const activeTab = useSignal("text");
 
   return (
     <div

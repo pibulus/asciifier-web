@@ -60,6 +60,23 @@ export default function TextToAscii() {
           document.removeEventListener("click", resumeAudio);
         };
         document.addEventListener("click", resumeAudio);
+
+        // Auto-type demo text on first load to show off the magic!
+        const autoTypeDemoText = "magic ✨";
+        let charIndex = 0;
+
+        const typeNextChar = () => {
+          if (charIndex < autoTypeDemoText.length) {
+            inputText.value = autoTypeDemoText.slice(0, charIndex + 1);
+            charIndex++;
+            setTimeout(typeNextChar, 120); // 120ms per character for smooth demo
+          }
+        };
+
+        // Start auto-typing after a brief delay
+        setTimeout(() => {
+          typeNextChar();
+        }, 500);
       }).catch((err) => {
         console.warn("Typewriter sounds unavailable:", err);
       });
