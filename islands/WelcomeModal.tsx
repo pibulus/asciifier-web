@@ -121,24 +121,27 @@ export function WelcomeModal() {
             </h1>
 
             {/* Features */}
-            <div class="space-y-2 sm:space-y-3 px-2">
+            <div class="space-y-3 sm:space-y-4">
               <p
-                class="text-sm sm:text-base font-medium leading-relaxed text-center"
+                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                🎨 Type text or drop images — instant ASCII art
+                🎨 <strong>Type anything or drop an image</strong>{" "}
+                — Watch it transform into glorious ASCII.
               </p>
               <p
-                class="text-sm sm:text-base font-medium leading-relaxed text-center"
+                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                🌈 Add rainbow fire gradients and vaporwave vibes
+                🌈 <strong>Add effects and export to share</strong>{" "}
+                — Rainbow fire, vaporwave vibes, instant download.
               </p>
               <p
-                class="text-sm sm:text-base font-medium leading-relaxed text-center"
+                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                📋 Copy or export to share your creations
+                📚 <strong>Gallery full of classics</strong>{" "}
+                — Dragons, Homer Simpson, Escher stairs. Copy and go.
               </p>
             </div>
 
