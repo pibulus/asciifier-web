@@ -7,6 +7,7 @@ import { COLOR_EFFECTS } from "../utils/constants.ts";
 import { MagicDropdown } from "../components/MagicDropdown.tsx";
 import { TerminalDisplay } from "../components/TerminalDisplay.tsx";
 import { applyColorToArt } from "../utils/colorEffects.ts";
+import { shouldStartAutoTyping } from "./WelcomeModal.tsx";
 
 // Curated figlet fonts - hand-picked fonts for the ASCII Factory!
 const FIGLET_FONTS = [
@@ -52,38 +53,19 @@ export default function TextToAscii() {
       typewriter.init().then(() => {
         typewriter.attach("#ascii-text-input");
 
-        // Resume audio context on first click (browser autoplay policy)
+        // Resume audio contexts on first click (browser autoplay policy)
         const resumeAudio = () => {
           if (typewriter.audioContext?.state === "suspended") {
             typewriter.audioContext.resume();
           }
+          // Initialize and resume sound effects engine on first interaction
+          sounds.init();
+          if (sounds.audioContext?.state === "suspended") {
+            sounds.audioContext.resume();
+          }
           document.removeEventListener("click", resumeAudio);
         };
         document.addEventListener("click", resumeAudio);
-
-        // Auto-type demo text on first load to show off the magic!
-        const demoTexts = [
-          "magic",
-          "rainbow",
-          "ascii vibes",
-          "terminal",
-          "text art"
-        ];
-        const autoTypeDemoText = demoTexts[Math.floor(Math.random() * demoTexts.length)];
-        let charIndex = 0;
-
-        const typeNextChar = () => {
-          if (charIndex < autoTypeDemoText.length) {
-            inputText.value = autoTypeDemoText.slice(0, charIndex + 1);
-            charIndex++;
-            setTimeout(typeNextChar, 120); // 120ms per character for smooth demo
-          }
-        };
-
-        // Start auto-typing after a brief delay
-        setTimeout(() => {
-          typeNextChar();
-        }, 500);
       }).catch((err) => {
         console.warn("Typewriter sounds unavailable:", err);
       });
@@ -195,6 +177,40 @@ export default function TextToAscii() {
   useEffect(() => {
     prefetchArt(3);
   }, []);
+
+  // Watch for welcome modal close signal to start auto-typing
+  useEffect(() => {
+    if (shouldStartAutoTyping.value) {
+      // Auto-type demo text after modal closes
+      const demoTexts = [
+        "magic",
+        "rainbow",
+        "ascii vibes",
+        "terminal",
+        "text art",
+      ];
+      const autoTypeDemoText = demoTexts[
+        Math.floor(Math.random() * demoTexts.length)
+      ];
+      let charIndex = 0;
+
+      const typeNextChar = () => {
+        if (charIndex < autoTypeDemoText.length) {
+          inputText.value = autoTypeDemoText.slice(0, charIndex + 1);
+          charIndex++;
+          setTimeout(typeNextChar, 120); // 120ms per character for smooth demo
+        }
+      };
+
+      // Start auto-typing after a brief delay
+      setTimeout(() => {
+        typeNextChar();
+      }, 300);
+
+      // Reset the signal
+      shouldStartAutoTyping.value = false;
+    }
+  }, [shouldStartAutoTyping.value]);
 
   // Check if all three dropdowns have been changed from default
   useEffect(() => {

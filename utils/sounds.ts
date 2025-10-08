@@ -24,6 +24,9 @@ export class SoundEngine {
     if (!this.audioContext) this.init();
     if (!this.audioContext) return;
 
+    // Don't try to play if AudioContext is suspended (browser autoplay policy)
+    if (this.audioContext.state === "suspended") return;
+
     const oscillator = this.audioContext.createOscillator();
     const gainNode = this.audioContext.createGain();
 

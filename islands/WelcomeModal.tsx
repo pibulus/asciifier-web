@@ -13,6 +13,9 @@ import { signal } from "@preact/signals";
 // Global signal for modal state
 export const welcomeModalOpen = signal(false);
 
+// Signal to trigger auto-typing when modal closes
+export const shouldStartAutoTyping = signal(false);
+
 // Check if user has seen welcome before
 const WELCOME_SEEN_KEY = "asciifier-welcome-seen";
 
@@ -34,6 +37,9 @@ export function markWelcomeSeen() {
 
   // Trigger brightness splash
   document.body.classList.add("brightness-splash");
+
+  // Signal to start auto-typing after modal closes
+  shouldStartAutoTyping.value = true;
 
   // Wait for animations to complete before closing modal
   setTimeout(() => {
@@ -74,39 +80,40 @@ export function WelcomeModal() {
     <>
       {/* Backdrop */}
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
         style="background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px);"
         role="dialog"
         aria-modal="true"
         aria-labelledby="welcome-modal-title"
+        onClick={markWelcomeSeen}
       >
         {/* Modal */}
         <div
-          class="relative w-full max-w-2xl animate-welcome-in"
+          class="relative w-full max-w-2xl animate-welcome-in mx-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Logo Image Header */}
           <div
-            class="p-6 border-4 rounded-3xl text-center shadow-brutal-xl mb-4 overflow-hidden"
+            class="p-4 sm:p-6 border-3 sm:border-4 rounded-2xl sm:rounded-3xl text-center shadow-brutal-xl mb-3 sm:mb-4 overflow-hidden"
             style="background: linear-gradient(135deg, #FFB6C1 0%, #FFA07A 25%, #FF8C94 50%, #9B6B9E 75%, #6B4D8A 100%); border-color: var(--color-border, #0A0A0A)"
           >
             <img
               src="/asciifier-logo.png"
               alt="ASCIIFIER - Text Art Machine"
-              class="w-full h-auto"
+              class="w-full h-auto max-w-full"
               style="image-rendering: crisp-edges; image-rendering: pixelated;"
             />
           </div>
 
           {/* Content */}
           <div
-            class="p-8 border-4 rounded-3xl shadow-brutal-xl space-y-6"
+            class="p-6 sm:p-8 border-3 sm:border-4 rounded-2xl sm:rounded-3xl shadow-brutal-xl space-y-4 sm:space-y-6"
             style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
           >
             {/* Headline */}
             <h1
               id="welcome-modal-title"
-              class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center leading-tight tracking-tight"
+              class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-center leading-tight tracking-tight px-2"
               style="color: var(--color-text, #0A0A0A)"
             >
               Turn anything into <br />
@@ -114,34 +121,31 @@ export function WelcomeModal() {
             </h1>
 
             {/* Features */}
-            <div class="space-y-3 sm:space-y-4">
+            <div class="space-y-2 sm:space-y-3 px-2">
               <p
-                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
+                class="text-sm sm:text-base font-medium leading-relaxed text-center"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                🎨 <strong>Type anything or drop an image</strong>{" "}
-                — Watch it transform into glorious ASCII.
+                🎨 Type text or drop images — instant ASCII art
               </p>
               <p
-                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
+                class="text-sm sm:text-base font-medium leading-relaxed text-center"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                🌈 <strong>17 fonts, 10 color effects</strong>{" "}
-                — Go rainbow, fire, ocean, matrix, cyberpunk.
+                🌈 Add rainbow fire gradients and vaporwave vibes
               </p>
               <p
-                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
+                class="text-sm sm:text-base font-medium leading-relaxed text-center"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                📚 <strong>Gallery full of classics</strong>{" "}
-                — Dragons, Homer Simpson, Escher stairs. Copy and go.
+                📋 Copy or export to share your creations
               </p>
             </div>
 
             {/* Action */}
             <button
               onClick={markWelcomeSeen}
-              class="w-full px-6 py-4 border-3 rounded-xl font-mono font-bold text-base sm:text-lg transition-all hover:scale-105 shadow-brutal-sm active:scale-[0.98]"
+              class="w-full px-6 py-3 sm:py-4 border-3 rounded-xl font-mono font-bold text-base sm:text-lg transition-all hover:scale-105 shadow-brutal-sm active:scale-[0.98]"
               style="background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
               aria-label="Close welcome message and start using ASCIIFIER"
             >
@@ -150,7 +154,7 @@ export function WelcomeModal() {
 
             {/* Tagline */}
             <p
-              class="text-base sm:text-lg md:text-xl font-bold text-center pt-2"
+              class="text-sm sm:text-base md:text-lg font-bold text-center pt-1 sm:pt-2"
               style="color: var(--color-accent, #FF69B4)"
             >
               Quick. Free. Nostalgic.
