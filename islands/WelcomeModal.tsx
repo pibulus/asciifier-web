@@ -80,7 +80,7 @@ export function WelcomeModal() {
     <>
       {/* Backdrop */}
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
         style="background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px);"
         role="dialog"
         aria-modal="true"
@@ -89,12 +89,12 @@ export function WelcomeModal() {
       >
         {/* Modal */}
         <div
-          class="relative w-full max-w-2xl animate-welcome-in mx-auto"
+          class="relative w-full max-w-2xl animate-welcome-in mx-auto my-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Logo Image Header */}
           <div
-            class="p-4 sm:p-6 border-3 sm:border-4 rounded-2xl sm:rounded-3xl text-center shadow-brutal-xl mb-3 sm:mb-4 overflow-hidden"
+            class="p-3 sm:p-6 border-3 sm:border-4 rounded-xl sm:rounded-3xl text-center shadow-brutal-xl mb-2 sm:mb-4 overflow-hidden"
             style="background: linear-gradient(135deg, #FFB6C1 0%, #FFA07A 25%, #FF8C94 50%, #9B6B9E 75%, #6B4D8A 100%); border-color: var(--color-border, #0A0A0A)"
           >
             <img
@@ -107,13 +107,13 @@ export function WelcomeModal() {
 
           {/* Content */}
           <div
-            class="p-6 sm:p-8 border-3 sm:border-4 rounded-2xl sm:rounded-3xl shadow-brutal-xl space-y-4 sm:space-y-6"
+            class="p-4 sm:p-8 border-3 sm:border-4 rounded-xl sm:rounded-3xl shadow-brutal-xl space-y-3 sm:space-y-6"
             style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
           >
             {/* Headline */}
             <h1
               id="welcome-modal-title"
-              class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-center leading-tight tracking-tight px-2"
+              class="text-xl sm:text-3xl md:text-4xl font-extrabold text-center leading-tight tracking-tight px-1 sm:px-2"
               style="color: var(--color-text, #0A0A0A)"
             >
               Turn anything into <br />
@@ -121,23 +121,23 @@ export function WelcomeModal() {
             </h1>
 
             {/* Features */}
-            <div class="space-y-3 sm:space-y-4">
+            <div class="space-y-2 sm:space-y-4">
               <p
-                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
+                class="text-xs sm:text-base md:text-lg font-medium leading-snug sm:leading-relaxed"
                 style="color: var(--color-text, #0A0A0A)"
               >
                 🎨 <strong>Type anything or drop an image</strong>{" "}
                 — Watch it transform into glorious ASCII.
               </p>
               <p
-                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
+                class="text-xs sm:text-base md:text-lg font-medium leading-snug sm:leading-relaxed"
                 style="color: var(--color-text, #0A0A0A)"
               >
                 🌈 <strong>Add effects and export to share</strong>{" "}
                 — Rainbow fire, vaporwave vibes, instant download.
               </p>
               <p
-                class="text-sm sm:text-base md:text-lg font-medium leading-relaxed"
+                class="text-xs sm:text-base md:text-lg font-medium leading-snug sm:leading-relaxed"
                 style="color: var(--color-text, #0A0A0A)"
               >
                 📚 <strong>Gallery full of classics</strong>{" "}
@@ -148,7 +148,7 @@ export function WelcomeModal() {
             {/* Action */}
             <button
               onClick={markWelcomeSeen}
-              class="w-full px-6 py-3 sm:py-4 border-3 rounded-xl font-mono font-bold text-base sm:text-lg transition-all hover:scale-105 shadow-brutal-sm active:scale-[0.98]"
+              class="w-full px-4 sm:px-6 py-3 sm:py-4 border-3 rounded-xl font-mono font-bold text-sm sm:text-lg transition-all hover:scale-105 shadow-brutal-sm active:scale-[0.98]"
               style="background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
               aria-label="Close welcome message and start using ASCIIFIER"
             >
@@ -157,7 +157,7 @@ export function WelcomeModal() {
 
             {/* Tagline */}
             <p
-              class="text-sm sm:text-base md:text-lg font-bold text-center pt-1 sm:pt-2"
+              class="text-xs sm:text-base md:text-lg font-bold text-center pt-0 sm:pt-2"
               style="color: var(--color-accent, #FF69B4)"
             >
               Quick. Free. Nostalgic.

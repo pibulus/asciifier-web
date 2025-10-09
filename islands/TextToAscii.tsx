@@ -6,7 +6,6 @@ import { SimpleTypeWriter } from "../utils/simple-typewriter.js";
 import { COLOR_EFFECTS } from "../utils/constants.ts";
 import { MagicDropdown } from "../components/MagicDropdown.tsx";
 import { TerminalDisplay } from "../components/TerminalDisplay.tsx";
-import { applyColorToArt } from "../utils/colorEffects.ts";
 import { shouldStartAutoTyping } from "./WelcomeModal.tsx";
 
 // Curated figlet fonts - hand-picked fonts for the ASCII Factory!
@@ -43,7 +42,6 @@ export default function TextToAscii() {
   const typewriterRef = useRef<SimpleTypeWriter | null>(null);
 
   // Track timeouts for cleanup
-  const shuffleTimeoutRef = useRef<number | null>(null);
   const autoTypeTimeoutRef = useRef<number | null>(null);
   const wiggleTimeoutRef = useRef<number | null>(null);
 
@@ -88,13 +86,6 @@ export default function TextToAscii() {
   const [asciiOutput, setAsciiOutput] = useState<string>("");
   const [htmlOutput, setHtmlOutput] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [welcomeArt, setWelcomeArt] = useState<string>("");
-  const [artCache, setArtCache] = useState<string[]>([]);
-  const [isLoadingArt, setIsLoadingArt] = useState(false);
-  const [welcomeArtColorized, setWelcomeArtColorized] = useState<string>("");
-  const [selectedWelcomeColor, setSelectedWelcomeColor] = useState<string>(
-    "none",
-  );
 
   // Dropdown states
   const [allSelected, setAllSelected] = useState(false);
@@ -106,94 +97,6 @@ export default function TextToAscii() {
   const selectedFont = useSignal("Standard");
   const colorEffect = useSignal("none");
   const borderStyle = useSignal("none");
-
-  // Function to fetch random ASCII art
-  const fetchRandomArt = async (): Promise<string | null> => {
-    try {
-      const response = await fetch("/api/random-ascii-art");
-      const data = await response.json();
-      analytics.trackRandomAscii(data.category);
-      return data.art || null;
-    } catch (error) {
-      console.error("Failed to fetch random ASCII art:", error);
-      return null;
-    }
-  };
-
-  // Escape HTML for display
-  const escapeHtml = (text: string): string => {
-    return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  };
-
-  // Prefetch multiple pieces of art
-  const prefetchArt = async (count: number = 3) => {
-    const promises = Array(count).fill(null).map(() => fetchRandomArt());
-    const results = await Promise.all(promises);
-    const validArt = results.filter((art): art is string => art !== null).map((
-      art,
-    ) => escapeHtml(art)); // Just escape, don't modify the art at all
-    setArtCache(validArt);
-    if (validArt.length > 0) {
-      setWelcomeArt(validArt[0]);
-    }
-  };
-
-  // Shuffle to next cached art or fetch new with loading state
-  const shuffleArt = () => {
-    sounds.click();
-    setIsLoadingArt(true);
-    setWelcomeArt(""); // Clear current art to show loading cursor
-    setSelectedWelcomeColor("none"); // Reset color selection
-
-    // Clear any existing shuffle timeout
-    if (shuffleTimeoutRef.current) {
-      clearTimeout(shuffleTimeoutRef.current);
-    }
-
-    // Brief loading delay for satisfaction
-    shuffleTimeoutRef.current = window.setTimeout(() => {
-      if (artCache.length > 1) {
-        // Use next cached piece
-        const [_current, ...rest] = artCache;
-        setWelcomeArt(rest[0]); // Already trimmed and escaped
-        setWelcomeArtColorized(""); // Clear colorized version
-        setArtCache(rest);
-        setIsLoadingArt(false);
-        // Prefetch one more to keep cache full
-        fetchRandomArt().then((art) => {
-          if (art) setArtCache((prev) => [...prev, escapeHtml(art)]);
-        });
-      } else {
-        // Fetch fresh if cache empty
-        prefetchArt(3).then(() => setIsLoadingArt(false));
-      }
-      shuffleTimeoutRef.current = null;
-    }, 300); // 300ms loading delay
-  };
-
-  // Apply color effect to welcome art
-  const applyColorToWelcomeArt = (effect: string) => {
-    setSelectedWelcomeColor(effect);
-    sounds.click();
-
-    if (effect === "none" || !welcomeArt) {
-      setWelcomeArtColorized("");
-      return;
-    }
-
-    const colorized = applyColorToArt(welcomeArt, effect);
-    setWelcomeArtColorized(colorized);
-  };
-
-  // Load and prefetch ASCII art on mount
-  useEffect(() => {
-    prefetchArt(3);
-  }, []);
 
   // Watch for welcome modal close signal to start auto-typing
   useEffect(() => {
@@ -348,13 +251,6 @@ export default function TextToAscii() {
     borderStyle.value,
   ]);
 
-  // Apply color effect to welcome art when COLOR dropdown changes
-  useEffect(() => {
-    if (welcomeArt && !asciiOutput) {
-      applyColorToWelcomeArt(colorEffect.value);
-    }
-  }, [colorEffect.value, welcomeArt]);
-
 
   return (
     <div class="max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
@@ -433,17 +329,14 @@ export default function TextToAscii() {
       {/* Terminal Display */}
       <div class="mb-4 sm:mb-10">
         <TerminalDisplay
-          content={asciiOutput || welcomeArt}
-          htmlContent={asciiOutput
-            ? (colorEffect.value === "none"
-              ? asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-              : htmlOutput)
-            : (welcomeArtColorized || welcomeArt)}
-          isLoading={isLoadingArt && !welcomeArt && !asciiOutput}
+          content={asciiOutput}
+          htmlContent={colorEffect.value === "none"
+            ? asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            : htmlOutput}
+          isLoading={false}
           filename={inputText.value.toLowerCase().replace(/[^a-z0-9]/g, "-") ||
             "ascii-art"}
-          onShuffle={!asciiOutput && welcomeArt ? shuffleArt : undefined}
-          showShuffleButton={!asciiOutput && Boolean(welcomeArt)}
+          showShuffleButton={false}
           terminalPath="~/output/text-art.txt"
         />
       </div>
