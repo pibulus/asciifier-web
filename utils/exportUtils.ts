@@ -179,11 +179,37 @@ export async function downloadPNG(
       parentContainer.scrollTop = scrollTop;
     }
 
-    // Download
+    // Convert data URL to blob for better mobile compatibility
+    const blob = await fetch(dataUrl).then(res => res.blob());
+
+    // Try native share API first (works great on mobile!)
+    if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      try {
+        const file = new File([blob], `${filename}.png`, { type: 'image/png' });
+        await navigator.share({
+          files: [file],
+          title: 'ASCII Art',
+          text: 'Check out this ASCII art!'
+        });
+        sounds.success();
+        return;
+      } catch (shareError) {
+        // User cancelled share or share not supported, fall through to download
+        console.log("Share cancelled or not supported, trying download:", shareError);
+      }
+    }
+
+    // Fallback to traditional download
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = dataUrl;
+    a.href = url;
     a.download = `${filename}.png`;
+
+    // Append to body for better iOS compatibility
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
     sounds.success();
   } catch (error) {

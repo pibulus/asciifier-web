@@ -178,15 +178,27 @@ export function TerminalDisplay({
       {/* Export Buttons - Show when content is ready */}
       {hasContent && (
         <>
-          {/* Mobile: Direct PNG Export Button */}
-          <div class="sm:hidden absolute bottom-6 right-6 z-10 animate-pop-in">
+          {/* Mobile: Copy + PNG Buttons */}
+          <div class="sm:hidden absolute bottom-6 right-4 z-10 flex gap-2 animate-pop-in">
+            <button
+              onClick={handleCopy}
+              class={`px-4 py-3 border-3 rounded-xl font-mono font-black shadow-brutal-lg transition-all active:scale-95 ${
+                copiedToClipboard ? "animate-bounce-once" : ""
+              }`}
+              style={copiedToClipboard
+                ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
+                : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
+              title="Copy to clipboard"
+            >
+              {copiedToClipboard ? "✅" : "📋"}
+            </button>
             <button
               onClick={handleDownloadPNG}
-              class="px-5 py-3 border-3 rounded-xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl active:scale-95"
-              style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+              class="px-4 py-3 border-3 rounded-xl font-mono font-black shadow-brutal-lg transition-all active:scale-95"
+              style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
               title="Download as PNG image"
             >
-              🖼️ PNG
+              🖼️
             </button>
           </div>
 
