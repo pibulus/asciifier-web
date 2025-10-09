@@ -126,9 +126,9 @@ export default function AsciiGallery() {
 
 
   return (
-    <div class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+    <div class="max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-8 space-y-3 sm:space-y-6">
       {/* Controls - Three Dropdown Layout matching Text view */}
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-8">
+      <div class="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 mb-3 sm:mb-8">
         {/* Category Selector */}
         <MagicDropdown
           label="Theme"
@@ -158,7 +158,7 @@ export default function AsciiGallery() {
       </div>
 
       {/* Terminal Display */}
-      <div class="mb-10">
+      <div class="mb-4 sm:mb-10">
         <TerminalDisplay
           content={currentArt}
           htmlContent={selectedColor !== "none" && colorizedArt

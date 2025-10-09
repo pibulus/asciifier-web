@@ -96,7 +96,7 @@ export function TerminalDisplay({
 
   return (
     <div
-      class="rounded-3xl border-4 shadow-brutal overflow-hidden relative"
+      class="rounded-2xl sm:rounded-3xl border-3 sm:border-4 shadow-brutal overflow-hidden relative"
       style="background-color: #000000; border-color: var(--color-border, #0A0A0A);"
     >
       {/* Terminal Menu Bar */}
@@ -141,8 +141,8 @@ export function TerminalDisplay({
 
       {/* Terminal Content Area */}
       <div
-        class="p-4 sm:p-6 md:p-8 overflow-auto custom-scrollbar transition-all duration-700"
-        style="height: 400px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
+        class="p-2 sm:p-6 md:p-8 overflow-auto custom-scrollbar transition-all duration-700"
+        style="height: 500px; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
       >
         {isLoading && !content
           ? (

@@ -319,9 +319,9 @@ export default function TextToAscii() {
 
 
   return (
-    <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
       {/* Text Input Section */}
-      <div class="mb-8">
+      <div class="mb-3 sm:mb-8">
         <div class="relative">
           <input
             id="ascii-text-input"
@@ -332,7 +332,7 @@ export default function TextToAscii() {
             }}
             placeholder="Type something magical... ✨"
             maxLength={20}
-            class="w-full px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-5 border-3 sm:border-4 rounded-2xl sm:rounded-3xl font-mono text-lg sm:text-xl md:text-2xl font-black focus:outline-none transition-all hover:scale-[1.005] focus:scale-[1.01] shadow-brutal"
+            class="w-full px-4 py-2 sm:px-6 sm:py-4 md:px-8 md:py-5 border-3 sm:border-4 rounded-2xl sm:rounded-3xl font-mono text-lg sm:text-xl md:text-2xl font-black focus:outline-none transition-all hover:scale-[1.005] focus:scale-[1.01] shadow-brutal"
             style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"
           />
           <div class="absolute right-4 sm:right-6 md:right-8 top-1/2 -translate-y-1/2">
@@ -347,10 +347,10 @@ export default function TextToAscii() {
       </div>
 
       {/* ASCII FACTORY JUKEBOX - Three Dropdown Combo Machine! */}
-      <div class="mb-8">
-        {/* Three Dropdown Reels - Stacked on mobile, horizontal on tablet+ */}
+      <div class="mb-3 sm:mb-8">
+        {/* Three Dropdown Reels - Horizontal on all screen sizes for max space */}
         <div
-          class={`grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 ${
+          class={`grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 ${
             allSelected ? "animate-wiggle" : ""
           }`}
         >
@@ -393,7 +393,7 @@ export default function TextToAscii() {
       </div>
 
       {/* Terminal Display */}
-      <div class="mb-10">
+      <div class="mb-4 sm:mb-10">
         <TerminalDisplay
           content={asciiOutput || welcomeArt}
           htmlContent={asciiOutput
