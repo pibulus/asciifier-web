@@ -42,6 +42,11 @@ export default function TextToAscii() {
   // Store typewriter instance for auto-typing
   const typewriterRef = useRef<SimpleTypeWriter | null>(null);
 
+  // Track timeouts for cleanup
+  const shuffleTimeoutRef = useRef<number | null>(null);
+  const autoTypeTimeoutRef = useRef<number | null>(null);
+  const wiggleTimeoutRef = useRef<number | null>(null);
+
   // Initialize analytics and typewriter sounds on mount
   useEffect(() => {
     analytics.init();
@@ -145,8 +150,13 @@ export default function TextToAscii() {
     setWelcomeArt(""); // Clear current art to show loading cursor
     setSelectedWelcomeColor("none"); // Reset color selection
 
+    // Clear any existing shuffle timeout
+    if (shuffleTimeoutRef.current) {
+      clearTimeout(shuffleTimeoutRef.current);
+    }
+
     // Brief loading delay for satisfaction
-    setTimeout(() => {
+    shuffleTimeoutRef.current = window.setTimeout(() => {
       if (artCache.length > 1) {
         // Use next cached piece
         const [_current, ...rest] = artCache;
@@ -162,6 +172,7 @@ export default function TextToAscii() {
         // Fetch fresh if cache empty
         prefetchArt(3).then(() => setIsLoadingArt(false));
       }
+      shuffleTimeoutRef.current = null;
     }, 300); // 300ms loading delay
   };
 
@@ -216,18 +227,28 @@ export default function TextToAscii() {
           }
 
           charIndex++;
-          setTimeout(typeNextChar, 180); // 180ms per character for satisfying demo typing
+          autoTypeTimeoutRef.current = window.setTimeout(typeNextChar, 180); // 180ms per character
+        } else {
+          autoTypeTimeoutRef.current = null;
         }
       };
 
       // Start auto-typing after a brief delay
-      setTimeout(() => {
+      autoTypeTimeoutRef.current = window.setTimeout(() => {
         typeNextChar();
       }, 300);
 
       // Reset the signal
       shouldStartAutoTyping.value = false;
     }
+
+    // Cleanup auto-typing timeout on unmount
+    return () => {
+      if (autoTypeTimeoutRef.current) {
+        clearTimeout(autoTypeTimeoutRef.current);
+        autoTypeTimeoutRef.current = null;
+      }
+    };
   }, [shouldStartAutoTyping.value]);
 
   // Check if all three dropdowns have been changed from default
@@ -236,9 +257,26 @@ export default function TextToAscii() {
     if (allHaveChanged && !allSelected) {
       setAllSelected(true);
       sounds.success(); // Play success sound on wiggle!
+
+      // Clear any existing wiggle timeout
+      if (wiggleTimeoutRef.current) {
+        clearTimeout(wiggleTimeoutRef.current);
+      }
+
       // Trigger wiggle animation
-      setTimeout(() => setAllSelected(false), 600);
+      wiggleTimeoutRef.current = window.setTimeout(() => {
+        setAllSelected(false);
+        wiggleTimeoutRef.current = null;
+      }, 600);
     }
+
+    // Cleanup wiggle timeout on unmount
+    return () => {
+      if (wiggleTimeoutRef.current) {
+        clearTimeout(wiggleTimeoutRef.current);
+        wiggleTimeoutRef.current = null;
+      }
+    };
   }, [fontChanged, colorChanged, borderChanged]);
 
 

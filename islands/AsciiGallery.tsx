@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState, useRef } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { analytics } from "../utils/analytics.ts";
 import { COLOR_EFFECTS, VISUAL_EFFECTS } from "../utils/constants.ts";
@@ -31,10 +31,17 @@ export default function AsciiGallery() {
   const [artCache, setArtCache] = useState<string[]>([]);
   const [isLoadingArt, setIsLoadingArt] = useState(false);
 
-  // Load initial random art on mount
+  // Track if component is mounted to prevent state updates after unmount
+  const isMountedRef = useRef(true);
+
+  // Load initial random art on mount and cleanup on unmount
   useEffect(() => {
     analytics.init();
     prefetchArt(3);
+
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
   // When category changes (but not on initial mount)
@@ -105,6 +112,9 @@ export default function AsciiGallery() {
 
       // Brief delay for visual feedback
       setTimeout(() => {
+        // Only update state if still mounted
+        if (!isMountedRef.current) return;
+
         // Rotate cache
         const [_current, ...rest] = artCache;
         setCurrentArt(rest[0]);
@@ -114,7 +124,9 @@ export default function AsciiGallery() {
 
         // Prefetch one more to keep cache full
         fetchSingleArt().then((art) => {
-          if (art) setArtCache((prev) => [...prev, art]);
+          if (art && isMountedRef.current) {
+            setArtCache((prev) => [...prev, art]);
+          }
         });
       }, 200); // Shorter delay since we're not clearing content
     } else {

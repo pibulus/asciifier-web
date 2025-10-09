@@ -326,11 +326,19 @@ export default function Dropzone() {
     }
   }, []);
 
-  // React to setting changes
+  // React to setting changes and cleanup timeout on unmount
   useEffect(() => {
     if (imageLoaded) {
       scheduleReprocess();
     }
+
+    // Cleanup: clear any pending timeout when component unmounts or dependencies change
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+        updateTimeoutRef.current = null;
+      }
+    };
   }, [
     selectedStyle.value,
     charWidth.value,
