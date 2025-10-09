@@ -36,7 +36,26 @@ html {
   box-shadow: 0 0 0 3px var(--color-accent);
 }
 
-/* Custom scrollbar */
+/* Main page scrollbar - thin and themed */
+html::-webkit-scrollbar {
+  width: 8px;
+}
+
+html::-webkit-scrollbar-track {
+  background: var(--color-base, #faf9f6);
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--color-accent, #ff69b4);
+  border-radius: 4px;
+  border: 2px solid var(--color-base, #faf9f6);
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border, #0a0a0a);
+}
+
+/* Custom scrollbar for terminal content */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }

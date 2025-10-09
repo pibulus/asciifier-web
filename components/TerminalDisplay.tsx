@@ -71,7 +71,6 @@ export function TerminalDisplay({
   visualEffect = "subtle",
 }: TerminalDisplayProps) {
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
-  const [mobileExportOpen, setMobileExportOpen] = useState(false);
 
   const handleCopy = async () => {
     const success = await copyToClipboard(
@@ -130,8 +129,8 @@ export function TerminalDisplay({
           {showShuffleButton && onShuffle && hasContent && (
             <button
               onClick={onShuffle}
-              class="px-2 py-1 text-xs font-mono font-bold transition-all hover:scale-110 active:scale-95 opacity-70 hover:opacity-100"
-              style="color: #00FF41"
+              class="px-4 py-2 text-xl font-mono font-bold transition-all hover:scale-125 active:scale-95 opacity-80 hover:opacity-100 rounded-lg border-2"
+              style="color: #00FF41; border-color: rgba(0, 255, 65, 0.3); background-color: rgba(0, 255, 65, 0.05);"
               title="Get a random ASCII art"
             >
               🎲
@@ -159,16 +158,16 @@ export function TerminalDisplay({
           : htmlContent
           ? (
             <pre
-              class="ascii-display font-mono text-base opacity-85"
-              style={`color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; ${getVisualEffectStyle(visualEffect)}`}
+              class="ascii-display font-mono text-[0.5rem] sm:text-xs md:text-sm lg:text-base opacity-85"
+              style={`color: #00FF41; line-height: 1.3; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; font-weight: 900; ${getVisualEffectStyle(visualEffect)}`}
               dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
           )
           : content
           ? (
             <pre
-              class="ascii-display font-mono text-base opacity-85"
-              style={`color: #00FF41; line-height: 1.4; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; letter-spacing: 0.8px; font-weight: 900; ${getVisualEffectStyle(visualEffect)}`}
+              class="ascii-display font-mono text-[0.5rem] sm:text-xs md:text-sm lg:text-base opacity-85"
+              style={`color: #00FF41; line-height: 1.3; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; font-weight: 900; ${getVisualEffectStyle(visualEffect)}`}
             >
               {content}
             </pre>
@@ -179,59 +178,16 @@ export function TerminalDisplay({
       {/* Export Buttons - Show when content is ready */}
       {hasContent && (
         <>
-          {/* Mobile: Single Export Dropdown */}
+          {/* Mobile: Direct PNG Export Button */}
           <div class="sm:hidden absolute bottom-6 right-6 z-10 animate-pop-in">
-            <div class="relative">
-              <button
-                onClick={() => {
-                  sounds.click();
-                  setMobileExportOpen(!mobileExportOpen);
-                }}
-                class="px-4 py-3 border-3 rounded-xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl active:scale-95"
-                style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
-              >
-                📤 Export
-              </button>
-              {mobileExportOpen && (
-                <div
-                  class="absolute bottom-full right-0 mb-2 border-3 rounded-xl overflow-hidden shadow-brutal-lg animate-dropdown-open"
-                  style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
-                >
-                  <button
-                    onClick={() => {
-                      handleDownloadPNG();
-                      setMobileExportOpen(false);
-                    }}
-                    class="w-full px-4 py-3 font-mono font-bold text-left hover:bg-opacity-80 transition-colors"
-                    style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A);"
-                  >
-                    🖼️ PNG
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleDownloadText();
-                      setMobileExportOpen(false);
-                    }}
-                    class="w-full px-4 py-3 font-mono font-bold text-left hover:bg-opacity-80 transition-colors border-t-2"
-                    style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
-                  >
-                    💾 TXT
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleCopy();
-                      setMobileExportOpen(false);
-                    }}
-                    class="w-full px-4 py-3 font-mono font-bold text-left hover:bg-opacity-80 transition-colors border-t-2"
-                    style={copiedToClipboard
-                      ? "background-color: #4ADE80; color: #0A0A0A; border-color: var(--color-border, #0A0A0A);"
-                      : "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"}
-                  >
-                    {copiedToClipboard ? "✅ COPIED!" : "📋 COPY"}
-                  </button>
-                </div>
-              )}
-            </div>
+            <button
+              onClick={handleDownloadPNG}
+              class="px-5 py-3 border-3 rounded-xl font-mono font-black shadow-brutal-lg transition-all hover:shadow-brutal-xl active:scale-95"
+              style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+              title="Download as PNG image"
+            >
+              🖼️ PNG
+            </button>
           </div>
 
           {/* Desktop: Three Button Layout */}
@@ -381,6 +337,26 @@ export function TerminalDisplay({
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #00CC33;
+        }
+
+        /* Responsive letter-spacing for ASCII display */
+        .ascii-display {
+          letter-spacing: 0.2px;
+        }
+        @media (min-width: 640px) {
+          .ascii-display {
+            letter-spacing: 0.4px;
+          }
+        }
+        @media (min-width: 768px) {
+          .ascii-display {
+            letter-spacing: 0.6px;
+          }
+        }
+        @media (min-width: 1024px) {
+          .ascii-display {
+            letter-spacing: 0.8px;
+          }
         }
       `}
       </style>

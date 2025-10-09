@@ -1,5 +1,5 @@
 import { useSignal } from "@preact/signals";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState, useRef } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { analytics } from "../utils/analytics.ts";
 import { SimpleTypeWriter } from "../utils/simple-typewriter.js";
@@ -39,6 +39,9 @@ const BORDER_STYLES = [
 ];
 
 export default function TextToAscii() {
+  // Store typewriter instance for auto-typing
+  const typewriterRef = useRef<SimpleTypeWriter | null>(null);
+
   // Initialize analytics and typewriter sounds on mount
   useEffect(() => {
     analytics.init();
@@ -49,6 +52,9 @@ export default function TextToAscii() {
         volume: 0.3,
         enabled: true,
       });
+
+      // Store reference for auto-typing
+      typewriterRef.current = typewriter;
 
       typewriter.init().then(() => {
         typewriter.attach("#ascii-text-input");
@@ -196,9 +202,21 @@ export default function TextToAscii() {
 
       const typeNextChar = () => {
         if (charIndex < autoTypeDemoText.length) {
+          const currentChar = autoTypeDemoText[charIndex];
           inputText.value = autoTypeDemoText.slice(0, charIndex + 1);
+
+          // Trigger typewriter sound with synthetic keyboard event
+          if (typewriterRef.current && typewriterRef.current.loaded) {
+            const syntheticEvent = {
+              key: currentChar,
+              keyCode: currentChar.charCodeAt(0),
+              which: currentChar.charCodeAt(0),
+            };
+            typewriterRef.current.play(syntheticEvent);
+          }
+
           charIndex++;
-          setTimeout(typeNextChar, 120); // 120ms per character for smooth demo
+          setTimeout(typeNextChar, 180); // 180ms per character for satisfying demo typing
         }
       };
 
