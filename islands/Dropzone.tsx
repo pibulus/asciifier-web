@@ -13,6 +13,8 @@ import { sounds } from "../utils/sounds.ts";
 import { easterEggs } from "../utils/easter-eggs.ts";
 import { analytics } from "../utils/analytics.ts";
 import { showToast } from "../components/Toast.tsx";
+import { MagicDropdown } from "../components/MagicDropdown.tsx";
+import { TerminalDisplay } from "../components/TerminalDisplay.tsx";
 
 // Preset configurations for quick starts
 const PRESETS = [
@@ -51,25 +53,52 @@ const PRESETS = [
   },
 ];
 
+// Dropdown options for MagicDropdown components
+const STYLE_OPTIONS = [
+  { name: "Classic", value: "classic" },
+  { name: "Blocks", value: "blocks" },
+  { name: "Dots", value: "dots" },
+  { name: "Hearts", value: "hearts" },
+  { name: "Minimal", value: "minimal" },
+  { name: "Retro", value: "retro" },
+  { name: "Shades", value: "shades" },
+  { name: "Geometric", value: "geometric" },
+  { name: "Gradient", value: "gradient" },
+];
+
+const PRESET_OPTIONS = [
+  { name: "Classic", value: "0" },
+  { name: "Color", value: "1" },
+  { name: "Inverted", value: "2" },
+  { name: "Detailed", value: "3" },
+];
+
+const COLOR_OPTIONS = [
+  { name: "None", value: "none" },
+  { name: "Color", value: "color" },
+  { name: "Rainbow", value: "rainbow" },
+];
+
 export default function Dropzone() {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [asciiOutput, setAsciiOutput] = useState<string>("");
+  const [htmlOutput, setHtmlOutput] = useState<string>("");
   const [imageLoaded, setImageLoaded] = useState(false);
   const [currentImage, setCurrentImage] = useState<File | null>(null);
-  const [showStylePreview, setShowStylePreview] = useState<string | null>(null);
-  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Track which dropdowns have been changed (for visual feedback)
+  const [styleChanged, setStyleChanged] = useState(false);
+  const [presetChanged, setPresetChanged] = useState(false);
+  const [colorChanged, setColorChanged] = useState(false);
+  const [selectedPresetIndex, setSelectedPresetIndex] = useState<string>("0"); // Track selected preset
 
   // Settings with signals for reactive updates
   const selectedStyle = useSignal<CharacterStyle>("classic");
   const charWidth = useSignal(80);
-  const useColor = useSignal(false);
-  const useRainbow = useSignal(false);
+  const colorMode = useSignal<string>("none"); // "none", "color", or "rainbow"
   const invertBrightness = useSignal(false);
-  const enhanceImage = useSignal(false);
-  const autoUpdate = useSignal(true);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -98,17 +127,10 @@ export default function Dropzone() {
         e.preventDefault();
         handleReset();
       }
-      // Cmd/Ctrl + C for copy
-      if ((e.metaKey || e.ctrlKey) && e.key === "c" && !e.shiftKey) {
-        e.preventDefault();
-        copyToClipboard();
-      }
-      // Number keys for presets
+      // Number keys for presets (1-4)
       if (e.key >= "1" && e.key <= "4") {
         const presetIndex = parseInt(e.key) - 1;
-        if (PRESETS[presetIndex]) {
-          applyPreset(PRESETS[presetIndex], presetIndex);
-        }
+        applyPreset(presetIndex);
       }
     };
 
@@ -178,25 +200,29 @@ export default function Dropzone() {
     try {
       const img = await processor.current.loadImage(file);
 
+      const useColor = colorMode.value === "color";
+      const useRainbow = colorMode.value === "rainbow";
+
       const options: ProcessOptions = {
         width: charWidth.value,
         style: selectedStyle.value,
-        useColor: useColor.value,
-        rainbow: useRainbow.value,
+        useColor: useColor,
+        rainbow: useRainbow,
         invert: invertBrightness.value,
-        enhance: enhanceImage.value,
+        enhance: false, // Simplified - removed enhance toggle
       };
 
       const ascii = processor.current.processImage(img, options);
       let formatted = processor.current.formatAscii(
         ascii,
-        useColor.value || useRainbow.value,
+        useColor || useRainbow,
       );
 
       // Maybe add secret watermark
       formatted = easterEggs.addSecretWatermark(formatted);
 
       setAsciiOutput(formatted);
+      setHtmlOutput(formatted); // Store HTML version for TerminalDisplay
       setImageLoaded(true);
       sounds.success();
       analytics.trackImageConverted(file.size, true);
@@ -214,9 +240,9 @@ export default function Dropzone() {
     }
   };
 
-  // Debounced reprocess for live updates
+  // Debounced reprocess for live updates (always auto-update)
   const scheduleReprocess = () => {
-    if (!autoUpdate.value || !currentImage || !imageLoaded) return;
+    if (!currentImage || !imageLoaded) return;
 
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
@@ -233,88 +259,44 @@ export default function Dropzone() {
     }
   };
 
-  const applyPreset = (preset: typeof PRESETS[0], index: number) => {
+  const applyPreset = (presetIndex: number) => {
+    const preset = PRESETS[presetIndex];
+    if (!preset) return;
+
     sounds.click();
     selectedStyle.value = preset.style as CharacterStyle;
-    useColor.value = preset.color;
+    colorMode.value = preset.color ? "color" : "none";
     charWidth.value = preset.width;
-    enhanceImage.value = preset.enhance;
     invertBrightness.value = preset.invert || false;
-    setSelectedPreset(index);
+    setSelectedPresetIndex(presetIndex.toString());
+    setPresetChanged(true);
+
     if (imageLoaded) {
       scheduleReprocess();
     }
   };
 
   const handleReset = () => {
+    sounds.click();
     setImageLoaded(false);
     setAsciiOutput("");
+    setHtmlOutput("");
     setCurrentImage(null);
+    // Reset all change trackers and settings
+    setStyleChanged(false);
+    setPresetChanged(false);
+    setColorChanged(false);
+    setSelectedPresetIndex("0");
+    // Reset signals to defaults
+    selectedStyle.value = "classic";
+    charWidth.value = 80;
+    colorMode.value = "none";
+    invertBrightness.value = false;
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  };
-
-  const downloadText = () => {
-    const blob = new Blob([asciiOutput.replace(/<[^>]*>/g, "")], {
-      type: "text/plain",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "ascii-art.txt";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const downloadHTML = () => {
-    const html = `<!DOCTYPE html>
-<html>
-<head>
-  <title>ASCII Art</title>
-  <style>
-    body { background: #000; color: #0F0; font-family: 'Courier New', monospace; font-size: 10px; line-height: 1.2; padding: 20px; }
-    pre { margin: 0; letter-spacing: 0.05em; }
-  </style>
-</head>
-<body><pre>${asciiOutput}</pre></body>
-</html>`;
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "ascii-art.html";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const copyToClipboard = async () => {
-    try {
-      // Strip HTML tags for plain text version
-      const plainText = asciiOutput.replace(/<[^>]*>/g, "");
-
-      // Create HTML version wrapped in monospace pre tag for rich text editors
-      const htmlText =
-        `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${asciiOutput}</pre>`;
-
-      // Try modern clipboard API with both formats
-      if (navigator.clipboard && navigator.clipboard.write) {
-        const clipboardItem = new ClipboardItem({
-          "text/plain": new Blob([plainText], { type: "text/plain" }),
-          "text/html": new Blob([htmlText], { type: "text/html" }),
-        });
-        await navigator.clipboard.write([clipboardItem]);
-      } else {
-        // Fallback for older browsers - just plain text
-        await navigator.clipboard.writeText(plainText);
-      }
-
-      setCopiedToClipboard(true);
-      sounds.copy();
-      setTimeout(() => setCopiedToClipboard(false), 2000);
-    } catch (err) {
-      sounds.error();
-      alert("Recalibration needed. Try again.");
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = "";
     }
   };
 
@@ -342,10 +324,8 @@ export default function Dropzone() {
   }, [
     selectedStyle.value,
     charWidth.value,
-    useColor.value,
-    useRainbow.value,
+    colorMode.value,
     invertBrightness.value,
-    enhanceImage.value,
     imageLoaded,
   ]);
 
@@ -473,329 +453,130 @@ export default function Dropzone() {
         </div>
       )}
 
-      {/* Controls & Preview (when image is loaded) */}
+      {/* Image Loaded State - Output First! */}
       {imageLoaded && (
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Controls */}
-          <div class="space-y-4">
-            {/* Style Controls */}
+        <div class="space-y-6 md:space-y-8">
+          {/* ASCII Output - Priority #1! */}
+          <TerminalDisplay
+            content={asciiOutput.replace(/<[^>]*>/g, "")}
+            htmlContent={htmlOutput}
+            isLoading={isProcessing}
+            filename="image-ascii-art"
+            terminalPath="~/output/image-art.txt"
+            showShuffleButton={false}
+          />
+
+          {/* Compact Controls - Below Output */}
+          <div class="space-y-4 md:space-y-6">
+            {/* Three Magic Dropdowns - Match TextToAscii layout */}
+            <div class="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
+              <MagicDropdown
+                label="Style"
+                options={STYLE_OPTIONS}
+                value={selectedStyle.value}
+                onChange={(value) => {
+                  selectedStyle.value = value as CharacterStyle;
+                  setStyleChanged(true);
+                }}
+                changed={styleChanged}
+              />
+
+              <MagicDropdown
+                label="Preset"
+                options={PRESET_OPTIONS}
+                value={selectedPresetIndex}
+                onChange={(value) => {
+                  const presetIndex = parseInt(value);
+                  applyPreset(presetIndex);
+                }}
+                changed={presetChanged}
+              />
+
+              <MagicDropdown
+                label="Color"
+                options={COLOR_OPTIONS}
+                value={colorMode.value}
+                onChange={(value) => {
+                  colorMode.value = value;
+                  setColorChanged(true);
+                }}
+                changed={colorChanged}
+              />
+            </div>
+
+            {/* Width Slider */}
             <div
-              class="border-4 rounded-lg p-4 shadow-brutal"
+              class="border-4 rounded-2xl p-4 md:p-6 shadow-brutal"
               style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
             >
               <label
-                class="block text-sm font-mono font-bold mb-2"
+                class="block text-sm md:text-base font-mono font-bold mb-3"
                 style="color: var(--color-text, #0A0A0A)"
               >
-                CHARACTER STYLE
+                WIDTH •{" "}
+                <span style="color: var(--color-accent, #FF69B4)">
+                  {charWidth.value}
+                </span>
               </label>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                {PRESETS.map((preset, i) => (
-                  <button
-                    key={preset.name}
-                    onClick={() => applyPreset(preset, i)}
-                    class={`px-4 py-3 sm:px-2 sm:py-1.5 border-2 rounded text-sm sm:text-xs font-bold transition-all duration-200 ${
-                      selectedPreset === i
-                        ? "shadow-brutal-sm animate-pulse-soft"
-                        : "hover:animate-spring hover:shadow-brutal-sm active:scale-95"
-                    }`}
-                    style={selectedPreset === i
-                      ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-                      : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"}
-                    title={`Quick preset ${i + 1}`}
-                  >
-                    {preset.name}
-                  </button>
-                ))}
-              </div>
-              <div class="space-y-2">
-                {Object.keys(CHARACTER_SETS).map((style) => (
-                  <button
-                    key={style}
-                    onClick={() => {
-                      sounds.click();
-                      selectedStyle.value = style as CharacterStyle;
-                      scheduleReprocess();
-                    }}
-                    onMouseEnter={() => setShowStylePreview(style)}
-                    onMouseLeave={() => setShowStylePreview(null)}
-                    class={`w-full text-left px-3 py-2 rounded border-2 transition-all duration-200 ${
-                      selectedStyle.value === style
-                        ? "bg-hot-pink text-white border-black animate-pulse-soft shadow-brutal-sm"
-                        : "bg-white border-gray-300 hover:border-black hover:shadow-brutal-sm hover:animate-pop"
-                    } active:scale-95`}
-                  >
-                    <div class="font-mono font-bold">{style}</div>
-                    <div class="text-xs opacity-60">
-                      {STYLE_DESCRIPTIONS[style as CharacterStyle]}
-                    </div>
-                    {showStylePreview === style && (
-                      <div class="mt-1 font-mono text-xs bg-black text-terminal-green p-1 rounded animate-slide-up">
-                        {CHARACTER_SETS[style as CharacterStyle]}
-                      </div>
-                    )}
-                  </button>
-                ))}
+              <input
+                type="range"
+                min="20"
+                max="200"
+                value={charWidth.value}
+                class="w-full slider-accent"
+                style="accent-color: var(--color-accent, #FF69B4)"
+                onInput={(e) => {
+                  const value = parseInt((e.target as HTMLInputElement).value);
+                  charWidth.value = value;
+                  if (Math.random() < 0.1) sounds.slide(value);
+                }}
+              />
+              <div class="flex justify-between text-xs font-mono opacity-60 mt-2" style="color: var(--color-text, #0A0A0A)">
+                <span>smol</span>
+                <span>just right</span>
+                <span>thicc</span>
               </div>
             </div>
 
-            {/* Controls */}
-            <div
-              class="border-4 rounded-lg p-4 shadow-brutal space-y-4"
-              style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
-            >
-              {/* Width Slider */}
-              <div>
-                <label
-                  class="block text-sm font-mono font-bold mb-2"
+            {/* Bottom Controls: Invert + New Image */}
+            <div class="flex items-center gap-4">
+              <label class="flex items-center space-x-3 cursor-pointer group flex-1">
+                <input
+                  type="checkbox"
+                  checked={invertBrightness.value}
+                  onChange={(e) => {
+                    sounds.toggle();
+                    invertBrightness.value = (e.target as HTMLInputElement).checked;
+                  }}
+                  class="w-5 h-5 group-hover:animate-wiggle"
+                  style="accent-color: var(--color-accent, #FF69B4)"
+                />
+                <span
+                  class="font-mono font-bold text-sm md:text-base transition-colors group-hover:opacity-80"
                   style="color: var(--color-text, #0A0A0A)"
                 >
-                  WIDTH •{" "}
-                  <span style="color: var(--color-accent, #FF69B4)">
-                    {charWidth.value}
-                  </span>
-                </label>
-                <input
-                  type="range"
-                  min="20"
-                  max="200"
-                  value={charWidth.value}
-                  class="w-full slider-accent"
-                  style="accent-color: var(--color-accent, #FF69B4)"
-                  onInput={(e) => {
-                    const value = parseInt(
-                      (e.target as HTMLInputElement).value,
-                    );
-                    charWidth.value = value;
-                    if (Math.random() < 0.1) sounds.slide(value); // Occasional sound feedback
-                    scheduleReprocess();
-                  }}
-                />
-                <div class="flex justify-between text-xs font-mono text-soft-black opacity-60 mt-1">
-                  <span>smol</span>
-                  <span>just right</span>
-                  <span>thicc</span>
-                </div>
-              </div>
-
-              {/* Toggle Options */}
-              <div class="space-y-3">
-                <label class="flex items-center space-x-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={useColor.value}
-                    onChange={(e) => {
-                      sounds.toggle();
-                      useColor.value = (e.target as HTMLInputElement).checked;
-                      if (useColor.value) useRainbow.value = false; // Disable rainbow
-                      scheduleReprocess();
-                    }}
-                    class="w-5 h-5 group-hover:animate-wiggle"
-                    style="accent-color: var(--color-accent, #FF69B4)"
-                  />
-                  <span
-                    class="font-mono font-bold transition-colors group-hover:opacity-80"
-                    style="color: var(--color-text, #0A0A0A)"
-                  >
-                    Color mode
-                  </span>
-                </label>
-
-                <label class="flex items-center space-x-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={useRainbow.value}
-                    onChange={(e) => {
-                      sounds.toggle();
-                      useRainbow.value = (e.target as HTMLInputElement).checked;
-                      if (useRainbow.value) useColor.value = false; // Disable regular color
-                      scheduleReprocess();
-                    }}
-                    class="w-5 h-5 group-hover:animate-wiggle"
-                    style="accent-color: var(--color-accent, #FF69B4)"
-                  />
-                  <span
-                    class="font-mono font-bold transition-colors group-hover:opacity-80"
-                    style="color: var(--color-text, #0A0A0A)"
-                  >
-                    Rainbow
-                  </span>
-                </label>
-
-                <label class="flex items-center space-x-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={invertBrightness.value}
-                    onChange={(e) => {
-                      sounds.toggle();
-                      invertBrightness.value =
-                        (e.target as HTMLInputElement).checked;
-                      scheduleReprocess();
-                    }}
-                    class="w-5 h-5 group-hover:animate-wiggle"
-                    style="accent-color: var(--color-accent, #FF69B4)"
-                  />
-                  <span
-                    class="font-mono font-bold transition-colors group-hover:opacity-80"
-                    style="color: var(--color-text, #0A0A0A)"
-                  >
-                    Invert
-                  </span>
-                </label>
-
-                <label class="flex items-center space-x-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={enhanceImage.value}
-                    onChange={(e) => {
-                      sounds.toggle();
-                      enhanceImage.value =
-                        (e.target as HTMLInputElement).checked;
-                      scheduleReprocess();
-                    }}
-                    class="w-5 h-5 group-hover:animate-wiggle"
-                    style="accent-color: var(--color-accent, #FF69B4)"
-                  />
-                  <span
-                    class="font-mono font-bold transition-colors group-hover:opacity-80"
-                    style="color: var(--color-text, #0A0A0A)"
-                  >
-                    Enhance
-                  </span>
-                </label>
-
-                <label class="flex items-center space-x-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={autoUpdate.value}
-                    onChange={(e) => {
-                      sounds.toggle();
-                      autoUpdate.value = (e.target as HTMLInputElement).checked;
-                      if (!autoUpdate.value && updateTimeoutRef.current) {
-                        clearTimeout(updateTimeoutRef.current);
-                      }
-                    }}
-                    class="w-5 h-5 group-hover:animate-wiggle"
-                    style="accent-color: var(--color-accent, #FF69B4)"
-                  />
-                  <span
-                    class="font-mono font-bold transition-colors group-hover:opacity-80"
-                    style="color: var(--color-text, #0A0A0A)"
-                  >
-                    Live update
-                  </span>
-                </label>
-              </div>
-
-              {/* Manual Update Button */}
-              {!autoUpdate.value && (
-                <button
-                  onClick={reprocess}
-                  class="w-full px-4 py-2 bg-terminal-green text-soft-black border-2 border-soft-black rounded-lg font-mono font-bold hover:animate-jello hover:shadow-brutal-sm transition-all duration-200 active:scale-95"
-                >
-                  REFRESH
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Right: ASCII Preview */}
-          <div class="lg:col-span-2 space-y-4">
-            {/* Output Display - Dynamic sizing */}
-            <div
-              class="text-terminal-green rounded-lg border-4 shadow-brutal overflow-hidden"
-              style="background-color: #000000; border-color: var(--color-border, #0A0A0A)"
-            >
-              <div
-                class="px-4 py-2 border-b-2 flex items-center justify-between"
-                style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)"
-              >
-                <div class="flex space-x-2">
-                  <div
-                    class="w-3 h-3 bg-red-500 rounded-full hover:animate-pulse-soft cursor-pointer"
-                    title="Close (jk)"
-                  >
-                  </div>
-                  <div
-                    class="w-3 h-3 bg-yellow-500 rounded-full hover:animate-pulse-soft cursor-pointer"
-                    title="Minimize (nope)"
-                  >
-                  </div>
-                  <div
-                    class="w-3 h-3 bg-green-500 rounded-full hover:animate-pulse-soft cursor-pointer"
-                    title="Full screen (maybe)"
-                  >
-                  </div>
-                </div>
-                <span class="text-xs font-mono opacity-60">
-                  ~/output/art.txt
+                  Invert
                 </span>
-              </div>
-              <div
-                class="p-4 overflow-auto custom-scrollbar"
-                style="max-height: 70vh"
-              >
-                <pre
-                  class="ascii-display leading-tight"
-                  dangerouslySetInnerHTML={{ __html: asciiOutput }}
-                  style={`color: ${
-                    useColor.value ? "inherit" : "#00FF41"
-                  }; font-size: clamp(0.5rem, 1.5vw, 0.75rem)`}
-                />
-              </div>
-            </div>
-
-            {/* Export Actions */}
-            <div class="flex flex-wrap gap-3">
-              <button
-                onClick={downloadText}
-                class="flex-1 px-4 py-3 bg-white border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
-              >
-                SAVE AS TEXT
-              </button>
-
-              <button
-                onClick={downloadHTML}
-                class="flex-1 px-4 py-3 bg-peach border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
-              >
-                SAVE AS HTML
-              </button>
-
-              <button
-                onClick={copyToClipboard}
-                class={`flex-1 px-4 py-3 border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg ${
-                  copiedToClipboard ? "animate-jello" : "hover:animate-pop"
-                } active:scale-95 transition-all duration-200 group ${
-                  copiedToClipboard
-                    ? "bg-terminal-green text-soft-black"
-                    : "bg-soft-mint"
-                }`}
-              >
-                {copiedToClipboard ? "COPIED" : "COPY"}
-              </button>
+              </label>
 
               <button
                 onClick={handleReset}
-                class="flex-1 px-4 py-3 bg-hot-pink text-white border-3 border-soft-black rounded-lg font-mono font-bold shadow-brutal hover:shadow-brutal-lg hover:animate-pop active:scale-95 transition-all duration-200 group"
+                class="px-6 py-3 md:px-8 md:py-4 border-4 rounded-2xl font-mono font-black text-sm md:text-base shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all active:scale-95"
+                style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
               >
                 NEW IMAGE
               </button>
             </div>
 
             {/* Keyboard Shortcuts Help */}
-            <div class="text-xs font-mono text-soft-black opacity-60 text-center space-x-4">
+            <div class="text-xs font-mono opacity-60 text-center space-x-4" style="color: var(--color-text, #0A0A0A)">
               <span>
-                <kbd class="px-1.5 py-0.5 bg-soft-yellow rounded">Cmd+C</kbd>
-                {" "}
-                copy
-              </span>
-              <span>
-                <kbd class="px-1.5 py-0.5 bg-soft-yellow rounded">Cmd+Z</kbd>
+                <kbd class="px-1.5 py-0.5 rounded" style="background-color: var(--color-secondary, #FFE5B4)">Cmd+Z</kbd>
                 {" "}
                 reset
               </span>
               <span>
-                <kbd class="px-1.5 py-0.5 bg-soft-yellow rounded">1-4</kbd>{" "}
+                <kbd class="px-1.5 py-0.5 rounded" style="background-color: var(--color-secondary, #FFE5B4)">1-4</kbd>{" "}
                 presets
               </span>
               <span class="opacity-40">•</span>
@@ -822,57 +603,16 @@ export default function Dropzone() {
 
       <style>
         {`
+        /* Processing overlay animation */
         @keyframes slide-right {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(200%); }
         }
-        @keyframes bounce-subtle {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-4px); }
-        }
         .animate-slide-right {
           animation: slide-right 1.5s ease-in-out infinite;
         }
-        .animate-bounce-subtle {
-          animation: bounce-subtle 0.5s ease-in-out;
-        }
-        .animation-delay-100 {
-          animation-delay: 0.1s;
-        }
-        .animation-delay-200 {
-          animation-delay: 0.2s;
-        }
-        .animation-delay-300 {
-          animation-delay: 0.3s;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 12px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #1a1a1a;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #00FF41;
-          border-radius: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #00CC33;
-        }
-        /* Spring physics for buttons on click */
-        button:active {
-          animation: spring 0.3s ease-out;
-        }
-        /* Smooth checkbox transitions */
-        input[type="checkbox"] {
-          transition: transform 0.2s ease-out;
-        }
-        input[type="checkbox"]:checked {
-          animation: spring 0.4s ease-out;
-        }
-        /* Range slider smooth updates */
-        input[type="range"] {
-          transition: transform 0.1s ease-out;
-        }
+
+        /* Smooth interactions */
         input[type="range"]:active {
           transform: scale(1.02);
         }

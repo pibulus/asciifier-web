@@ -58,7 +58,7 @@ export function AboutModal() {
     <>
       {/* Backdrop */}
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
         style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);"
         onClick={closeAboutModal}
         role="dialog"
@@ -67,25 +67,25 @@ export function AboutModal() {
       >
         {/* Modal */}
         <div
-          class="relative w-full max-w-3xl animate-modal-in"
+          class="relative w-full max-w-2xl max-h-[90vh] overflow-hidden animate-modal-in"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div
-            class="p-6 border-4 border-b-0 rounded-t-3xl"
+            class="p-4 sm:p-6 border-4 border-b-0 rounded-t-2xl sm:rounded-t-3xl"
             style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A)"
           >
-            <div class="flex items-start justify-between mb-2">
+            <div class="flex items-start justify-between mb-1 sm:mb-2">
               <h2
                 id="about-modal-title"
-                class="text-3xl font-bold font-mono"
+                class="text-xl sm:text-3xl font-bold font-mono"
                 style="color: var(--color-text, #0A0A0A)"
               >
                 About ASCIIFIER
               </h2>
               <button
                 onClick={closeAboutModal}
-                class="text-3xl leading-none font-bold transition-transform hover:scale-110"
+                class="text-2xl sm:text-3xl leading-none font-bold transition-transform hover:scale-110"
                 style="color: var(--color-text, #0A0A0A)"
                 aria-label="Close about dialog"
               >
@@ -93,21 +93,21 @@ export function AboutModal() {
               </button>
             </div>
             <p
-              class="text-lg font-mono font-bold"
+              class="text-sm sm:text-lg font-mono font-bold"
               style="color: var(--color-accent, #FF69B4)"
             >
               A love letter to text art 🌈
             </p>
           </div>
 
-          {/* Content */}
+          {/* Content - Scrollable */}
           <div
-            class="p-8 border-4 rounded-b-3xl shadow-brutal-xl space-y-6"
-            style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
+            class="p-4 sm:p-8 border-4 rounded-b-2xl sm:rounded-b-3xl shadow-brutal-xl space-y-4 sm:space-y-6 overflow-y-auto"
+            style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: calc(90vh - 140px);"
           >
             {/* Story */}
             <p
-              class="text-base sm:text-lg leading-relaxed"
+              class="text-sm sm:text-lg leading-relaxed"
               style="color: var(--color-text, #0A0A0A)"
             >
               I'm Pablo. I build tools with personality. This one celebrates
@@ -117,18 +117,18 @@ export function AboutModal() {
 
             {/* What it's for */}
             <div
-              class="py-4 px-4 border-2 rounded-xl space-y-2"
+              class="py-3 px-3 sm:py-4 sm:px-4 border-2 rounded-xl space-y-2"
               style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A)"
             >
               <p
-                class="text-sm sm:text-base font-medium"
+                class="text-xs sm:text-base font-medium"
                 style="color: var(--color-text, #0A0A0A)"
               >
                 Make signatures for forums. Turn your face into ASCII. Explore
                 the gallery of internet classics. Export and share anywhere.
               </p>
               <p
-                class="text-sm sm:text-base font-medium"
+                class="text-xs sm:text-base font-medium"
                 style="color: var(--color-text, #0A0A0A)"
               >
                 It's quick, it's fun, and it works forever. Free.
@@ -136,19 +136,19 @@ export function AboutModal() {
             </div>
 
             {/* Links */}
-            <div class="pt-2">
+            <div class="pt-1 sm:pt-2">
               <p
-                class="text-sm font-medium mb-3 text-center"
+                class="text-xs sm:text-sm font-medium mb-2 sm:mb-3 text-center"
                 style="color: var(--color-text, #0A0A0A)"
               >
                 Check out more of my work:
               </p>
-              <div class="flex flex-wrap gap-3 justify-center">
+              <div class="flex flex-wrap gap-2 sm:gap-3 justify-center">
                 <a
                   href="https://pibul.us"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
+                  class="inline-flex items-center gap-1 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 border-3 rounded-lg text-xs sm:text-base font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
                 >
                   🌐 Portfolio
@@ -157,7 +157,7 @@ export function AboutModal() {
                   href="https://github.com/pibulus"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="inline-flex items-center gap-2 px-4 py-2 border-3 rounded-lg font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
+                  class="inline-flex items-center gap-1 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 border-3 rounded-lg text-xs sm:text-base font-mono font-bold transition-all hover:scale-105 shadow-brutal-sm"
                   style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A)"
                 >
                   💻 GitHub
@@ -167,7 +167,7 @@ export function AboutModal() {
 
             {/* Footer */}
             <div
-              class="pt-4 text-center border-t-2"
+              class="pt-3 sm:pt-4 text-center border-t-2"
               style="border-color: var(--color-border, #0A0A0A)"
             >
               <p
@@ -180,7 +180,7 @@ export function AboutModal() {
           </div>
 
           {/* Footer hint */}
-          <div class="text-center mt-4">
+          <div class="text-center mt-2 sm:mt-4 hidden sm:block">
             <p
               class="text-xs font-mono opacity-60"
               style="color: var(--color-text, #0A0A0A)"
