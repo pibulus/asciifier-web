@@ -1,14 +1,10 @@
-import { computed, useSignal } from "@preact/signals";
+import { useSignal } from "@preact/signals";
 import { useEffect, useRef, useState } from "preact/hooks";
 import {
   ImageProcessor,
   type ProcessOptions,
 } from "../utils/image-processor.ts";
-import {
-  CHARACTER_SETS,
-  type CharacterStyle,
-  STYLE_DESCRIPTIONS,
-} from "../utils/character-sets.ts";
+import { type CharacterStyle } from "../utils/character-sets.ts";
 import { sounds } from "../utils/sounds.ts";
 import { easterEggs } from "../utils/easter-eggs.ts";
 import { analytics } from "../utils/analytics.ts";
@@ -104,14 +100,26 @@ export default function Dropzone() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const processor = useRef(new ImageProcessor());
   const updateTimeoutRef = useRef<number | null>(null);
+  const isMountedRef = useRef(true);
+  const processRequestRef = useRef(0);
 
   // Detect mobile device
   useEffect(() => {
+    isMountedRef.current = true;
+
     if (typeof window !== "undefined") {
       // Modern best practice: check for touch points instead of userAgent
       const isTouchDevice = navigator.maxTouchPoints > 0;
       setIsMobile(isTouchDevice);
     }
+
+    return () => {
+      isMountedRef.current = false;
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+        updateTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   // Handle keyboard shortcuts
@@ -134,8 +142,8 @@ export default function Dropzone() {
       }
     };
 
-    window.addEventListener("keydown", handleKeyboard);
-    return () => window.removeEventListener("keydown", handleKeyboard);
+    globalThis.addEventListener("keydown", handleKeyboard);
+    return () => globalThis.removeEventListener("keydown", handleKeyboard);
   }, [imageLoaded]);
 
   const handleDragOver = (e: DragEvent) => {
@@ -194,6 +202,7 @@ export default function Dropzone() {
   };
 
   const processImage = async (file: File) => {
+    const requestId = ++processRequestRef.current;
     setIsProcessing(true);
     setCurrentImage(file);
 
@@ -221,12 +230,20 @@ export default function Dropzone() {
       // Maybe add secret watermark
       formatted = easterEggs.addSecretWatermark(formatted);
 
+      if (!isMountedRef.current || requestId !== processRequestRef.current) {
+        return;
+      }
+
       setAsciiOutput(formatted);
       setHtmlOutput(formatted); // Store HTML version for TerminalDisplay
       setImageLoaded(true);
       sounds.success();
       analytics.trackImageConverted(file.size, true);
     } catch (error) {
+      if (!isMountedRef.current || requestId !== processRequestRef.current) {
+        return;
+      }
+
       console.error("Error processing image:", error);
       showToast("Failed to process image. Please try another file.", "error");
       sounds.error();
@@ -236,7 +253,9 @@ export default function Dropzone() {
         error instanceof Error ? error.message : "unknown",
       );
     } finally {
-      setIsProcessing(false);
+      if (isMountedRef.current && requestId === processRequestRef.current) {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -248,7 +267,7 @@ export default function Dropzone() {
       clearTimeout(updateTimeoutRef.current);
     }
 
-    updateTimeoutRef.current = window.setTimeout(() => {
+    updateTimeoutRef.current = globalThis.setTimeout(() => {
       reprocess();
     }, 150); // Small delay for smooth updates
   };
@@ -277,6 +296,7 @@ export default function Dropzone() {
   };
 
   const handleReset = () => {
+    processRequestRef.current++;
     sounds.click();
     setImageLoaded(false);
     setAsciiOutput("");
@@ -303,8 +323,8 @@ export default function Dropzone() {
   // Add paste event listener
   useEffect(() => {
     if (typeof window !== "undefined") {
-      window.addEventListener("paste", handlePaste);
-      return () => window.removeEventListener("paste", handlePaste);
+      globalThis.addEventListener("paste", handlePaste);
+      return () => globalThis.removeEventListener("paste", handlePaste);
     }
   }, []);
 
@@ -365,15 +385,14 @@ export default function Dropzone() {
                 <span style="--char-index: 2">t</span>
                 <span style="--char-index: 3">o</span>
                 <span style="--char-index: 4">&nbsp;</span>
-                <span style="--char-index: 5">A</span>
-                <span style="--char-index: 6">S</span>
-                <span style="--char-index: 7">C</span>
-                <span style="--char-index: 8">I</span>
-                <span style="--char-index: 9">I</span>
-                <span style="--char-index: 10">&nbsp;</span>
-                <span style="--char-index: 11">a</span>
-                <span style="--char-index: 12">r</span>
-                <span style="--char-index: 13">t</span>
+                <span style="--char-index: 5">t</span>
+                <span style="--char-index: 6">e</span>
+                <span style="--char-index: 7">x</span>
+                <span style="--char-index: 8">t</span>
+                <span style="--char-index: 9">&nbsp;</span>
+                <span style="--char-index: 10">a</span>
+                <span style="--char-index: 11">r</span>
+                <span style="--char-index: 12">t</span>
               </span>
             </h2>
           </div>
@@ -428,6 +447,7 @@ export default function Dropzone() {
           {isMobile && (
             <div class="flex flex-col gap-3 items-stretch justify-center">
               <button
+                type="button"
                 onClick={() => cameraInputRef.current?.click()}
                 class="group px-6 py-4 border-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-brutal hover:shadow-brutal-lg hover:scale-105 active:scale-95 animate-pulse-soft"
                 style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
@@ -459,7 +479,7 @@ export default function Dropzone() {
           {/* ASCII Output - Priority #1! */}
           <TerminalDisplay
             content={asciiOutput.replace(/<[^>]*>/g, "")}
-            htmlContent={htmlOutput}
+            htmlContent={htmlOutput.includes("<span") ? htmlOutput : undefined}
             isLoading={isProcessing}
             filename="image-ascii-art"
             terminalPath="~/output/image-art.txt"
@@ -469,7 +489,7 @@ export default function Dropzone() {
           {/* Compact Controls - Below Output */}
           <div class="space-y-4 md:space-y-6">
             {/* Three Magic Dropdowns - Match TextToAscii layout */}
-            <div class="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
               <MagicDropdown
                 label="Style"
                 options={STYLE_OPTIONS}
@@ -531,7 +551,10 @@ export default function Dropzone() {
                   if (Math.random() < 0.1) sounds.slide(value);
                 }}
               />
-              <div class="flex justify-between text-xs font-mono opacity-60 mt-2" style="color: var(--color-text, #0A0A0A)">
+              <div
+                class="flex justify-between text-xs font-mono opacity-60 mt-2"
+                style="color: var(--color-text, #0A0A0A)"
+              >
                 <span>smol</span>
                 <span>just right</span>
                 <span>thicc</span>
@@ -546,7 +569,8 @@ export default function Dropzone() {
                   checked={invertBrightness.value}
                   onChange={(e) => {
                     sounds.toggle();
-                    invertBrightness.value = (e.target as HTMLInputElement).checked;
+                    invertBrightness.value =
+                      (e.target as HTMLInputElement).checked;
                   }}
                   class="w-5 h-5 group-hover:animate-wiggle"
                   style="accent-color: var(--color-accent, #FF69B4)"
@@ -560,6 +584,7 @@ export default function Dropzone() {
               </label>
 
               <button
+                type="button"
                 onClick={handleReset}
                 class="px-6 py-3 md:px-8 md:py-4 border-4 rounded-2xl font-mono font-black text-sm md:text-base shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all active:scale-95"
                 style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
@@ -569,14 +594,26 @@ export default function Dropzone() {
             </div>
 
             {/* Keyboard Shortcuts Help */}
-            <div class="text-xs font-mono opacity-60 text-center space-x-4" style="color: var(--color-text, #0A0A0A)">
+            <div
+              class="text-xs font-mono opacity-60 text-center space-x-4"
+              style="color: var(--color-text, #0A0A0A)"
+            >
               <span>
-                <kbd class="px-1.5 py-0.5 rounded" style="background-color: var(--color-secondary, #FFE5B4)">Cmd+Z</kbd>
-                {" "}
+                <kbd
+                  class="px-1.5 py-0.5 rounded"
+                  style="background-color: var(--color-secondary, #FFE5B4)"
+                >
+                  Cmd+Z
+                </kbd>{" "}
                 reset
               </span>
               <span>
-                <kbd class="px-1.5 py-0.5 rounded" style="background-color: var(--color-secondary, #FFE5B4)">1-4</kbd>{" "}
+                <kbd
+                  class="px-1.5 py-0.5 rounded"
+                  style="background-color: var(--color-secondary, #FFE5B4)"
+                >
+                  1-4
+                </kbd>{" "}
                 presets
               </span>
               <span class="opacity-40">•</span>

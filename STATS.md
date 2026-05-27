@@ -51,10 +51,11 @@ Generated: 2025-10-01 19:54:23
 
 ## Setup
 
-Make sure your `.env` file has PostHog credentials:
+Make sure your `.env` file has PostHog credentials. Analytics are optional; if
+`POSTHOG_KEY` is missing, the app skips PostHog initialization.
 
 ```env
-POSTHOG_KEY=phc_jGhmUYUdDhjQhbGBTare6Jvca3gXxN7ap4CRn5GKwHl
+POSTHOG_KEY=phc_your_public_project_key
 POSTHOG_HOST=https://us.i.posthog.com
 ```
 

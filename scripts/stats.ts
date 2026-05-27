@@ -18,11 +18,25 @@ if (!POSTHOG_KEY) {
 
 const DAYS = parseInt(Deno.args[0] || "7");
 
+interface PostHogEvent {
+  event: string;
+  timestamp: string;
+  properties?: Record<string, unknown>;
+}
+
 // ASCII bar chart generator
 function renderBar(value: number, max: number, width = 20): string {
   const filled = Math.round((value / max) * width);
   const empty = width - filled;
   return "█".repeat(filled) + "░".repeat(empty);
+}
+
+function getStringProperty(
+  properties: Record<string, unknown> | undefined,
+  key: string,
+): string | null {
+  const value = properties?.[key];
+  return typeof value === "string" ? value : null;
 }
 
 // Fetch events from PostHog
@@ -39,7 +53,7 @@ async function getEvents() {
     throw new Error(`PostHog API error: ${response.statusText}`);
   }
 
-  const data = await response.json();
+  const data = await response.json() as { results?: PostHogEvent[] };
   return data.results || [];
 }
 
@@ -52,7 +66,7 @@ async function getStats() {
 
     // Filter to last N days
     const cutoff = Date.now() - (DAYS * 24 * 60 * 60 * 1000);
-    const recentEvents = events.filter((e: any) =>
+    const recentEvents = events.filter((e) =>
       new Date(e.timestamp).getTime() > cutoff
     );
 
@@ -68,23 +82,23 @@ async function getStats() {
       eventCounts[eventName] = (eventCounts[eventName] || 0) + 1;
 
       // Track specific properties
-      if (eventName === "export_clicked" && event.properties?.format) {
-        const format = event.properties.format;
+      const format = getStringProperty(event.properties, "format");
+      if (eventName === "export_clicked" && format) {
         exportFormats[format] = (exportFormats[format] || 0) + 1;
       }
 
-      if (eventName === "theme_changed" && event.properties?.to_theme) {
-        const theme = event.properties.to_theme;
+      const theme = getStringProperty(event.properties, "to_theme");
+      if (eventName === "theme_changed" && theme) {
         themes[theme] = (themes[theme] || 0) + 1;
       }
 
-      if (eventName === "ascii_generated" && event.properties?.font) {
-        const font = event.properties.font;
+      const font = getStringProperty(event.properties, "font");
+      if (eventName === "ascii_generated" && font) {
         fonts[font] = (fonts[font] || 0) + 1;
       }
 
-      if (eventName === "ascii_generated" && event.properties?.effect) {
-        const effect = event.properties.effect;
+      const effect = getStringProperty(event.properties, "effect");
+      if (eventName === "ascii_generated" && effect) {
         if (effect !== "none") {
           effects[effect] = (effects[effect] || 0) + 1;
         }

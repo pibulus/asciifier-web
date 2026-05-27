@@ -109,6 +109,7 @@ export default function ThemeIsland() {
     <div class="relative" ref={dropdownRef}>
       {/* Theme Toggle Button */}
       <button
+        type="button"
         onClick={() => setShowPicker(!showPicker)}
         onMouseEnter={() => sounds.hover()}
         aria-label="Open theme picker"
@@ -132,6 +133,7 @@ export default function ThemeIsland() {
             <div class="space-y-3">
               {themes.map((theme) => (
                 <button
+                  type="button"
                   key={theme.name}
                   onClick={() => handleThemeChange(theme)}
                   onMouseEnter={() => sounds.hover()}
@@ -174,6 +176,7 @@ export default function ThemeIsland() {
 
             {/* Smart Random Theme Button - smaller and elegant */}
             <button
+              type="button"
               onClick={generateRandomTheme}
               aria-label="Generate random theme"
               class="w-full px-3 py-1.5 rounded-lg text-xs font-mono hover:scale-[1.02] transition-all"

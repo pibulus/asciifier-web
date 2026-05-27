@@ -1,34 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Main Page -->
   <url>
     <loc>https://asciifier.app</loc>
-    <lastmod>2025-01-18</lastmod>
+    <lastmod>2026-05-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Text to ASCII Tab -->
   <url>
-    <loc>https://asciifier.app/?tab=text</loc>
-    <lastmod>2025-01-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Image to ASCII Tab -->
-  <url>
-    <loc>https://asciifier.app/?tab=image</loc>
-    <lastmod>2025-01-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Gallery Tab -->
-  <url>
-    <loc>https://asciifier.app/?tab=gallery</loc>
-    <lastmod>2025-01-18</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <loc>https://asciifier.app/thanks</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

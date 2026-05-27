@@ -18,6 +18,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
         style="border-color: var(--color-border, #0A0A0A)"
       >
         <button
+          type="button"
           onClick={() => handleTabChange("image")}
           aria-label="Switch to image to ASCII converter"
           class={`px-4 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-sm sm:text-sm md:text-base transition-all duration-200 ${
@@ -39,6 +40,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
         >
         </div>
         <button
+          type="button"
           onClick={() => handleTabChange("text")}
           aria-label="Switch to text to ASCII converter"
           class={`px-4 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-sm sm:text-sm md:text-base transition-all duration-200 ${
@@ -60,6 +62,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
         >
         </div>
         <button
+          type="button"
           onClick={() => handleTabChange("gallery")}
           aria-label="Switch to ASCII art gallery"
           class={`px-4 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-sm sm:text-sm md:text-base transition-all duration-200 ${

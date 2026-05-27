@@ -1,235 +1,143 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with
-code in this repository.
+This file gives Claude Code and other coding agents the working map for this
+repository. Keep `README.md`, `GLOSSARY.md`, and `TINKER.md` in sync when the
+architecture changes.
 
-## 📁 Repository Overview
+## Repository Overview
 
-**ASCIIFIER-WEB** is Pablo's revolutionary ASCII art generator web application
-that brings terminal magic to browsers. This project represents a breakthrough
-in architecture: running server-side terminal tools (Figlet + LolcatJS) through
-web APIs to create rich, colorful ASCII art experiences.
+ASCIIFIER Web is a Deno/Fresh ASCII art app. It converts:
 
-## 🏗 Project Architecture & Key Innovation
+- images to ASCII in the browser,
+- typed text to Figlet ASCII through a Fresh API route,
+- curated museum samples to displayable, colorized, exportable terminal output.
 
-### The Rainbow Wizard Architecture™
+The current architecture is:
 
-This project pioneered a revolutionary approach: **Server-side ASCII generation
-→ Custom HSL color effects → Rich browser UI**
+`Fresh routes -> hydrated islands -> shared terminal/export components -> utils`
 
-**Why This Is Genius:**
+## Current Stack
 
-- **Figlet** runs server-side for ASCII art generation
-- **Custom HSL gradients** (NOT lolcat) create vibrant color effects
-- Effects like "unicorn", "fire", "cyberpunk" use pure HSL color math
-- Colors converted to HTML `<span style="color: ...">` for browsers
-- Rich Gmail paste compatibility with embedded styling
-- No terminal dependency for colors - works perfectly in browsers
-- Full power of figlet + mathematical color beauty
+- Framework: Deno/Fresh 1.7 with Preact islands.
+- Styling: Tailwind plus CSS custom properties.
+- Text ASCII: `figlet` in `routes/api/enhanced-figlet.ts`.
+- Image ASCII: browser-side canvas/image processing in
+  `utils/image-processor.ts`.
+- Exports: clipboard, TXT, and PNG via `utils/exportUtils.ts`.
+- Analytics: optional PostHog client loaded only when `POSTHOG_KEY` exists.
+- Deployment: Deno Deploy through `.github/workflows/deploy.yml`.
+- Local port: `8001`.
 
-### Tech Stack
+`lolcatjs` is still listed as a dependency, but the active browser color effects
+are custom HSL span generation, not a `/api/colorize` route.
 
-- **Framework**: Deno/Fresh with Islands architecture
-- **Server Tools**: Figlet (ASCII art generation) + LolcatJS (rainbow effects)
-- **Styling**: Tailwind CSS with CSS custom properties for theming
-- **Deployment**: Deno Deploy ready
-- **Port**: 8001 (development)
+## Source Map
 
-## 🎯 Core Features
-
-1. **Text to ASCII Art**: Multiple figlet fonts with rainbow colorization
-2. **Image to ASCII**: Upload images, convert to ASCII art
-3. **Color Effects**: Rainbow, fire, ocean, unicorn, matrix effects via lolcat
-4. **Dynamic Themes**: Pastel-punk, brutalist dark, retro wave
-5. **Export Options**: Plain text, HTML, clipboard copy
-6. **Sound Effects**: UI feedback with terminal-inspired sounds
-
-## 🗂 File Structure & Conventions
-
-### Directory Layout
-
-```
+```text
 asciifier-web/
-├── routes/           # Fresh routes (pages + API)
-├── islands/          # Interactive client components
-├── utils/            # Core business logic
-├── static/           # CSS, assets
-├── components/       # Shared UI components
-└── deno.json        # Dependencies & task configuration
+├── routes/
+│   ├── index.tsx                  # App shell and tab container
+│   ├── _app.tsx                   # HTML head, env bridge, service worker setup
+│   ├── thanks.tsx                 # Ko-fi/support thank-you route
+│   └── api/
+│       ├── enhanced-figlet.ts     # Text -> Figlet ASCII API
+│       ├── random-ascii-art.ts    # Museum/local collection API
+│       └── joke.ts                # Legacy joke endpoint
+├── islands/
+│   ├── Dropzone.tsx               # Image upload/paste/camera conversion
+│   ├── TextToAscii.tsx            # Text controls and Figlet API caller
+│   ├── AsciiGallery.tsx           # Museum/category/search UI
+│   ├── TabsIsland.tsx             # Active tab content
+│   ├── TabSwitcher.tsx            # Tab buttons
+│   ├── ThemeIsland.tsx            # Theme picker
+│   ├── WelcomeChecker.tsx         # First-visit welcome trigger
+│   ├── WelcomeModal.tsx           # Welcome modal
+│   ├── AboutModal.tsx             # About modal and link
+│   ├── KofiModal.tsx              # Support modal/button
+│   └── ThanksPage.tsx             # Support thank-you page island
+├── components/
+│   ├── TerminalDisplay.tsx        # Shared terminal output and export controls
+│   ├── MagicDropdown.tsx          # Shared dropdown control
+│   ├── Toast.tsx                  # Toast store/container
+│   └── Button.tsx                 # Small shared button
+├── utils/
+│   ├── ascii-collection.ts        # Local museum starter art
+│   ├── constants.ts               # Shared dropdown options/categories
+│   ├── colorEffects.ts            # HSL color span utilities
+│   ├── exportUtils.ts             # Clipboard/TXT/PNG export helpers
+│   ├── image-processor.ts         # Image -> ASCII conversion
+│   ├── analytics.ts               # Optional PostHog wrapper
+│   ├── html.ts                    # HTML escaping helpers
+│   ├── themes.ts                  # App theme configuration
+│   ├── sounds.ts                  # UI sound effects
+│   ├── easter-eggs.ts             # Small interaction extras
+│   └── simple-typewriter.js       # Typewriter audio helper
+├── static/                        # CSS, PWA files, icons, sounds
+├── theme-system/                  # Reusable theme engine
+└── deno.json                      # Tasks, imports, lint settings
 ```
 
-### Key Files
+## Core Flows
 
-- **routes/index.tsx**: Main application UI
-- **routes/api/figlet.ts**: Core ASCII generation API
-- **routes/api/colorize.ts**: Lolcat color effects API
-- **islands/TextToAscii.tsx**: Text input interface
-- **islands/Dropzone.tsx**: Image upload interface
-- **utils/themes.ts**: Theme system & CSS variables
+### Image to ASCII
 
-## 🛠 Development Commands
+`Dropzone.tsx` accepts a file, pasted image, drag/drop image, or camera capture.
+It calls `ImageProcessor` directly in the browser, then passes plain/HTML output
+to `TerminalDisplay`.
+
+### Text to ASCII
+
+`TextToAscii.tsx` posts text, font, color effect, and border style to
+`/api/enhanced-figlet`. The route validates the font/effect/border, runs Figlet,
+applies optional border and HSL color spans, then returns plain ASCII and HTML.
+
+### ASCII Museum
+
+`AsciiGallery.tsx` uses categories from `utils/constants.ts` and local art from
+`utils/ascii-collection.ts` through `/api/random-ascii-art`.
+
+The museum intentionally does not scrape asciiart.eu. Categories link out to the
+archive, and unmatched searches return a source-only card instead of pretending
+to have downloadable art.
+
+### Export
+
+`TerminalDisplay` owns the shared copy/TXT/PNG buttons. `exportUtils.ts` strips
+HTML/ANSI for TXT, writes rich HTML for clipboard where supported, and captures
+PNG with `html-to-image`.
+
+## Development Commands
 
 ```bash
-# Start development server (port 8001)
 deno task start
-
-# Production build
-deno task build
-
-# Format, lint, and type check
 deno task check
-
-# Generate Fresh manifest
-deno task manifest
-
-# Preview production build
-deno task preview
-```
-
-## 🎨 Design Philosophy & Style
-
-### Pablo's Aesthetic DNA
-
-- **Pastel-Punk Brutalism**: Soft colors, chunky 4px borders, hard shadows
-- **Rainbow Wizard Energy**: Colorful, magical, joyful ASCII art
-- **80/20 Principle**: Essential features that spark joy
-- **Neo-Toybrut Design**: Playful, approachable, personality-driven
-
-### Code Style
-
-- **Fresh Islands**: Interactive components as islands
-- **CSS Custom Properties**: Dynamic theming with `--color-*` variables
-- **TypeScript**: Full type safety with strict mode
-- **Server-First**: Core logic runs server-side for performance
-
-## 🔌 API Architecture
-
-### Core Endpoints
-
-- **POST /api/enhanced-figlet**: Text → ASCII art with fonts + HSL color effects
-- **GET /api/random-ascii-art**: Random ASCII art from curated collection
-- **POST /api/image-to-ascii**: Image → ASCII art (via ImageProcessor)
-
-### Revolutionary Approach
-
-- **Figlet** runs server-side in Deno runtime
-- **Custom HSL math** generates color gradients (lines 169-265 in
-  enhanced-figlet.ts)
-- Effects: unicorn, fire, cyberpunk, sunrise, vaporwave, angel, chrome
-- Rich clipboard formats for Gmail pasting
-- Full font selection without client-side dependencies
-- Random ASCII art can be colorized on-the-fly in browser
-
-## 🚀 Deployment & Production
-
-### Deno Deploy Setup
-
-```bash
-# First deployment (adds project ID to deno.json)
-deployctl deploy --production
-
-# Subsequent deployments
 deno task build
-deployctl deploy --prod
+deno task preview
+deno task manifest
 ```
 
-### Environment Variables
+`deno task start` and `deno task dev` both run on port `8001` and watch:
+`static/`, `routes/`, `islands/`, `components/`, `utils/`, and `theme-system/`.
 
-- `PORT`: Development server port (default: 8001)
-- Deno Deploy handles production environment automatically
+## Deployment
 
-## 🧩 Common Development Patterns
+GitHub Actions builds and deploys with Deno Deploy:
 
-### Adding New Figlet Fonts
-
-1. Update font options in `routes/api/figlet.ts`
-2. Add to frontend dropdown in text input components
-3. Test with various text inputs
-
-### Creating New Color Effects
-
-1. Add effect name to type definition in `routes/api/colorize.ts`
-2. Implement effect logic in switch statement
-3. Update frontend effect selector
-
-### Theme System Usage
-
-```typescript
-// In utils/themes.ts
-export const newTheme = {
-  name: "New Theme",
-  colors: {
-    "--color-base": "#FFFFFF",
-    "--color-accent": "#FF69B4",
-  },
-};
+```text
+.github/workflows/deploy.yml
+project: asciifier
+entrypoint: main.ts
 ```
 
-## 🎭 Project Character & Personality
+Set `POSTHOG_KEY` and `POSTHOG_HOST` in the deployment environment if analytics
+should be active.
 
-### The Rainbow ASCII Legend
+## Maintenance Notes
 
-This project emerged from a legendary breakthrough session where Pablo
-discovered how to bring terminal magic to browsers. The moment of "server-side
-terminal tools in browser = GENIUS architecture" became the foundation for a new
-approach to web applications.
-
-### Core Values
-
-- **Compression > Complexity**: Essential ASCII magic, nothing more
-- **Joy First**: Every interaction should spark delight
-- **Terminal Heritage**: Honor the beauty of command-line tools
-- **Accessibility**: ASCII art works everywhere
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-1. **Port 8001 in use**: `lsof -i :8001` then `kill -9 PID`
-2. **Fresh manifest errors**: `deno task manifest` to regenerate
-3. **Dependency issues**: `rm deno.lock` and restart
-4. **Color effects broken**: Check lolcat import in colorize API
-
-### Debug Commands
-
-```bash
-# Check server health
-curl http://localhost:8001/api/joke
-
-# Test figlet API
-curl -X POST -H "Content-Type: application/json" \
-  -d '{"text":"TEST","font":"big","colorize":true}' \
-  http://localhost:8001/api/figlet
-```
-
-## 📚 Technical References
-
-### Dependencies
-
-- **Fresh**: Modern Deno web framework
-- **Figlet**: ASCII art generation (npm:figlet@^1.7.0)
-- **LolcatJS**: Rainbow text effects (npm:lolcatjs@^2.4.3)
-- **Tailwind**: Utility-first CSS framework
-- **Preact**: Lightweight React alternative
-
-### Architecture Patterns
-
-- **Islands**: Interactive components hydrate on client
-- **API Routes**: Server-side logic in Fresh routes/api/
-- **CSS Variables**: Dynamic theming without JS
-- **Signals**: Preact signals for reactive state
-
----
-
-## 🌟 The Legacy
-
-This project represents a breakthrough in web architecture: proving that
-terminal tools can be beautifully integrated into modern web experiences without
-sacrificing their power or character. The Rainbow Wizard Architecture pioneered
-here opens new possibilities for bringing command-line magic to browser
-interfaces.
-
-**"Server-side terminal tools in browsers = Revolutionary architecture!"** 🌈⚡
-
-_Built with 80/20 energy during the legendary Rainbow ASCII breakthrough
-session_
+- Run `deno task check` before shipping.
+- Run `deno task manifest` after adding or removing Fresh routes/islands.
+- Keep `README.md`, `GLOSSARY.md`, and `TINKER.md` aligned with route/island
+  changes.
+- Do not treat `_fresh/` or `node_modules/` as source.
+- On localhost, `_app.tsx` unregisters service workers so local UI changes do
+  not get trapped behind stale caches.

@@ -20,8 +20,12 @@ html {
   overflow-y: scroll;
 }
 
-/* Global theme transitions */
-* {
+/* Theme transitions scoped to common UI surfaces, not every painted node. */
+button,
+a,
+input,
+select,
+textarea {
   transition:
     background-color 0.3s ease,
     color 0.3s ease,
@@ -81,7 +85,8 @@ html::-webkit-scrollbar-thumb:hover {
 
   .ascii-display {
     font-family: "JetBrains Mono", "Courier New", monospace;
-    letter-spacing: 0.05em;
+    letter-spacing: 0;
+    font-variant-ligatures: none;
     line-height: 1.2;
     white-space: pre;
     overflow-wrap: normal;
@@ -132,5 +137,16 @@ html::-webkit-scrollbar-thumb:hover {
     75% {
       transform: translateY(-6px) rotate(1deg);
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

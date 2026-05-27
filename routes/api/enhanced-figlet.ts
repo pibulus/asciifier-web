@@ -1,4 +1,5 @@
 import { FreshContext } from "$fresh/server.ts";
+import { escapeHtml } from "../../utils/html.ts";
 
 interface AsciiArtRequest {
   text: string;
@@ -13,17 +14,76 @@ interface AsciiArtRequest {
     | "blink"
     | "inverse";
   color?: string; // Color name or hex
-  borderStyle?: "single" | "double" | "block" | "angles" | "round";
+  borderStyle?: "none" | "single" | "double" | "block" | "angles" | "round";
   effect?:
+    | "none"
     | "rainbow"
     | "fire"
     | "ocean"
     | "unicorn"
     | "matrix"
     | "metal"
-    | "chrome";
+    | "chrome"
+    | "angel"
+    | "sunrise"
+    | "cyberpunk"
+    | "vaporwave"
+    | "neon"
+    | "poison";
   width?: number; // Control output width
 }
+
+interface FigletOptions {
+  font: string;
+  horizontalLayout: "fitted";
+  verticalLayout: "fitted";
+}
+
+interface FigletFunction {
+  (
+    text: string,
+    options: FigletOptions,
+    callback: (err: Error | null, data?: string) => void,
+  ): void;
+  fontsSync?: () => string[];
+  textSync?: (text: string, options: FigletOptions) => string;
+}
+
+type FigletModule = FigletFunction & { default?: FigletFunction };
+
+interface BorderChars {
+  tl: string;
+  tr: string;
+  bl: string;
+  br: string;
+  h: string;
+  v: string;
+}
+
+const VALID_EFFECTS = new Set([
+  "none",
+  "rainbow",
+  "fire",
+  "ocean",
+  "unicorn",
+  "matrix",
+  "chrome",
+  "angel",
+  "sunrise",
+  "cyberpunk",
+  "vaporwave",
+  "neon",
+  "poison",
+]);
+
+const VALID_BORDERS = new Set([
+  "none",
+  "single",
+  "double",
+  "block",
+  "angles",
+  "round",
+]);
 
 export const handler = async (
   req: Request,
@@ -38,16 +98,22 @@ export const handler = async (
     const {
       text,
       font = "Doom",
-      style,
       color = "#00FF41",
       borderStyle,
       effect = "none",
-      width = 80,
     } = await req.json() as AsciiArtRequest;
+    const safeEffect = VALID_EFFECTS.has(effect) ? effect : "none";
+    const safeBorderStyle = borderStyle && VALID_BORDERS.has(borderStyle)
+      ? borderStyle
+      : "none";
+    const safeColor = sanitizeCssColor(color);
 
     // Validate input
     if (!text || typeof text !== "string") {
-      return new Response("Invalid text input", { status: 400 });
+      return jsonResponse(
+        { success: false, error: "Invalid text input" },
+        400,
+      );
     }
 
     // Limit text length for performance
@@ -57,7 +123,7 @@ export const handler = async (
     let result: string;
 
     try {
-      const figletModule = await import("figlet");
+      const figletModule = await import("figlet") as unknown as FigletModule;
       const figlet = figletModule.default || figletModule;
 
       // Get all available fonts dynamically from figlet
@@ -69,16 +135,16 @@ export const handler = async (
       // Generate ASCII art with figlet
       result = figlet.textSync
         ? figlet.textSync(limitedText, {
-          font: safeFont as any,
+          font: safeFont,
           horizontalLayout: "fitted",
           verticalLayout: "fitted",
         })
         : await new Promise((resolve, reject) => {
           figlet(limitedText, {
-            font: safeFont as any,
+            font: safeFont,
             horizontalLayout: "fitted",
             verticalLayout: "fitted",
-          }, (err: any, data: string) => {
+          }, (err, data) => {
             if (err) {
               console.error(`Font ${safeFont} failed, using fallback`);
               // Try with Standard font as ultimate fallback
@@ -86,12 +152,12 @@ export const handler = async (
                 font: "Standard",
                 horizontalLayout: "fitted",
                 verticalLayout: "fitted",
-              }, (err2: any, data2: string) => {
+              }, (err2, data2) => {
                 if (err2) reject(err2);
-                else resolve(data2);
+                else resolve(data2 ?? "");
               });
             } else {
-              resolve(data);
+              resolve(data ?? "");
             }
           });
         });
@@ -105,13 +171,13 @@ ${"─".repeat(limitedText.length + 2)}`;
 
     // Apply border if requested - using manual implementation for reliability
     let borderedResult = result;
-    if (borderStyle && borderStyle !== "none") {
+    if (safeBorderStyle !== "none") {
       // Manual border implementation that always works
       const lines = result.split("\n");
       const maxLength = Math.max(...lines.map((l) => l.length));
 
       // Border characters based on style
-      const borders: Record<string, any> = {
+      const borders: Record<string, BorderChars> = {
         "single": { tl: "┌", tr: "┐", bl: "└", br: "┘", h: "─", v: "│" },
         "double": { tl: "╔", tr: "╗", bl: "╚", br: "╝", h: "═", v: "║" },
         "block": { tl: "█", tr: "█", bl: "█", br: "█", h: "█", v: "█" },
@@ -119,7 +185,7 @@ ${"─".repeat(limitedText.length + 2)}`;
         "round": { tl: "╭", tr: "╮", bl: "╰", br: "╯", h: "─", v: "│" },
       };
 
-      const b = borders[borderStyle] || borders["single"];
+      const b = borders[safeBorderStyle] || borders["single"];
       const horizontalBorder = b.h.repeat(maxLength + 2);
 
       borderedResult = [
@@ -131,49 +197,60 @@ ${"─".repeat(limitedText.length + 2)}`;
 
     // Apply color effects
     let htmlResult = borderedResult;
-    if (effect !== "none") {
-      htmlResult = applyColorEffect(borderedResult, effect, color);
-    } else if (color && color !== "#00FF41") {
+    if (safeEffect !== "none") {
+      htmlResult = applyColorEffect(borderedResult, safeEffect);
+    } else if (safeColor && safeColor !== "#00FF41") {
       // Apply solid color
-      htmlResult = `<span style="color: ${color};">${borderedResult}</span>`;
+      htmlResult = `<span style="color: ${safeColor};">${
+        escapeHtml(borderedResult)
+      }</span>`;
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        ascii: borderedResult,
-        html: htmlResult,
-        plain: result,
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
+    return jsonResponse({
+      success: true,
+      ascii: borderedResult,
+      html: htmlResult,
+      plain: result,
+      effect: safeEffect,
+      borderStyle: safeBorderStyle,
+    });
   } catch (error) {
     console.error("ASCII Art API error:", error);
-    return new Response(
-      JSON.stringify({ success: false, error: "Failed to generate ASCII art" }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
+    return jsonResponse(
+      { success: false, error: "Failed to generate ASCII art" },
+      500,
     );
   }
 };
+
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+function sanitizeCssColor(value?: string): string {
+  if (!value) return "#00FF41";
+  if (/^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(value)) {
+    return value;
+  }
+  if (/^[a-zA-Z]+$/.test(value)) {
+    return value;
+  }
+  return "#00FF41";
+}
 
 // Apply color effects to ASCII art
 function applyColorEffect(
   text: string,
   effect: string,
-  baseColor: string,
 ): string {
   const lines = text.split("\n");
   const colorizedLines: string[] = [];
+  const widestLine = Math.max(1, ...lines.map((line) => line.length));
 
   for (let y = 0; y < lines.length; y++) {
     const line = lines[y];
@@ -185,8 +262,10 @@ function applyColorEffect(
       if (char === " " || char === "") {
         colorizedLine += char;
       } else {
-        const color = getEffectColor(effect, x, y, line.length, lines.length);
-        colorizedLine += `<span style="color: ${color};">${char}</span>`;
+        const color = getEffectColor(effect, x, y, widestLine, lines.length);
+        colorizedLine += `<span style="color: ${color};">${
+          escapeHtml(char)
+        }</span>`;
       }
     }
     colorizedLines.push(colorizedLine);
@@ -203,77 +282,100 @@ function getEffectColor(
   lineWidth: number,
   totalLines: number,
 ): string {
+  const safeLineWidth = Math.max(1, lineWidth);
+  const safeTotalLines = Math.max(1, totalLines);
+
   switch (effect) {
-    case "unicorn":
+    case "rainbow": {
+      const rainbowHue = ((x * 18) + (y * 24)) % 360;
+      return `hsl(${rainbowHue}, 90%, 60%)`;
+    }
+
+    case "matrix": {
+      const matrixBright = 45 + Math.sin((x + y) * 0.8) * 18;
+      return `hsl(132, 100%, ${matrixBright}%)`;
+    }
+
+    case "unicorn": {
       // Pastel rainbow - soft, magical
-      const unicornHue = (x * 360 / lineWidth) % 360;
+      const unicornHue = (x * 360 / safeLineWidth) % 360;
       return `hsl(${unicornHue}, 85%, 75%)`;
+    }
 
-    case "fire":
+    case "fire": {
       // Fire gradient - red to yellow
-      const fireHue = 60 - (y * 60 / totalLines);
-      const fireSat = 100 - (y * 20 / totalLines);
+      const fireHue = 60 - (y * 60 / safeTotalLines);
+      const fireSat = 100 - (y * 20 / safeTotalLines);
       return `hsl(${fireHue}, ${fireSat}%, 50%)`;
+    }
 
-    case "angel":
+    case "angel": {
       // Angel - lush whites with soft gold/blue shimmer
-      const angelProgress = (x + y) / (lineWidth + totalLines);
+      const angelProgress = (x + y) / (safeLineWidth + safeTotalLines);
       const angelHue = 45 + Math.sin(angelProgress * 8) * 15; // Soft gold shimmer (30-60)
       const angelSat = 15 + Math.sin(angelProgress * 6) * 10; // Very subtle saturation
       const angelBright = 85 + Math.sin(angelProgress * 10) * 10; // Bright whites (75-95)
       return `hsl(${angelHue}, ${angelSat}%, ${angelBright}%)`;
+    }
 
-    case "chrome":
+    case "chrome": {
       // Chrome reflection - cool blues/silvers
       const chromeHue = 200 + Math.sin(x * 0.2) * 60;
       const chromeBrightness = 70 + Math.sin(y * 0.3) * 20;
       return `hsl(${chromeHue}, 30%, ${chromeBrightness}%)`;
+    }
 
-    case "sunrise":
+    case "sunrise": {
       // Succulent sunrise - pink to orange to yellow gradient
-      const sunriseProgress = y / totalLines;
+      const sunriseProgress = y / safeTotalLines;
       const sunriseHue = 330 + (sunriseProgress * 60); // Pink (330) → Orange (30) → Yellow (60)
       const sunriseSat = 85 + (sunriseProgress * 15);
       const sunriseBright = 60 + (sunriseProgress * 20);
       return `hsl(${sunriseHue}, ${sunriseSat}%, ${sunriseBright}%)`;
+    }
 
-    case "cyberpunk":
+    case "cyberpunk": {
       // Bangkok cyberpunk - hot pink to cyan gradient
-      const cyberpunkProgress = (x + y) / (lineWidth + totalLines);
+      const cyberpunkProgress = (x + y) / (safeLineWidth + safeTotalLines);
       const cyberpunkHue = 320 - (cyberpunkProgress * 140); // Pink (320) → Purple (280) → Cyan (180)
       return `hsl(${cyberpunkHue}, 100%, 65%)`;
+    }
 
-    case "vaporwave":
+    case "vaporwave": {
       // Vaporwave - nostalgic 80s/90s aesthetic with pink, cyan, purple
-      const vaporProgress = y / totalLines;
+      const vaporProgress = y / safeTotalLines;
       const vaporHue = 280 + (vaporProgress * 80); // Purple (280) → Pink (320) → Hot Pink (340)
       const vaporSat = 80 + Math.sin((x + y) * 0.3) * 15;
       const vaporBright = 65 + Math.sin(x * 0.4) * 10;
       return `hsl(${vaporHue}, ${vaporSat}%, ${vaporBright}%)`;
+    }
 
-    case "ocean":
+    case "ocean": {
       // Ocean - calming blue/cyan gradient
-      const oceanProgress = y / totalLines;
+      const oceanProgress = y / safeTotalLines;
       const oceanHue = 180 + (oceanProgress * 30); // Cyan (180) → Blue (210)
       const oceanSat = 70 + (oceanProgress * 20);
       const oceanBright = 50 + (oceanProgress * 20);
       return `hsl(${oceanHue}, ${oceanSat}%, ${oceanBright}%)`;
+    }
 
-    case "neon":
+    case "neon": {
       // Neon - bright electric oscillating colors
-      const neonProgress = (x + y) / (lineWidth + totalLines);
+      const neonProgress = (x + y) / (safeLineWidth + safeTotalLines);
       const neonHue = 60 + Math.sin(neonProgress * 10) * 120; // Yellow/Green/Pink oscillation
       const neonSat = 100;
       const neonBright = 60 + Math.sin(neonProgress * 8) * 15;
       return `hsl(${neonHue}, ${neonSat}%, ${neonBright}%)`;
+    }
 
-    case "poison":
+    case "poison": {
       // Poison - toxic radioactive green
-      const poisonProgress = (x + y) / (lineWidth + totalLines);
+      const poisonProgress = (x + y) / (safeLineWidth + safeTotalLines);
       const poisonHue = 90 + (poisonProgress * 30); // Lime green (90) → Yellow-green (120)
       const poisonSat = 90 + Math.sin(x * 0.5) * 10;
       const poisonBright = 45 + (poisonProgress * 20);
       return `hsl(${poisonHue}, ${poisonSat}%, ${poisonBright}%)`;
+    }
 
     case "none":
     default:

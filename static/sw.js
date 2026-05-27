@@ -1,9 +1,8 @@
-// Asciifier Service Worker v1.0
+// Asciifier Service Worker v2.0
 // Enables offline functionality and PWA features
 
-const CACHE_NAME = "asciifier-v1";
+const CACHE_NAME = "asciifier-v2";
 const urlsToCache = [
-  "/",
   "/styles.css",
   "/manifest.json",
   "/icons/icon-192x192.png",
@@ -42,19 +41,25 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Fetch event - serve from cache when possible
+function shouldUseNetworkOnly(request) {
+  const url = new URL(request.url);
+
+  if (url.origin !== self.location.origin) {
+    return true;
+  }
+
+  return request.mode === "navigate" ||
+    url.pathname === "/" ||
+    url.pathname.startsWith("/api/") ||
+    url.pathname.startsWith("/_frsh/");
+}
+
+// Fetch event - cache static assets only; keep HTML/API/fresh bundles current.
 self.addEventListener("fetch", (event) => {
   // Skip non-GET requests
   if (event.request.method !== "GET") return;
 
-  // Skip external API requests (horoscope API, PostHog)
-  if (
-    event.request.url.includes("/api/horoscope") ||
-    event.request.url.includes("horoscope-app-api.vercel.app") ||
-    event.request.url.includes("posthog.com") ||
-    event.request.url.includes("ko-fi.com")
-  ) {
-    // Network-only for API calls - don't cache horoscope data
+  if (shouldUseNetworkOnly(event.request)) {
     return;
   }
 

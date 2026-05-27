@@ -1,5 +1,5 @@
 import { useSignal } from "@preact/signals";
-import { useEffect, useState, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 import { analytics } from "../utils/analytics.ts";
 import { SimpleTypeWriter } from "../utils/simple-typewriter.js";
@@ -40,6 +40,7 @@ const BORDER_STYLES = [
 export default function TextToAscii() {
   // Store typewriter instance for auto-typing
   const typewriterRef = useRef<SimpleTypeWriter | null>(null);
+  const generationRequestRef = useRef(0);
 
   // Track timeouts for cleanup
   const autoTypeTimeoutRef = useRef<number | null>(null);
@@ -51,6 +52,7 @@ export default function TextToAscii() {
 
     // Initialize typewriter sounds
     if (typeof window !== "undefined") {
+      let isMounted = true;
       const typewriter = new SimpleTypeWriter({
         volume: 0.3,
         enabled: true,
@@ -59,27 +61,32 @@ export default function TextToAscii() {
       // Store reference for auto-typing
       typewriterRef.current = typewriter;
 
-      typewriter.init().then(() => {
-        typewriter.attach("#ascii-text-input");
+      // Resume audio contexts on first click (browser autoplay policy)
+      const resumeAudio = () => {
+        if (typewriter.audioContext?.state === "suspended") {
+          typewriter.audioContext.resume();
+        }
+        sounds.init();
+        sounds.resume();
+        document.removeEventListener("click", resumeAudio);
+      };
 
-        // Resume audio contexts on first click (browser autoplay policy)
-        const resumeAudio = () => {
-          if (typewriter.audioContext?.state === "suspended") {
-            typewriter.audioContext.resume();
-          }
-          // Initialize and resume sound effects engine on first interaction
-          sounds.init();
-          if (sounds.audioContext?.state === "suspended") {
-            sounds.audioContext.resume();
-          }
-          document.removeEventListener("click", resumeAudio);
-        };
+      typewriter.init().then(() => {
+        if (!isMounted) return;
+        typewriter.attach("#ascii-text-input");
         document.addEventListener("click", resumeAudio);
       }).catch((err) => {
         console.warn("Typewriter sounds unavailable:", err);
       });
 
-      return () => typewriter.dispose();
+      return () => {
+        isMounted = false;
+        document.removeEventListener("click", resumeAudio);
+        typewriter.dispose();
+        if (typewriterRef.current === typewriter) {
+          typewriterRef.current = null;
+        }
+      };
     }
   }, []);
 
@@ -130,14 +137,14 @@ export default function TextToAscii() {
           }
 
           charIndex++;
-          autoTypeTimeoutRef.current = window.setTimeout(typeNextChar, 180); // 180ms per character
+          autoTypeTimeoutRef.current = globalThis.setTimeout(typeNextChar, 180); // 180ms per character
         } else {
           autoTypeTimeoutRef.current = null;
         }
       };
 
       // Start auto-typing after a brief delay
-      autoTypeTimeoutRef.current = window.setTimeout(() => {
+      autoTypeTimeoutRef.current = globalThis.setTimeout(() => {
         typeNextChar();
       }, 300);
 
@@ -167,7 +174,7 @@ export default function TextToAscii() {
       }
 
       // Trigger wiggle animation
-      wiggleTimeoutRef.current = window.setTimeout(() => {
+      wiggleTimeoutRef.current = globalThis.setTimeout(() => {
         setAllSelected(false);
         wiggleTimeoutRef.current = null;
       }, 600);
@@ -182,8 +189,9 @@ export default function TextToAscii() {
     };
   }, [fontChanged, colorChanged, borderChanged]);
 
-
   const generateAscii = async () => {
+    const requestId = ++generationRequestRef.current;
+
     if (!inputText.value.trim()) {
       setAsciiOutput("");
       setHtmlOutput("");
@@ -211,6 +219,14 @@ export default function TextToAscii() {
 
       const data = await response.json();
 
+      if (requestId !== generationRequestRef.current) {
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate ASCII text");
+      }
+
       if (data.success) {
         setAsciiOutput(data.ascii);
         setHtmlOutput(data.html || data.ascii);
@@ -224,8 +240,13 @@ export default function TextToAscii() {
         throw new Error(data.error || "Failed to generate ASCII text");
       }
     } catch (error) {
+      if (requestId !== generationRequestRef.current) {
+        return;
+      }
+
       console.error("Error generating ASCII text:", error);
       setAsciiOutput("Error: Could not generate ASCII text");
+      setHtmlOutput("");
       sounds.error();
       analytics.trackAsciiGenerated(
         selectedFont.value,
@@ -233,7 +254,9 @@ export default function TextToAscii() {
         false,
       );
     } finally {
-      setIsGenerating(false);
+      if (requestId === generationRequestRef.current) {
+        setIsGenerating(false);
+      }
     }
   };
 
@@ -250,7 +273,6 @@ export default function TextToAscii() {
     colorEffect.value,
     borderStyle.value,
   ]);
-
 
   return (
     <div class="max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
@@ -284,7 +306,7 @@ export default function TextToAscii() {
       <div class="mb-3 sm:mb-8">
         {/* Three Dropdown Reels - Horizontal on all screen sizes for max space */}
         <div
-          class={`grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 ${
+          class={`grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 ${
             allSelected ? "animate-wiggle" : ""
           }`}
         >
@@ -330,17 +352,14 @@ export default function TextToAscii() {
       <div class="mb-4 sm:mb-10">
         <TerminalDisplay
           content={asciiOutput}
-          htmlContent={colorEffect.value === "none"
-            ? asciiOutput.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-            : htmlOutput}
-          isLoading={false}
+          htmlContent={colorEffect.value === "none" ? undefined : htmlOutput}
+          isLoading={isGenerating}
           filename={inputText.value.toLowerCase().replace(/[^a-z0-9]/g, "-") ||
             "ascii-art"}
           showShuffleButton={false}
           terminalPath="~/output/text-art.txt"
         />
       </div>
-
 
       <style>
         {`

@@ -6,6 +6,10 @@
 import { toPng } from "html-to-image";
 import { sounds } from "./sounds.ts";
 import { analytics } from "./analytics.ts";
+import { escapeHtml } from "./html.ts";
+
+const ESCAPE_CHAR = String.fromCharCode(27);
+const ANSI_ESCAPE_PATTERN = new RegExp(`${ESCAPE_CHAR}\\[[0-9;]*m`, "g");
 
 /**
  * Copy ASCII art to clipboard with optional formatting
@@ -20,7 +24,7 @@ export async function copyToClipboard(
 
   try {
     // Strip ANSI codes for plain text
-    const cleanText = plainText.replace(/\u001b\[[0-9;]*m/g, "");
+    const cleanText = plainText.replace(ANSI_ESCAPE_PATTERN, "");
 
     let textToCopy = cleanText;
     let htmlToCopy = "";
@@ -29,12 +33,14 @@ export async function copyToClipboard(
       // Rich HTML for email (Gmail, Outlook, etc.)
       htmlToCopy = htmlContent.includes("<span")
         ? `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0; background: black; color: white; padding: 8px; border-radius: 4px;">${htmlContent}</pre>`
-        : `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${cleanText}</pre>`;
+        : `<pre style="font-family: 'Courier New', 'Monaco', 'Menlo', monospace; white-space: pre; line-height: 1.2; font-size: 12px; margin: 0;">${
+          escapeHtml(cleanText)
+        }</pre>`;
       textToCopy = cleanText;
     } else if (format === "message") {
       // Wrapped in backticks for messaging apps (Discord, WhatsApp, Slack)
       textToCopy = `\`\`\`\n${cleanText}\n\`\`\``;
-      htmlToCopy = `<pre>${textToCopy}</pre>`;
+      htmlToCopy = `<pre>${escapeHtml(textToCopy)}</pre>`;
     } else {
       // Plain text
       textToCopy = cleanText;
@@ -54,7 +60,7 @@ export async function copyToClipboard(
 
     sounds.copy();
     return true;
-  } catch (err) {
+  } catch {
     sounds.error();
     alert("Copy failed. Try again.");
     return false;
@@ -82,7 +88,7 @@ export function downloadText(
   }
 
   // Also strip any remaining ANSI codes
-  plainText = plainText.replace(/\u001b\[[0-9;]*m/g, "");
+  plainText = plainText.replace(ANSI_ESCAPE_PATTERN, "");
 
   const blob = new Blob([plainText], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
@@ -106,7 +112,9 @@ export async function downloadPNG(
 
   try {
     // Get the ASCII display element
-    const asciiElement = document.querySelector(asciiElementSelector) as HTMLElement;
+    const asciiElement = document.querySelector(
+      asciiElementSelector,
+    ) as HTMLElement;
     if (!asciiElement) {
       console.error("ASCII display element not found");
       sounds.error();
@@ -115,11 +123,19 @@ export async function downloadPNG(
     }
 
     // Calculate actual text dimensions
-    const lines = asciiElement.innerText.split('\n').filter(line => line.trim().length > 0);
-    const maxLineLength = Math.max(...lines.map(line => line.length));
+    const lines = asciiElement.innerText.split("\n").filter((line) =>
+      line.trim().length > 0
+    );
+    if (lines.length === 0) {
+      sounds.error();
+      alert("Could not find ASCII art to export.");
+      return;
+    }
+
+    const maxLineLength = Math.max(...lines.map((line) => line.length));
 
     // Get font size from computed styles or use defaults
-    const computedStyles = window.getComputedStyle(asciiElement);
+    const computedStyles = globalThis.getComputedStyle(asciiElement);
     const fontSize = parseInt(computedStyles.fontSize) || 16;
 
     // Monospace character dimensions (more generous for effects)
@@ -143,59 +159,61 @@ export async function downloadPNG(
     const parentContainer = asciiElement.parentElement;
     const scrollTop = parentContainer?.scrollTop || 0;
 
-    // Temporarily set exact dimensions for perfect capture
-    asciiElement.style.width = `${contentWidth}px`;
-    asciiElement.style.height = `${contentHeight}px`;
-    asciiElement.style.maxWidth = "none";
-    asciiElement.style.maxHeight = "none";
-    asciiElement.style.overflow = "visible";
-    asciiElement.style.opacity = "1";
+    let dataUrl: string;
+    try {
+      // Temporarily set exact dimensions for perfect capture
+      asciiElement.style.width = `${contentWidth}px`;
+      asciiElement.style.height = `${contentHeight}px`;
+      asciiElement.style.maxWidth = "none";
+      asciiElement.style.maxHeight = "none";
+      asciiElement.style.overflow = "visible";
+      asciiElement.style.opacity = "1";
 
-    // Force layout recalculation
-    asciiElement.offsetHeight;
+      // Force layout recalculation
+      asciiElement.offsetHeight;
 
-    // Capture with html-to-image with exact dimensions
-    const dataUrl = await toPng(asciiElement, {
-      cacheBust: true,
-      pixelRatio: 2,
-      backgroundColor: "#000000",
-      width: contentWidth + (padding * 2),
-      height: contentHeight + (padding * 2),
-      style: {
-        padding: `${padding}px`,
+      // Capture with html-to-image with exact dimensions
+      dataUrl = await toPng(asciiElement, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#000000",
+        width: contentWidth + (padding * 2),
+        height: contentHeight + (padding * 2),
+        style: {
+          padding: `${padding}px`,
+        },
+      });
+    } finally {
+      asciiElement.style.width = originalWidth;
+      asciiElement.style.height = originalHeight;
+      asciiElement.style.maxWidth = originalMaxWidth;
+      asciiElement.style.maxHeight = originalMaxHeight;
+      asciiElement.style.overflow = originalOverflow;
+      asciiElement.style.opacity = originalOpacity;
+
+      if (parentContainer) {
+        parentContainer.scrollTop = scrollTop;
       }
-    });
-
-    // Immediately restore original styles
-    asciiElement.style.width = originalWidth;
-    asciiElement.style.height = originalHeight;
-    asciiElement.style.maxWidth = originalMaxWidth;
-    asciiElement.style.maxHeight = originalMaxHeight;
-    asciiElement.style.overflow = originalOverflow;
-    asciiElement.style.opacity = originalOpacity;
-
-    // Restore scroll position
-    if (parentContainer) {
-      parentContainer.scrollTop = scrollTop;
     }
 
     // Convert data URL to blob for better mobile compatibility
-    const blob = await fetch(dataUrl).then(res => res.blob());
+    const blob = await fetch(dataUrl).then((res) => res.blob());
 
     // Try native share API first (works great on mobile!)
-    if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    if (
+      navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    ) {
       try {
-        const file = new File([blob], `${filename}.png`, { type: 'image/png' });
+        const file = new File([blob], `${filename}.png`, { type: "image/png" });
         await navigator.share({
           files: [file],
-          title: 'ASCII Art',
-          text: 'Check out this ASCII art!'
+          title: "ASCII Art",
+          text: "Check out this ASCII art!",
         });
         sounds.success();
         return;
-      } catch (shareError) {
-        // User cancelled share or share not supported, fall through to download
-        console.log("Share cancelled or not supported, trying download:", shareError);
+      } catch {
+        // User cancelled share or share failed; fall through to download.
       }
     }
 

@@ -1,6 +1,11 @@
 # Memory & Performance Audit Report
-**Date:** 2025-10-10
-**Project:** asciifier-web
+
+> Historical note, 2026-05-27: this is an archived audit from 2025. Several line
+> numbers and implementation details have moved since then. Use it as context
+> for the kinds of lifecycle bugs that mattered, not as the current file map.
+> Current docs live in `README.md`, `CLAUDE.md`, `GLOSSARY.md`, and `TINKER.md`.
+
+**Date:** 2025-10-10 **Project:** asciifier-web
 
 ## Issues Found & Fixed
 
@@ -8,7 +13,8 @@
 
 1. **AsciiGallery.tsx - Async setState After Unmount**
    - **Location:** Line 116-118
-   - **Issue:** `fetchSingleArt()` sets state in setTimeout without checking if component is mounted
+   - **Issue:** `fetchSingleArt()` sets state in setTimeout without checking if
+     component is mounted
    - **Impact:** Memory leak + "setState on unmounted component" warnings
    - **Fix:** Add mounted ref to prevent state updates after unmount
 
@@ -29,12 +35,14 @@
 4. **SoundEngine - AudioContext Never Closed**
    - **Location:** utils/sounds.ts
    - **Issue:** AudioContext created but never closed (singleton pattern)
-   - **Impact:** Minor - AudioContext persists but this is acceptable for singleton
+   - **Impact:** Minor - AudioContext persists but this is acceptable for
+     singleton
    - **Fix:** Add cleanup method (optional, singleton is intentional)
 
 5. **PNG Export - Large Canvas Creation**
    - **Location:** utils/exportUtils.ts downloadPNG
-   - **Issue:** html-to-image creates large canvases, could spike memory on mobile
+   - **Issue:** html-to-image creates large canvases, could spike memory on
+     mobile
    - **Impact:** Temporary memory spike during export
    - **Fix:** Already mitigated by restoring element styles immediately
 
@@ -48,12 +56,15 @@
 ## Recommended Fixes
 
 ### Priority 1: Component Unmount Safety
+
 All async operations and timeouts need mounted checks or cleanup.
 
 ### Priority 2: Mobile Performance
+
 - PNG export already optimized
 - Consider throttling rapid shuffle clicks
 - Art cache limited to prevent unbounded growth
 
 ### Priority 3: Audio Context Management
+
 Current singleton pattern is acceptable, but could add cleanup for completeness.

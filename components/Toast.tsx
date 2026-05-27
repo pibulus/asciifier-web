@@ -2,7 +2,7 @@
 // TOAST NOTIFICATION - Better than alert()
 // ===================================================================
 
-import { signal } from "@preact/signals";
+import { signal, useSignal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
 
 interface ToastProps {
@@ -12,7 +12,9 @@ interface ToastProps {
   onClose?: () => void;
 }
 
-export function Toast({ message, type = "error", duration = 4000, onClose }: ToastProps) {
+export function Toast(
+  { message, type = "error", duration = 4000, onClose }: ToastProps,
+) {
   const isVisible = useSignal(true);
 
   useEffect(() => {
@@ -44,6 +46,7 @@ export function Toast({ message, type = "error", duration = 4000, onClose }: Toa
         <div class="flex items-center justify-between gap-4">
           <span class="flex-1 text-sm sm:text-base">{message}</span>
           <button
+            type="button"
             onClick={() => {
               isVisible.value = false;
               if (onClose) setTimeout(onClose, 300);
@@ -100,7 +103,9 @@ export function ToastContainer() {
           message={toast.message}
           type={toast.type}
           onClose={() => {
-            toastMessages.value = toastMessages.value.filter((t) => t.id !== toast.id);
+            toastMessages.value = toastMessages.value.filter((t) =>
+              t.id !== toast.id
+            );
           }}
         />
       ))}
@@ -111,7 +116,10 @@ export function ToastContainer() {
 // Helper function to show toasts
 let toastIdCounter = 0;
 
-export function showToast(message: string, type: "error" | "success" | "info" = "error") {
+export function showToast(
+  message: string,
+  type: "error" | "success" | "info" = "error",
+) {
   const id = ++toastIdCounter;
   toastMessages.value = [...toastMessages.value, { id, message, type }];
 }

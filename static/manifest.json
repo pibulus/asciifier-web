@@ -1,7 +1,7 @@
 {
   "name": "Asciifier",
   "short_name": "ASCII",
-  "description": "Turn anything into glorious text art. Drop an image, get instant ASCII magic with color effects and export.",
+  "description": "Convert images and text into ASCII art with color effects, museum samples, and copy or download exports.",
   "start_url": "/?source=pwa",
   "display": "standalone",
   "background_color": "#FAF9F6",

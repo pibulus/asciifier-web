@@ -3,6 +3,8 @@
 // ===================================================================
 // Used by both TextToAscii and AsciiGallery for consistent coloring
 
+import { escapeHtml } from "./html.ts";
+
 /**
  * Calculate HSL color for a specific position in ASCII art
  * based on the selected color effect
@@ -14,30 +16,48 @@ export function getEffectColor(
   lineWidth: number,
   totalLines: number,
 ): string {
+  const safeLineWidth = Math.max(1, lineWidth);
+  const safeTotalLines = Math.max(1, totalLines);
+
   switch (effect) {
+    case "rainbow": {
+      const hue = ((x * 18) + (y * 24)) % 360;
+      return `hsl(${hue}, 90%, 60%)`;
+    }
+    case "matrix": {
+      const bright = 45 + Math.sin((x + y) * 0.8) * 18;
+      return `hsl(132, 100%, ${bright}%)`;
+    }
     case "unicorn": {
-      const hue = (x * 360 / lineWidth) % 360;
+      const hue = (x * 360 / safeLineWidth) % 360;
       return `hsl(${hue}, 95%, 65%)`;
     }
     case "fire": {
-      const hue = 60 - (y * 60 / totalLines);
-      const sat = 100 - (y * 20 / totalLines);
+      const hue = 60 - (y * 60 / safeTotalLines);
+      const sat = 100 - (y * 20 / safeTotalLines);
       return `hsl(${hue}, ${sat}%, 55%)`;
     }
+    case "angel": {
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 45 + Math.sin(progress * 8) * 15;
+      const sat = 15 + Math.sin(progress * 6) * 10;
+      const bright = 85 + Math.sin(progress * 10) * 10;
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
     case "cyberpunk": {
-      const progress = (x + y) / (lineWidth + totalLines);
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
       const hue = 320 - (progress * 140);
       return `hsl(${hue}, 100%, 60%)`;
     }
     case "sunrise": {
-      const progress = y / totalLines;
+      const progress = y / safeTotalLines;
       const hue = 330 + (progress * 60);
       const sat = 85 + (progress * 15);
       const bright = 60 + (progress * 20);
       return `hsl(${hue}, ${sat}%, ${bright}%)`;
     }
     case "vaporwave": {
-      const progress = y / totalLines;
+      const progress = y / safeTotalLines;
       const hue = 280 + (progress * 80);
       const sat = 80 + Math.sin((x + y) * 0.3) * 15;
       const bright = 65 + Math.sin(x * 0.4) * 10;
@@ -49,21 +69,21 @@ export function getEffectColor(
       return `hsl(${hue}, 30%, ${brightness}%)`;
     }
     case "ocean": {
-      const progress = y / totalLines;
+      const progress = y / safeTotalLines;
       const hue = 180 + (progress * 30); // Cyan (180) → Blue (210)
       const sat = 70 + (progress * 20);
       const bright = 50 + (progress * 20);
       return `hsl(${hue}, ${sat}%, ${bright}%)`;
     }
     case "neon": {
-      const progress = (x + y) / (lineWidth + totalLines);
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
       const hue = 60 + Math.sin(progress * 10) * 120; // Yellow/Green/Pink oscillation
       const sat = 100;
       const bright = 60 + Math.sin(progress * 8) * 15;
       return `hsl(${hue}, ${sat}%, ${bright}%)`;
     }
     case "poison": {
-      const progress = (x + y) / (lineWidth + totalLines);
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
       const hue = 90 + (progress * 30); // Lime green (90) → Yellow-green (120)
       const sat = 90 + Math.sin(x * 0.5) * 10;
       const bright = 45 + (progress * 20);
@@ -85,21 +105,25 @@ export function applyColorToArt(art: string, effect: string): string {
 
   const lines = art.split("\n");
   const colorizedLines: string[] = [];
+  const widestLine = Math.max(1, ...lines.map((line) => line.length));
 
   for (let y = 0; y < lines.length; y++) {
     const line = lines[y];
 
-    // Calculate color for this line
-    const color = getEffectColor(
-      effect,
-      Math.floor(line.length / 2),
-      y,
-      line.length,
-      lines.length,
-    );
+    let colorizedLine = "";
+    for (let x = 0; x < line.length; x++) {
+      const char = line[x];
+      if (char === " ") {
+        colorizedLine += " ";
+      } else {
+        const color = getEffectColor(effect, x, y, widestLine, lines.length);
+        colorizedLine += `<span style="color: ${color};">${
+          escapeHtml(char)
+        }</span>`;
+      }
+    }
 
-    // Wrap entire line in colored span
-    colorizedLines.push(`<span style="color: ${color};">${line}</span>`);
+    colorizedLines.push(colorizedLine);
   }
 
   return colorizedLines.join("\n");

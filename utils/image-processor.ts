@@ -25,7 +25,7 @@ export class ImageProcessor {
     }
   }
 
-  async loadImage(file: File): Promise<HTMLImageElement> {
+  loadImage(file: File): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);

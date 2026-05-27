@@ -1,38 +1,107 @@
-# Glossary - Asciifier Web
+# Glossary - ASCIIFIER Web
 
-## Islands (Interactive Components)
-- `AsciiGallery` - Gallery of pre-made ASCII art examples (islands/AsciiGallery.tsx)
-- `Dropzone` - Drag-and-drop image upload zone (islands/Dropzone.tsx)
-- `TextToAscii` - Text input → ASCII art converter (islands/TextToAscii.tsx)
-- `ThemeIsland` - Theme switcher UI (islands/ThemeIsland.tsx)
-- `TabsIsland` - Main tab navigation container (islands/TabsIsland.tsx)
-- `TabSwitcher` - Individual tab switcher logic (islands/TabSwitcher.tsx)
-- `AboutModal` - About/info modal dialog (islands/AboutModal.tsx)
-- `KofiModal` - Ko-fi donation modal (islands/KofiModal.tsx)
-- `WelcomeChecker` - First-visit welcome flow (islands/WelcomeChecker.tsx)
-- `WelcomeModal` - Welcome message modal (islands/WelcomeModal.tsx)
+## App Entry Points
 
-## Components (Shared UI)
-- `Button` - Styled button component (components/Button.tsx)
-- `MagicDropdown` - Animated dropdown selector (components/MagicDropdown.tsx)
-- `TerminalDisplay` - ASCII art output display (components/TerminalDisplay.tsx)
+- `main.ts` - production server entrypoint.
+- `dev.ts` - Fresh dev/build helper entrypoint.
+- `fresh.config.ts` - Fresh plugin config.
+- `fresh.gen.ts` - generated Fresh manifest; regenerate with
+  `deno task manifest`.
+- `deno.json` - tasks, imports, lint rules, and Deno settings.
+
+## Routes
+
+- `routes/index.tsx` - main app shell and tab host.
+- `routes/_app.tsx` - document shell, metadata, analytics env bridge, service
+  worker registration, global modals/toasts.
+- `routes/_404.tsx` - not-found page.
+- `routes/thanks.tsx` - support thank-you route that renders `ThanksPage`.
 
 ## API Routes
-- `POST /api/enhanced-figlet` - Text → ASCII with fonts + HSL color effects (routes/api/enhanced-figlet.ts)
-- `GET /api/joke` - Random ASCII joke generator (routes/api/joke.ts)
-- `GET /api/random-ascii-art` - Random ASCII art from collection (routes/api/random-ascii-art.ts)
 
-## Key Functions
-- `openAboutModal()` - Show about modal (islands/AboutModal.tsx)
-- `closeAboutModal()` - Hide about modal (islands/AboutModal.tsx)
-- `openKofiModal()` - Show Ko-fi modal (islands/KofiModal.tsx)
-- `closeKofiModal()` - Hide Ko-fi modal (islands/KofiModal.tsx)
-- `checkWelcomeStatus()` - Check if user has seen welcome (islands/WelcomeModal.tsx)
-- `markWelcomeSeen()` - Mark welcome as viewed (islands/WelcomeModal.tsx)
+- `POST /api/enhanced-figlet` - `routes/api/enhanced-figlet.ts`; text to Figlet
+  ASCII with optional border and color effect HTML.
+- `GET /api/random-ascii-art` - `routes/api/random-ascii-art.ts`; random local
+  museum sample or source-only archive link card.
+- `GET /api/joke` - `routes/api/joke.ts`; small legacy text endpoint.
+
+There is no current `/api/figlet`, `/api/colorize`, or `/api/image-to-ascii`
+route.
+
+## Islands
+
+- `Dropzone` - image upload, drag/drop, paste, and camera capture UI.
+- `TextToAscii` - text input, Figlet font selector, color selector, border
+  selector, and API caller.
+- `AsciiGallery` - museum category/search/color/effect controls.
+- `TabsIsland` - renders the active app tab.
+- `TabSwitcher` - tab button UI and active-tab signal updates.
+- `ThemeIsland` - theme picker.
+- `WelcomeChecker` - first-visit welcome state check.
+- `WelcomeModal` - welcome modal and auto-type trigger.
+- `AboutModal` / `AboutLink` - about dialog and footer opener.
+- `KofiModal` / `KofiButton` - support modal and CTA.
+- `ThanksPage` - support thank-you page UI.
+
+## Components
+
+- `TerminalDisplay` - shared terminal frame, ASCII display, shuffle button, copy
+  button, TXT export, and PNG export.
+- `MagicDropdown` - shared dropdown selector used by text/image/museum controls.
+- `Toast` / `ToastContainer` / `showToast` - global toast system.
+- `Button` - small shared styled button.
+
+## Utilities
+
+- `ascii-collection.ts` - curated local museum starter art with titles, artists,
+  categories, and keywords.
+- `constants.ts` - shared dropdown data for color effects, visual effects, and
+  museum categories.
+- `colorEffects.ts` - shared HSL color math and HTML span generation.
+- `exportUtils.ts` - clipboard, TXT, and PNG export functions.
+- `image-processor.ts` - client-side image-to-ASCII conversion engine.
+- `character-sets.ts` - character ramps/styles for image conversion.
+- `analytics.ts` - optional PostHog wrapper; no text/image contents tracked.
+- `html.ts` - HTML escaping helper.
+- `share.ts` - share helpers.
+- `sounds.ts` - UI sound engine.
+- `simple-typewriter.js` - typewriter sound helper.
+- `easter-eggs.ts` - small hidden UI extras.
+- `themes.ts` - app theme configuration.
+
+## Theme System
+
+- `theme-system/mod.ts` - reusable theme engine and random theme generator.
+- `theme-system/asciifier-themes.ts` - app-specific theme exports.
+- `theme-system/README.md` - standalone theme-system documentation.
+
+## Static Assets
+
+- `static/styles.css` - global CSS, animations, scrollbars, reduced-motion
+  rules, and ASCII display defaults.
+- `static/sw.js` - production service worker; navigation/API/Fresh assets are
+  network-only.
+- `static/manifest.json` - PWA metadata.
+- `static/sitemap.xml` - public sitemap.
+- `static/robots.txt` - crawler policy.
+- `static/icons/` - PWA icons.
+- `static/sounds/` - keyboard/audio assets.
 
 ## Core Concepts
-- **Rainbow Wizard Architecture** - Server-side Figlet + custom HSL gradients → browser magic
-- **HSL Color Effects** - Mathematical color gradients (unicorn, fire, cyberpunk, etc.)
-- **Figlet** - Server-side ASCII art generation engine
-- **Islands Architecture** - Fresh framework pattern for selective hydration
-- **Destructible Stickers** - Ephemeral UI feedback elements
+
+- Figlet text generation - server-side text-to-ASCII generation through
+  `figlet`.
+- HSL effects - custom color spans generated from character positions.
+- ASCII Museum - local curated samples with online source links, not live
+  scraping.
+- Source-only card - museum fallback that points to asciiart.eu when local art
+  does not exist for a category/search.
+- TerminalDisplay - the shared output surface for text, image, and museum art.
+- Fresh islands - interactive Preact components hydrated selectively.
+- Theme CSS variables - app colors are driven by `--color-*` values.
+- Optional analytics - PostHog only loads when public env values are configured.
+
+## Generated Or External Folders
+
+- `_fresh/` - generated build output; not source.
+- `node_modules/` - Deno npm compatibility directory; not source.

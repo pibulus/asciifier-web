@@ -12,19 +12,46 @@
  * Uses dynamic import to prevent connection attempts without API keys
  */
 
+type AnalyticsProperties = Record<string, unknown>;
+
+interface PostHogClient {
+  init: (
+    key: string,
+    options: {
+      api_host: string;
+      person_profiles: string;
+      capture_pageview: boolean;
+      capture_pageleave: boolean;
+      disable_session_recording: boolean;
+      disable_survey_popups: boolean;
+      property_blacklist: string[];
+      loaded: () => void;
+    },
+  ) => void;
+  capture: (eventName: string, properties: AnalyticsProperties) => void;
+}
+
+interface ClientGlobals {
+  ENV?: {
+    POSTHOG_KEY?: string;
+    POSTHOG_HOST?: string;
+  };
+}
+
 class AnalyticsService {
   private isInitialized = false;
-  private posthog: any = null;
+  private posthog: PostHogClient | null = null;
   private eventQueue: Array<
-    { eventName: string; properties: Record<string, any> }
+    { eventName: string; properties: AnalyticsProperties }
   > = [];
 
   async init() {
     if (this.isInitialized || typeof window === "undefined") return;
 
     // Get keys from window.ENV (set by Fresh in _app.tsx)
-    const key = (window as any).ENV?.POSTHOG_KEY;
-    const host = (window as any).ENV?.POSTHOG_HOST || "https://app.posthog.com";
+    const env = (globalThis as typeof globalThis & ClientGlobals).ENV;
+    const key = env?.POSTHOG_KEY;
+    const host = env?.POSTHOG_HOST || "https://app.posthog.com";
 
     if (!key) {
       // Silently disable analytics - no warnings needed for local dev
@@ -35,7 +62,7 @@ class AnalyticsService {
     try {
       // Dynamic import - only loads PostHog when we have API keys
       const posthogModule = await import("posthog-js");
-      this.posthog = posthogModule.default;
+      this.posthog = posthogModule.default as unknown as PostHogClient;
 
       this.posthog.init(key, {
         api_host: host,
@@ -56,7 +83,7 @@ class AnalyticsService {
     }
   }
 
-  private trackEvent(eventName: string, properties: Record<string, any> = {}) {
+  private trackEvent(eventName: string, properties: AnalyticsProperties = {}) {
     if (typeof window === "undefined") return;
 
     const event = { eventName, properties };
@@ -121,7 +148,7 @@ class AnalyticsService {
   }
 
   // Error Tracking
-  trackError(errorType: string, context: Record<string, any> = {}) {
+  trackError(errorType: string, context: AnalyticsProperties = {}) {
     this.trackEvent("error_occurred", {
       error_type: errorType,
       context,

@@ -9,6 +9,24 @@ export default function App({ Component }: PageProps) {
     POSTHOG_KEY: Deno.env.get("POSTHOG_KEY"),
     POSTHOG_HOST: Deno.env.get("POSTHOG_HOST"),
   };
+  const analyticsEnvScript = `globalThis.ENV = ${
+    JSON.stringify(analyticsEnv).replaceAll("<", "\\u003c")
+  };`;
+  const serviceWorkerScript = `
+    if ('serviceWorker' in navigator) {
+      globalThis.addEventListener('load', () => {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          navigator.serviceWorker.getRegistrations()
+            .then((registrations) => registrations.forEach((registration) => registration.unregister()))
+            .catch(() => {});
+          return;
+        }
+
+        navigator.serviceWorker.register('/sw.js')
+          .catch(() => {});
+      });
+    }
+  `;
 
   return (
     <html lang="en">
@@ -21,7 +39,7 @@ export default function App({ Component }: PageProps) {
         <title>ASCIIFIER • Text Art Machine</title>
         <meta
           name="description"
-          content="Drop a pic. Get ASCII magic. 12 styles, live preview, $0 forever. No scale, no BS."
+          content="Convert images and text into ASCII art with color effects, museum samples, and copy or download exports."
         />
 
         {/* PWA & iOS App Meta Tags */}
@@ -39,24 +57,36 @@ export default function App({ Component }: PageProps) {
         <meta property="og:title" content="ASCIIFIER • Pics to Text Art" />
         <meta
           property="og:description"
-          content="The text art machine that actually slaps. Drop image, get ASCII."
+          content="Convert images and text into ASCII art with color effects, museum samples, and clean exports."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://asciifier.app" />
-        <meta property="og:image" content="https://asciifier.app/asciifier-logo.png" />
+        <meta
+          property="og:image"
+          content="https://asciifier.app/asciifier-logo.png"
+        />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="ASCIIFIER - Turn anything into text art" />
+        <meta
+          property="og:image:alt"
+          content="ASCIIFIER - Turn anything into text art"
+        />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="ASCIIFIER • Pics to Text Art" />
         <meta
           name="twitter:description"
-          content="The text art machine that actually slaps. Drop image, get ASCII."
+          content="Convert images and text into ASCII art with color effects, museum samples, and clean exports."
         />
-        <meta name="twitter:image" content="https://asciifier.app/asciifier-logo.png" />
-        <meta name="twitter:image:alt" content="ASCIIFIER - Turn anything into text art" />
+        <meta
+          name="twitter:image"
+          content="https://asciifier.app/asciifier-logo.png"
+        />
+        <meta
+          name="twitter:image:alt"
+          content="ASCIIFIER - Turn anything into text art"
+        />
 
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
@@ -74,11 +104,7 @@ export default function App({ Component }: PageProps) {
         <link rel="stylesheet" href="/styles.css" />
 
         {/* Analytics env vars */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(analyticsEnv)};`,
-          }}
-        />
+        <script>{analyticsEnvScript}</script>
       </head>
       <body>
         {/* Real grain texture using noise image */}
@@ -138,19 +164,7 @@ export default function App({ Component }: PageProps) {
         <AboutModal />
 
         {/* Service Worker Registration */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(registration => console.log('🎨 SW registered:', registration.scope))
-                    .catch(error => console.log('SW registration failed:', error));
-                });
-              }
-            `,
-          }}
-        />
+        <script>{serviceWorkerScript}</script>
       </body>
     </html>
   );

@@ -15,8 +15,14 @@ export class SoundEngine {
     }
   }
 
+  resume() {
+    if (this.audioContext?.state === "suspended") {
+      this.audioContext.resume();
+    }
+  }
+
   // Play a simple beep/boop sound
-  async playTone(
+  playTone(
     frequency: number,
     duration: number,
     type: OscillatorType = "sine",

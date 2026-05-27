@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 
 /**
@@ -37,6 +37,31 @@ export function MagicDropdown({
   width = "w-full",
 }: MagicDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
 
   const handleSelect = (optionValue: string) => {
     sounds.click();
@@ -47,12 +72,15 @@ export function MagicDropdown({
   const selectedOption = options.find((o) => o.value === value);
 
   return (
-    <div class="relative">
-      <div
-        class={`magic-select ${width} px-2 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4 border-3 sm:border-4 rounded-xl sm:rounded-2xl font-mono font-bold cursor-pointer transition-all shadow-brutal hover:shadow-brutal-lg hover:-translate-y-0.5`}
+    <div class="relative" ref={rootRef}>
+      <button
+        type="button"
+        class={`magic-select ${width} min-h-[44px] px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4 border-3 sm:border-4 rounded-xl sm:rounded-2xl font-mono font-bold cursor-pointer transition-all shadow-brutal hover:shadow-brutal-lg hover:-translate-y-0.5 text-left`}
         style={changed
           ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
           : "background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A);"}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
         onClick={(e) => {
           e.stopPropagation();
           sounds.click();
@@ -73,16 +101,20 @@ export function MagicDropdown({
             ▼
           </span>
         </div>
-      </div>
+      </button>
       {isOpen && (
         <div
-          class="absolute z-20 w-full mt-1 border-3 sm:border-4 rounded-xl sm:rounded-2xl shadow-brutal-lg overflow-hidden dropdown-scrollbar animate-dropdown-open"
+          role="listbox"
+          class="absolute z-20 w-full min-w-[12rem] mt-1 border-3 sm:border-4 rounded-xl sm:rounded-2xl shadow-brutal-lg overflow-hidden dropdown-scrollbar animate-dropdown-open"
           style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: 300px; overflow-y: auto;"
         >
           {options.map((option) => (
-            <div
+            <button
+              type="button"
               key={option.value}
-              class="px-2 py-2 sm:px-4 sm:py-3 md:px-5 md:py-3 text-xs sm:text-sm md:text-base font-mono font-bold cursor-pointer transition-all hover:pl-4 sm:hover:pl-6 md:hover:pl-7"
+              role="option"
+              aria-selected={value === option.value}
+              class="w-full min-h-[44px] text-left px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-3 text-xs sm:text-sm md:text-base font-mono font-bold cursor-pointer transition-all hover:pl-4 sm:hover:pl-6 md:hover:pl-7"
               style={`background-color: ${
                 value === option.value
                   ? "var(--color-accent, #FF69B4)"
@@ -97,7 +129,7 @@ export function MagicDropdown({
             >
               {value === option.value && <span class="mr-1 sm:mr-2">✓</span>}
               {option.name}
-            </div>
+            </button>
           ))}
         </div>
       )}

@@ -147,6 +147,7 @@ export function WelcomeModal() {
 
             {/* Action */}
             <button
+              type="button"
               onClick={markWelcomeSeen}
               class="w-full px-4 sm:px-6 py-3 sm:py-4 border-3 rounded-xl font-mono font-bold text-sm sm:text-lg transition-all hover:scale-105 shadow-brutal-sm active:scale-[0.98]"
               style="background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"

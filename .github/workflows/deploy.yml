@@ -32,5 +32,3 @@ jobs:
           project: "asciifier"
           entrypoint: "main.ts"
           root: "."
-          
-          

@@ -7,7 +7,6 @@ import * as $_app from "./routes/_app.tsx";
 import * as $api_enhanced_figlet from "./routes/api/enhanced-figlet.ts";
 import * as $api_joke from "./routes/api/joke.ts";
 import * as $api_random_ascii_art from "./routes/api/random-ascii-art.ts";
-import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
 import * as $thanks from "./routes/thanks.tsx";
 import * as $AboutModal from "./islands/AboutModal.tsx";
@@ -17,6 +16,7 @@ import * as $KofiModal from "./islands/KofiModal.tsx";
 import * as $TabSwitcher from "./islands/TabSwitcher.tsx";
 import * as $TabsIsland from "./islands/TabsIsland.tsx";
 import * as $TextToAscii from "./islands/TextToAscii.tsx";
+import * as $ThanksPage from "./islands/ThanksPage.tsx";
 import * as $ThemeIsland from "./islands/ThemeIsland.tsx";
 import * as $WelcomeChecker from "./islands/WelcomeChecker.tsx";
 import * as $WelcomeModal from "./islands/WelcomeModal.tsx";
@@ -29,7 +29,6 @@ const manifest = {
     "./routes/api/enhanced-figlet.ts": $api_enhanced_figlet,
     "./routes/api/joke.ts": $api_joke,
     "./routes/api/random-ascii-art.ts": $api_random_ascii_art,
-    "./routes/greet/[name].tsx": $greet_name_,
     "./routes/index.tsx": $index,
     "./routes/thanks.tsx": $thanks,
   },
@@ -41,6 +40,7 @@ const manifest = {
     "./islands/TabSwitcher.tsx": $TabSwitcher,
     "./islands/TabsIsland.tsx": $TabsIsland,
     "./islands/TextToAscii.tsx": $TextToAscii,
+    "./islands/ThanksPage.tsx": $ThanksPage,
     "./islands/ThemeIsland.tsx": $ThemeIsland,
     "./islands/WelcomeChecker.tsx": $WelcomeChecker,
     "./islands/WelcomeModal.tsx": $WelcomeModal,

@@ -14,7 +14,7 @@ export function generateShareableAscii(ascii: string, style: string): string {
   const encoded = btoa(JSON.stringify(data));
 
   // Create shareable URL
-  const url = `${window.location.origin}/#share=${encoded}`;
+  const url = `${globalThis.location.origin}/#share=${encoded}`;
 
   return url;
 }

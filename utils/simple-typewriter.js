@@ -38,8 +38,9 @@ export class SimpleTypeWriter {
     try {
       // Create audio context (required for Web Audio API)
       if (!this.audioContext) {
-        this.audioContext =
-          new (window.AudioContext || window.webkitAudioContext)();
+        const AudioContextConstructor = globalThis.AudioContext ||
+          globalThis.webkitAudioContext;
+        this.audioContext = new AudioContextConstructor();
       }
 
       // Load the config and audio in parallel
@@ -55,9 +56,7 @@ export class SimpleTypeWriter {
 
       this.loaded = true;
       this.config.pack = pack;
-      console.log("🎹 Keyboard sounds loaded:", this.configData.name);
-    } catch (error) {
-      console.error("Failed to load keyboard sounds:", error);
+    } catch {
       // Fail silently - typing still works without sounds
     }
   }
@@ -72,7 +71,7 @@ export class SimpleTypeWriter {
   /**
    * Play a key sound
    */
-  async play(event) {
+  play(event) {
     if (!this.enabled || !this.loaded) return;
 
     // Map the key to a sound ID
@@ -120,7 +119,6 @@ export class SimpleTypeWriter {
    */
   getKeyId(event) {
     const key = event.key;
-    const code = event.keyCode || event.which;
 
     // Special keys first
     const specialMap = {
@@ -179,8 +177,6 @@ export class SimpleTypeWriter {
       element._typewriterHandler = handler;
       this.attachedElements.add(element);
     });
-
-    console.log(`🎹 Keyboard sounds attached to ${elements.length} elements`);
   }
 
   /**

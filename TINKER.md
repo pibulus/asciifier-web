@@ -1,322 +1,174 @@
-# 🔧 TINKER.md - JUICY-THEMES Quick Reference
+# TINKER.md - ASCIIFIER Quick Reference
 
-_For when you haven't touched this in 6 months and need to change something NOW_
+For fast repo changes after time away. The fuller map lives in `CLAUDE.md`; the
+file glossary lives in `GLOSSARY.md`.
 
-**ADHD MODE**: Jump to [QUICK WINS](#-quick-wins---80-of-what-youll-change) or
-[WHEN SHIT BREAKS](#-when-shit-breaks---top-3-fixes)
-
----
-
-## 🚀 START HERE - RUN THE DAMN THING
-
-### Dev Mode
+## Run It
 
 ```bash
-# STACK: DENO/FRESH
 deno task start
-# Opens: http://localhost:8001
 ```
 
-### Production Build
+Local URL: `http://localhost:8001`
+
+## Check It
 
 ```bash
+deno task check
 deno task build
 ```
 
-### Health Check
+Run `deno task manifest` after adding or deleting Fresh routes or islands.
 
-```bash
-deno task check    # Format, lint, type check
+## Files You Will Usually Touch
+
+- Main shell/copy: `routes/index.tsx`
+- Global metadata/env/service worker: `routes/_app.tsx`
+- Image converter: `islands/Dropzone.tsx`
+- Text converter: `islands/TextToAscii.tsx`
+- Museum/gallery: `islands/AsciiGallery.tsx`
+- Shared terminal/export UI: `components/TerminalDisplay.tsx`
+- Shared dropdown UI: `components/MagicDropdown.tsx`
+- Text ASCII API: `routes/api/enhanced-figlet.ts`
+- Museum API: `routes/api/random-ascii-art.ts`
+- Museum art: `utils/ascii-collection.ts`
+- Dropdown options/categories: `utils/constants.ts`
+- Image character styles: `utils/character-sets.ts`
+- Color effect math: `utils/colorEffects.ts`
+- Exports: `utils/exportUtils.ts`
+- App themes: `utils/themes.ts`
+- Global CSS: `static/styles.css`
+
+## Current Feature Map
+
+```text
+Image tab
+  Dropzone.tsx -> ImageProcessor -> TerminalDisplay
+
+Text tab
+  TextToAscii.tsx -> POST /api/enhanced-figlet -> TerminalDisplay
+
+Gallery tab
+  AsciiGallery.tsx -> GET /api/random-ascii-art -> TerminalDisplay
 ```
 
----
+## Common Tweaks
 
-## 📁 FILE MAP - WHERE SHIT LIVES
+### Add a Figlet Font
 
-```
-asciifier-web/
-├── routes/
-│   ├── index.tsx           # Main page - the beautiful UI
-│   ├── _app.tsx           # App wrapper with themes
-│   └── api/
-│       ├── figlet.ts      # Text → ASCII API (THE MAGIC)
-│       ├── colorize.ts    # Lolcat rainbow effects
-│       └── joke.ts        # Random jokes
-├── islands/
-│   ├── Dropzone.tsx       # Drag & drop for images
-│   ├── TextToAscii.tsx    # Text input → ASCII output
-│   ├── ThemeIsland.tsx    # Theme switcher
-│   └── TabsIsland.tsx     # Tab navigation
-├── utils/
-│   ├── character-sets.ts  # ASCII character mappings
-│   ├── themes.ts         # Color themes & CSS vars
-│   ├── image-processor.ts # Image → ASCII conversion
-│   └── sounds.ts         # UI sound effects
-├── static/
-│   └── styles.css        # Global CSS & theme vars
-└── deno.json            # Dependencies & tasks
-```
+1. Add it to `FIGLET_FONTS` in `islands/TextToAscii.tsx`.
+2. Make sure the value matches a font returned by `figlet.fontsSync()`.
+3. Test with `POST /api/enhanced-figlet`.
 
-### The Files You'll Actually Touch:
+### Add a Text Color Effect
 
-1. **routes/index.tsx** - Main page text, taglines, layout
-2. **routes/api/figlet.ts** - Fonts, ASCII generation logic
-3. **utils/themes.ts** - Colors, theme definitions
-4. **static/styles.css** - Global styles, CSS variables
-5. **deno.json** - Port, dependencies, tasks
+1. Add the option to `COLOR_EFFECTS` in `utils/constants.ts`.
+2. Add validation in `VALID_EFFECTS` in `routes/api/enhanced-figlet.ts`.
+3. Add the effect math in `utils/colorEffects.ts`.
+4. Mirror the effect in `applyColorEffect()` inside
+   `routes/api/enhanced-figlet.ts` if generated text needs server-side HTML.
 
----
+### Add a Visual Effect
 
-## 🎯 QUICK WINS - 80% OF WHAT YOU'LL CHANGE
+1. Add the option to `VISUAL_EFFECTS` in `utils/constants.ts`.
+2. Add the CSS/filter behavior in `getVisualEffectStyle()` in
+   `components/TerminalDisplay.tsx`.
 
-### 1. Change the Main Text/Copy
+### Add Museum Art
 
-```
-File: routes/index.tsx
-Lines: 18-22
-Current: "Turn ANYTHING into text art"
-Change: Update taglines and descriptions
-```
+1. Add an entry to `asciiCollection` in `utils/ascii-collection.ts`.
+2. Set `sourceCategory` to one of the values in `ASCII_MUSEUM_CATEGORIES`.
+3. Include `title`, optional `artist`, and useful `keywords`.
+4. Keep source/artist attribution intact.
 
-### 2. Add New Figlet Fonts
+The museum should link to asciiart.eu categories/searches. Do not add a live
+scraper.
 
-```
-File: routes/api/figlet.ts
-Look for: font = "standard"
-Available fonts: big, block, bubble, digital, doom, epic, ghost, etc.
-Add to options array for frontend
-```
+### Add a Museum Category
 
-### 3. Change Colors/Theme
+1. Add the category to `ASCII_MUSEUM_CATEGORIES` in `utils/constants.ts`.
+2. Add local samples in `utils/ascii-collection.ts` when downloadable/exportable
+   art should be available.
+3. If no local samples exist, the API returns a source-only card that links
+   online.
 
-```
-File: utils/themes.ts
-Look for: brutalistDark, pastelPunk, retroWave themes
-Current: --color-accent: #FF69B4
-Options: Edit theme objects or create new themes
-```
+### Add an Image Character Style
 
-### 4. Modify Lolcat Effects
-
-```
-File: routes/api/colorize.ts
-Look for: effect types
-Current: rainbow, fire, ocean, unicorn, matrix
-Add: New effect names to the enum and switch
-```
-
-### 5. Change Port
-
-```
-File: dev.ts and main.ts
-Look for: :8001
-Change to: :YOUR_PORT
-```
-
----
-
-## 🔧 COMMON TWEAKS
-
-### Add a New Color Effect
-
-```bash
-# Edit the colorize API
-File: routes/api/colorize.ts
-1. Add effect name to type: 'youreffect'
-2. Add case to switch statement
-3. Update frontend effect options
-```
-
-### Add New ASCII Character Set
-
-```bash
-File: utils/character-sets.ts
-1. Create new character array (light → dark)
-2. Export with descriptive name
-3. Update frontend dropdown options
-```
+1. Add the character ramp in `utils/character-sets.ts`.
+2. Add the dropdown option in `STYLE_OPTIONS` in `islands/Dropzone.tsx`.
+3. Test with small and high-contrast images.
 
 ### Change Themes
 
-```bash
-File: utils/themes.ts
-1. Edit existing theme colors
-2. Or add new theme object
-3. Update theme switcher options
-```
+1. Edit app themes in `utils/themes.ts`.
+2. Keep reusable engine changes in `theme-system/mod.ts`.
+3. Keep `theme-system/README.md` aligned if the public theme API changes.
 
-### Modify Main Layout
+### Change Exports
 
-```bash
-File: routes/index.tsx
-- Header: lines 8-30
-- Content tabs: <TabsIsland />
-- Footer: bottom section
-```
+1. Start in `components/TerminalDisplay.tsx` for button/UI changes.
+2. Use `utils/exportUtils.ts` for clipboard/TXT/PNG behavior.
+3. Check mobile layout; export buttons live below the terminal content.
 
----
-
-## 💥 WHEN SHIT BREAKS - TOP 3 FIXES
-
-### 1. Port Already in Use (8001)
+## API Smoke Tests
 
 ```bash
-# Find what's using it:
-lsof -i :8001
-
-# Kill it:
-kill -9 PID_NUMBER
-
-# Or change port in dev.ts
+curl -X POST http://localhost:8001/api/enhanced-figlet \
+  -H "Content-Type: application/json" \
+  -d '{"text":"TEST","font":"Big","effect":"rainbow","borderStyle":"single"}'
 ```
-
-### 2. Fresh Manifest Fucked
 
 ```bash
-# Regenerate manifest:
-deno task manifest
-
-# If that fails:
-rm fresh.gen.ts
-deno task start  # Auto-regenerates
+curl "http://localhost:8001/api/random-ascii-art?category=animals/cats&q=cat"
 ```
-
-### 3. Dependencies Broken
-
-```bash
-# Clear cache:
-rm deno.lock
-
-# Reload dependencies:
-deno cache --reload dev.ts
-
-# If node_modules issues:
-rm -rf node_modules
-```
-
----
-
-## 🚦 DEPLOYMENT - SHIP IT
-
-### Deno Deploy (Recommended)
-
-```bash
-# First deploy (adds project ID to deno.json):
-deployctl deploy --production
-
-# Future deploys:
-deno task build
-deployctl deploy --prod
-```
-
-### Manual Deploy Steps
-
-1. Build it: `deno task build`
-2. Test it: `deno task preview` (or check localhost:8001)
-3. Push it: `git push origin main`
-4. Deploy: `deployctl deploy --prod`
-
----
-
-## 🌈 API ENDPOINTS - THE SERVER-SIDE MAGIC
-
-### POST /api/figlet
-
-```json
-{
-  "text": "HELLO",
-  "font": "big",
-  "colorize": true,
-  "effect": "rainbow"
-}
-```
-
-### POST /api/colorize
-
-```json
-{
-  "text": "plain text",
-  "effect": "fire",
-  "animate": false
-}
-```
-
-### GET /api/joke
 
 ```bash
 curl http://localhost:8001/api/joke
 ```
 
----
+## Troubleshooting
 
-## 🎨 ENVIRONMENT VARIABLES
-
-### Where They Live
-
-```
-File: .env.local (create if needed)
-Format: KEY=value
-```
-
-### Available Options
-
-- `PORT` - Server port (default: 8001)
-- Any Deno Deploy vars get set in dashboard
-
----
-
-## 📝 NOTES FOR FUTURE PABLO
-
-### The Revolutionary Architecture Discovery:
-
-- **Server-side terminal tools in browser** = GENIUS breakthrough
-- Figlet + Lolcat running on server, serving rich HTML to browser
-- ANSI-to-HTML conversion for Gmail paste compatibility
-- No client-side CLI emulation needed!
-
-### Pablo's Project Quirks:
-
-- **Rainbow Wizard Mode**: The lolcat effects are PERFECT
-- **Pastel-punk aesthetic**: CSS vars system for easy theming
-- **80/20 energy**: Focused on the essential ASCII magic
-- **Terminal-to-web pipeline**: Converts shell tools to web APIs
-
-### Technical Innovations:
-
-- Fresh/Deno for modern server-side rendering
-- CSS custom properties for dynamic theming
-- Islands architecture for interactive components
-- Server-side ASCII generation with client-side polish
-
----
-
-## 🎸 TLDR - COPY PASTE ZONE
+### Port 8001 Is Busy
 
 ```bash
-# Start working
-deno task start
-
-# Ship it
-deno task build && deployctl deploy --prod
-
-# When broken
-rm deno.lock fresh.gen.ts
-deno task start
+lsof -i :8001
+kill -9 PID_NUMBER
 ```
 
-**Quick paths:**
+### Fresh Manifest Is Stale
 
-- Text/copy: `routes/index.tsx` (lines 18-22)
-- Colors: `utils/themes.ts`
-- API logic: `routes/api/figlet.ts`
-- Main layout: `routes/index.tsx`
+```bash
+deno task manifest
+```
 
-**Live URL:** http://localhost:8001 **Architecture:** Deno/Fresh + Figlet +
-LolcatJS + Tailwind **The Magic:** Server-side terminal tools → Rich browser
-experience
+### Local UI Looks Stale
 
----
+The app unregisters service workers on localhost. If the browser is still stale,
+hard refresh and restart `deno task start`.
 
-_"Server-side terminal tools in browsers = Revolutionary architecture!" 🌈⚡_
+### Dependency Cache Is Weird
 
-**Generated from the legendary Rainbow ASCII breakthrough session** 🚀
+```bash
+deno cache --reload dev.ts
+```
+
+Avoid deleting unrelated local changes when cleaning generated files.
+
+## Deploy
+
+GitHub Actions deploys `main` to Deno Deploy using
+`.github/workflows/deploy.yml`.
+
+Manual path:
+
+```bash
+deno task check
+deno task build
+deployctl deploy --prod
+```
+
+Deployment env vars:
+
+- `POSTHOG_KEY` - optional public PostHog project key.
+- `POSTHOG_HOST` - optional PostHog host, for example
+  `https://us.i.posthog.com`.
