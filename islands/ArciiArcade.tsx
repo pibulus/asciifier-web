@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { sounds } from "../utils/sounds.ts";
 
 // ===================================================================
-// ARCII ARCADE - Retro ASCII Games (Snake & Game of Life)
+// ARCII ARCADE - Retro ASCII Games (Snake, Game of Life, Tetris)
 // ===================================================================
 
 type GameType = "snake" | "life" | "tetris";

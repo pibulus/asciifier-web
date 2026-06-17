@@ -34,7 +34,8 @@ route.
 - `TextToAscii` - text input, Figlet font selector, color selector, border
   selector, and API caller.
 - `AsciiGallery` - museum category/search/color/effect controls.
-- `ArciiArcade` - retro ASCII arcade suite (Snake & Conway's Game of Life).
+- `ArciiArcade` - retro ASCII arcade suite (Snake, Conway's Game of Life, and
+  Tetris).
 - `TabsIsland` - renders the active app tab.
 - `TabSwitcher` - tab button UI and active-tab signal updates.
 - `ThemeIsland` - theme picker.
