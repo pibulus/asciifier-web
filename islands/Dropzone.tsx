@@ -61,13 +61,6 @@ const STYLE_OPTIONS = [
   { name: "Geometric", value: "geometric" },
 ];
 
-const PRESET_OPTIONS = [
-  { name: "Classic", value: "0" },
-  { name: "Color", value: "1" },
-  { name: "Inverted", value: "2" },
-  { name: "Detailed", value: "3" },
-];
-
 const COLOR_OPTIONS = [
   { name: "None", value: "none" },
   { name: "Color", value: "color" },
@@ -85,7 +78,7 @@ export default function Dropzone() {
 
   // Track which dropdowns have been changed (for visual feedback)
   const [styleChanged, setStyleChanged] = useState(false);
-  const [presetChanged, setPresetChanged] = useState(false);
+
   const [colorChanged, setColorChanged] = useState(false);
   const [selectedPresetIndex, setSelectedPresetIndex] = useState<string>("0"); // Track selected preset
 
@@ -287,7 +280,6 @@ export default function Dropzone() {
     charWidth.value = preset.width;
     invertBrightness.value = preset.invert || false;
     setSelectedPresetIndex(presetIndex.toString());
-    setPresetChanged(true);
 
     if (imageLoaded) {
       scheduleReprocess();
@@ -303,7 +295,6 @@ export default function Dropzone() {
     setCurrentImage(null);
     // Reset all change trackers and settings
     setStyleChanged(false);
-    setPresetChanged(false);
     setColorChanged(false);
     setSelectedPresetIndex("0");
     // Reset signals to defaults
@@ -487,8 +478,28 @@ export default function Dropzone() {
 
           {/* Compact Controls - Below Output */}
           <div class="space-y-4 md:space-y-6">
-            {/* Three Magic Dropdowns - Match TextToAscii layout */}
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+            {/* Quick Presets Pills Row */}
+            <div class="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+              <span class="font-mono text-xs font-bold opacity-60 mr-1 uppercase">
+                Presets:
+              </span>
+              {PRESETS.map((preset, index) => (
+                <button
+                  type="button"
+                  key={preset.name}
+                  onClick={() => applyPreset(index)}
+                  class={`px-3 py-1.5 text-xs font-mono font-bold border-3 rounded-xl transition-all active:scale-95 shadow-brutal-sm hover:translate-y-[-1px]`}
+                  style={selectedPresetIndex === index.toString()
+                    ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A);"
+                    : "background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"}
+                >
+                  {preset.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Two Magic Dropdowns - Style and Color */}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
               <MagicDropdown
                 label="Style"
                 options={STYLE_OPTIONS}
@@ -496,19 +507,9 @@ export default function Dropzone() {
                 onChange={(value) => {
                   selectedStyle.value = value as CharacterStyle;
                   setStyleChanged(true);
+                  setSelectedPresetIndex("-1");
                 }}
                 changed={styleChanged}
-              />
-
-              <MagicDropdown
-                label="Preset"
-                options={PRESET_OPTIONS}
-                value={selectedPresetIndex}
-                onChange={(value) => {
-                  const presetIndex = parseInt(value);
-                  applyPreset(presetIndex);
-                }}
-                changed={presetChanged}
               />
 
               <MagicDropdown
@@ -518,6 +519,7 @@ export default function Dropzone() {
                 onChange={(value) => {
                   colorMode.value = value;
                   setColorChanged(true);
+                  setSelectedPresetIndex("-1");
                 }}
                 changed={colorChanged}
               />
@@ -547,6 +549,7 @@ export default function Dropzone() {
                 onInput={(e) => {
                   const value = parseInt((e.target as HTMLInputElement).value);
                   charWidth.value = value;
+                  setSelectedPresetIndex("-1");
                   if (Math.random() < 0.1) sounds.slide(value);
                 }}
               />
@@ -570,6 +573,7 @@ export default function Dropzone() {
                     sounds.toggle();
                     invertBrightness.value =
                       (e.target as HTMLInputElement).checked;
+                    setSelectedPresetIndex("-1");
                   }}
                   class="w-5 h-5 group-hover:animate-wiggle"
                   style="accent-color: var(--color-accent, #FF69B4)"
