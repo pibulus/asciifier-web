@@ -86,6 +86,26 @@ export function TerminalDisplay({
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [wrapLines, setWrapLines] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: MouseEvent) => {
+    const rect = (e.currentTarget as Element).getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    setMousePos({ x, y });
+  };
+
+  const isHolo = visualEffect === "hologram";
+  const tiltStyle = isHolo
+    ? (isHovered
+      ? `transform: perspective(1000px) rotateY(${
+        (mousePos.x - 0.5) * 14
+      }deg) rotateX(${
+        (0.5 - mousePos.y) * 14
+      }deg); transition: transform 0.1s ease-out; will-change: transform;`
+      : "transform: perspective(1000px) rotateY(0deg) rotateX(0deg); transition: transform 0.5s ease-in-out; will-change: transform;")
+    : "";
 
   const customStyle =
     `color: #00FF41; line-height: 1.3; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; font-weight: 900; font-size: calc(${
@@ -129,8 +149,32 @@ export function TerminalDisplay({
   return (
     <div
       class="rounded-2xl sm:rounded-3xl border-3 sm:border-4 shadow-brutal overflow-hidden relative"
-      style="background-color: #000000; border-color: var(--color-border, #0A0A0A);"
+      style={`background-color: #000000; border-color: var(--color-border, #0A0A0A); ${tiltStyle}`}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
+      {isHolo && (
+        <div
+          class="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300"
+          style={`
+            background: linear-gradient(
+              115deg,
+              transparent 10%,
+              rgba(0, 255, 255, 0.4) 35%,
+              rgba(255, 0, 255, 0.45) 50%,
+              rgba(255, 255, 0, 0.35) 65%,
+              transparent 90%
+            );
+            background-position: ${mousePos.x * 150 - 25}% ${
+            mousePos.y * 150 - 25
+          }%;
+            background-size: 160% 160%;
+            mix-blend-mode: color-dodge;
+            opacity: ${isHovered ? 0.75 : 0};
+          `}
+        />
+      )}
       {/* Terminal Menu Bar */}
       <div
         class="px-4 py-3 border-b-4 flex items-center justify-between gap-2"
