@@ -110,17 +110,19 @@ export function HistoryModal() {
             style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A); max-height: calc(92vh - 140px);"
           >
             {/* Slogan Intro */}
-            <div class="space-y-2">
-              <p class="text-xs sm:text-sm font-mono uppercase tracking-widest font-bold text-gray-500">
-                [SYSTEMS CHECK // HISTORICAL RECORDS ONLINE]
+            <div class="space-y-2 text-left">
+              <p class="text-xs sm:text-sm font-mono uppercase tracking-widest font-bold text-[#FF69B4]">
+                ✨ a friendly zine on text art roots
               </p>
               <h3 class="text-lg sm:text-2xl font-black font-mono leading-tight">
-                Before pixels hijacked our attention, we painted with keys.
+                Before screens got heavy, we painted with keys.
               </h3>
               <p class="text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300">
-                Monospace was the constraint. Speed was the canvas. We mapped
-                characters to values, bent teleprinters to our whims, and turned
-                low-power dial-up lines into visual portals.
+                Welcome to the monospace clubhouse. Long before graphics cards
+                and high-definition video took over, folks were figuring out how
+                to draw butterflies, rockets, and funny faces using nothing but
+                letters. It is scrappy, nostalgic, and a whole lot of fun. Grab
+                a warm drink and dig into the timeline.
               </p>
             </div>
 
@@ -143,9 +145,10 @@ export function HistoryModal() {
                   </h4>
                   <p class="text-xs sm:text-sm font-serif leading-relaxed text-gray-800">
                     Flora Stacey struck the first butterfly in 1898. No screen,
-                    no buffer, just ink-ribbons and brute striking force.
-                    Secretaries created shading by over-striking letters and
-                    adjusting paper feeds by hand.
+                    no save buttons, just heavy iron keys and paper. She and
+                    other pioneers did shading by hitting characters right on
+                    top of each other and rolling the feed by hand. Pure tactile
+                    focus.
                   </p>
                 </div>
 
@@ -175,10 +178,10 @@ export function HistoryModal() {
                     RTTY & Line Printers
                   </h4>
                   <p class="text-xs sm:text-sm font-mono leading-relaxed text-gray-800">
-                    Teleprinters sent code over radio lines. Mainframe reels
-                    spat out long banners of Snoopy, pinups, and flags.
-                    Monospace alignment grid systems were locked in,
-                    birth-marking the standard 1:2 height ratio.
+                    Teleprinters chattered over radio waves, rolling out
+                    continuous paper banners. Operators programmed mainframes to
+                    print giant pinups, peace signs, and seasonal greetings.
+                    Monospace rules were locked in, keeping characters aligned.
                   </p>
                 </div>
 
@@ -208,10 +211,10 @@ export function HistoryModal() {
                     BBS & CP437 Underground
                   </h4>
                   <p class="text-xs sm:text-sm font-mono leading-relaxed text-[#2CDE10]">
-                    Dial-up Bulletin Boards loaded IBM's Code Page 437 blocks
-                    (░▒▓█) and half-blocks (▄▀). ANSI colors allowed 16-color
-                    graphics. Groups like ACiD and iCE battled to design dial-up
-                    doors and NFO scene loaders.
+                    Dial-up Bulletin Boards lit up dark bedrooms with glowing
+                    CRT screens. Standard IBM blocks (░▒▓█) and ANSI escape
+                    sequences let kids build 16-color underground menus. Dialing
+                    in felt like magic, and the art scene was alive.
                   </p>
                 </div>
 
@@ -240,10 +243,11 @@ export function HistoryModal() {
                     Unicode & Japanese Shift-JIS
                   </h4>
                   <p class="text-xs sm:text-sm font-mono leading-relaxed text-gray-800">
-                    Unicode introduced thousands of mathematical and script
-                    symbols. Japanese 2channel users combined katakana into
-                    expressive Shift-JIS faces (Kaomoji). Today, braille
-                    generators pack density into 8-dot matrices.
+                    Unicode gave us thousands of strange symbols to play with.
+                    On Japanese message boards, users combined katakana into
+                    legendary kaomoji faces (Giko Cat). Today, braille
+                    generators map images so they run fast on low-power
+                    cyberdecks.
                   </p>
                 </div>
 
@@ -264,26 +268,29 @@ export function HistoryModal() {
             >
               <div class="flex items-center gap-2 mb-1">
                 <span class="font-mono text-xs font-black bg-[#D2E4F2] px-2 py-0.5 rounded border border-[#0078BF]">
-                  RISOGRAPH DEPT
+                  ⚙️ HOW IT WORKS
                 </span>
-                <span class="font-mono text-xs font-bold">
-                  SCHEMATIC V4-LORE
+                <span class="font-mono text-xs font-bold text-blue-700">
+                  SIMPLE SPELLS
                 </span>
               </div>
               <h4 class="text-base sm:text-lg font-black font-mono tracking-tight uppercase">
-                ⚙️ The Mechanics of Light to Text Mapping
+                The Mechanics of Light to Text Mapping
               </h4>
               <p class="text-xs sm:text-sm leading-relaxed font-mono">
-                Inside the ASCIIFIER converter engine, standard pixel graphics
-                undergo translation to text via a three-part pipeline:
+                Here is the clean logic under the hood. No heavy machine
+                learning, just a three-step spell to translate light into
+                letters:
               </p>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs sm:text-sm pt-2">
                 <div class="p-3 bg-white rounded border border-[#D2E4F2] space-y-2">
-                  <span class="font-bold text-[#0078BF]">01 / LUMINOSITY</span>
+                  <span class="font-bold text-[#0078BF]">
+                    01 / LIGHT WEIGHTS
+                  </span>
                   <p class="text-xs text-gray-700 leading-normal">
-                    We process each pixel matrix. Perceiving light like the
-                    human eye does:
+                    We evaluate each pixel block and calculate how bright it
+                    feels to a human eye:
                   </p>
                   <code class="block p-1 bg-gray-50 rounded text-[9px] text-[#004B87] font-bold text-center">
                     0.299R + 0.587G + 0.114B
@@ -291,10 +298,10 @@ export function HistoryModal() {
                 </div>
 
                 <div class="p-3 bg-white rounded border border-[#D2E4F2] space-y-2">
-                  <span class="font-bold text-[#0078BF]">02 / COMPRESSION</span>
+                  <span class="font-bold text-[#0078BF]">02 / GLYPH MAGIC</span>
                   <p class="text-xs text-gray-700 leading-normal">
-                    We map the brightness byte (0-255) to character weight
-                    strings. Bright maps to space; dark maps to dense glyphs.
+                    We match that brightness byte to our text strings. Bright
+                    spots get airy characters, dark spots get chunky blocks.
                   </p>
                 </div>
 
@@ -303,9 +310,9 @@ export function HistoryModal() {
                     03 / RATIO STRETCH
                   </span>
                   <p class="text-xs text-gray-700 leading-normal">
-                    Terminal characters are twice as tall as they are wide. To
-                    stop squishing, we scale height sample bounds by a factor of
-                    0.5.
+                    Terminal characters are taller than they are wide. To stop
+                    squishing, we scale height by 0.5 so your face stays
+                    natural.
                   </p>
                 </div>
               </div>
@@ -319,6 +326,10 @@ export function HistoryModal() {
               >
                 🔗 Old Skool Internet Preservation Databases
               </h4>
+              <p class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-mono">
+                Swinging by these digital archives is highly recommended if you
+                want to explore further:
+              </p>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm font-mono">
                 <a
                   href="https://www.asciiart.eu/"
@@ -369,7 +380,8 @@ export function HistoryModal() {
               style="border-color: var(--color-border, #0A0A0A)"
             >
               <p>
-                Keep the terminal alive. Long live monospace.
+                Made with love, zines, and standard monospace fonts. Thanks for
+                swinging by. ☕
               </p>
             </div>
           </div>
