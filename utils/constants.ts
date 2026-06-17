@@ -18,13 +18,8 @@ export const COLOR_EFFECTS = [
   { name: "Vaporwave", value: "vaporwave" },
   { name: "Cyberpunk", value: "cyberpunk" },
   { name: "Ocean", value: "ocean" },
-  { name: "Chrome", value: "chrome" },
-  { name: "Neon", value: "neon" },
-  { name: "Poison", value: "poison" },
-  { name: "Angel", value: "angel" },
   { name: "Vampire", value: "vampire" },
   { name: "Ice", value: "ice" },
-  { name: "Forest", value: "forest" },
   { name: "Gold", value: "gold" },
   { name: "Candy", value: "candy" },
 ];
@@ -37,7 +32,6 @@ export const VISUAL_EFFECTS = [
   { name: "Thermal", value: "thermal" },
   { name: "Hologram", value: "hologram" },
   { name: "Retro", value: "retro" },
-  { name: "Cyberpunk", value: "cyberpunk" },
 ];
 
 export const ASCII_MUSEUM_CATEGORIES = [

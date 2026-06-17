@@ -67,16 +67,11 @@ const VALID_EFFECTS = new Set([
   "ocean",
   "unicorn",
   "matrix",
-  "chrome",
-  "angel",
   "sunrise",
   "cyberpunk",
   "vaporwave",
-  "neon",
-  "poison",
   "vampire",
   "ice",
-  "forest",
   "gold",
   "candy",
 ]);
@@ -314,22 +309,6 @@ function getEffectColor(
       return `hsl(${fireHue}, ${fireSat}%, 50%)`;
     }
 
-    case "angel": {
-      // Angel - lush whites with soft gold/blue shimmer
-      const angelProgress = (x + y) / (safeLineWidth + safeTotalLines);
-      const angelHue = 45 + Math.sin(angelProgress * 8) * 15; // Soft gold shimmer (30-60)
-      const angelSat = 15 + Math.sin(angelProgress * 6) * 10; // Very subtle saturation
-      const angelBright = 85 + Math.sin(angelProgress * 10) * 10; // Bright whites (75-95)
-      return `hsl(${angelHue}, ${angelSat}%, ${angelBright}%)`;
-    }
-
-    case "chrome": {
-      // Chrome reflection - cool blues/silvers
-      const chromeHue = 200 + Math.sin(x * 0.2) * 60;
-      const chromeBrightness = 70 + Math.sin(y * 0.3) * 20;
-      return `hsl(${chromeHue}, 30%, ${chromeBrightness}%)`;
-    }
-
     case "sunrise": {
       // Succulent sunrise - pink to orange to yellow gradient
       const sunriseProgress = y / safeTotalLines;
@@ -364,24 +343,6 @@ function getEffectColor(
       return `hsl(${oceanHue}, ${oceanSat}%, ${oceanBright}%)`;
     }
 
-    case "neon": {
-      // Neon - bright electric oscillating colors
-      const neonProgress = (x + y) / (safeLineWidth + safeTotalLines);
-      const neonHue = 60 + Math.sin(neonProgress * 10) * 120; // Yellow/Green/Pink oscillation
-      const neonSat = 100;
-      const neonBright = 60 + Math.sin(neonProgress * 8) * 15;
-      return `hsl(${neonHue}, ${neonSat}%, ${neonBright}%)`;
-    }
-
-    case "poison": {
-      // Poison - toxic radioactive green
-      const poisonProgress = (x + y) / (safeLineWidth + safeTotalLines);
-      const poisonHue = 90 + (poisonProgress * 30); // Lime green (90) → Yellow-green (120)
-      const poisonSat = 90 + Math.sin(x * 0.5) * 10;
-      const poisonBright = 45 + (poisonProgress * 20);
-      return `hsl(${poisonHue}, ${poisonSat}%, ${poisonBright}%)`;
-    }
-
     case "vampire": {
       // Deep blood red with subtle charcoal shading
       const progress = (x + y) / (safeLineWidth + safeTotalLines);
@@ -397,15 +358,6 @@ function getEffectColor(
       const hue = 190 + Math.sin(progress * 4) * 20;
       const sat = 80 - progress * 40;
       const bright = 75 + progress * 20;
-      return `hsl(${hue}, ${sat}%, ${bright}%)`;
-    }
-
-    case "forest": {
-      // Moss green to fluorescent nature chartreuse
-      const progress = (x + y) / (safeLineWidth + safeTotalLines);
-      const hue = 90 + progress * 40;
-      const sat = 75 + Math.sin(progress * 6) * 15;
-      const bright = 40 + progress * 20;
       return `hsl(${hue}, ${sat}%, ${bright}%)`;
     }
 

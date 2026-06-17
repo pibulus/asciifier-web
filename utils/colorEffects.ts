@@ -37,13 +37,6 @@ export function getEffectColor(
       const sat = 100 - (y * 20 / safeTotalLines);
       return `hsl(${hue}, ${sat}%, 55%)`;
     }
-    case "angel": {
-      const progress = (x + y) / (safeLineWidth + safeTotalLines);
-      const hue = 45 + Math.sin(progress * 8) * 15;
-      const sat = 15 + Math.sin(progress * 6) * 10;
-      const bright = 85 + Math.sin(progress * 10) * 10;
-      return `hsl(${hue}, ${sat}%, ${bright}%)`;
-    }
     case "cyberpunk": {
       const progress = (x + y) / (safeLineWidth + safeTotalLines);
       const hue = 320 - (progress * 140);
@@ -63,30 +56,11 @@ export function getEffectColor(
       const bright = 65 + Math.sin(x * 0.4) * 10;
       return `hsl(${hue}, ${sat}%, ${bright}%)`;
     }
-    case "chrome": {
-      const hue = 200 + Math.sin(x * 0.2) * 60;
-      const brightness = 70 + Math.sin(y * 0.3) * 20;
-      return `hsl(${hue}, 30%, ${brightness}%)`;
-    }
     case "ocean": {
       const progress = y / safeTotalLines;
       const hue = 180 + (progress * 30); // Cyan (180) → Blue (210)
       const sat = 70 + (progress * 20);
       const bright = 50 + (progress * 20);
-      return `hsl(${hue}, ${sat}%, ${bright}%)`;
-    }
-    case "neon": {
-      const progress = (x + y) / (safeLineWidth + safeTotalLines);
-      const hue = 60 + Math.sin(progress * 10) * 120; // Yellow/Green/Pink oscillation
-      const sat = 100;
-      const bright = 60 + Math.sin(progress * 8) * 15;
-      return `hsl(${hue}, ${sat}%, ${bright}%)`;
-    }
-    case "poison": {
-      const progress = (x + y) / (safeLineWidth + safeTotalLines);
-      const hue = 90 + (progress * 30); // Lime green (90) → Yellow-green (120)
-      const sat = 90 + Math.sin(x * 0.5) * 10;
-      const bright = 45 + (progress * 20);
       return `hsl(${hue}, ${sat}%, ${bright}%)`;
     }
     case "vampire": {
@@ -101,13 +75,6 @@ export function getEffectColor(
       const hue = 190 + Math.sin(progress * 4) * 20; // 170 to 210 (cyan-blue)
       const sat = 80 - progress * 40; // Whitening effect
       const bright = 75 + progress * 20; // Soft bright ice
-      return `hsl(${hue}, ${sat}%, ${bright}%)`;
-    }
-    case "forest": {
-      const progress = (x + y) / (safeLineWidth + safeTotalLines);
-      const hue = 90 + progress * 40; // 90 to 130
-      const sat = 75 + Math.sin(progress * 6) * 15;
-      const bright = 40 + progress * 20;
       return `hsl(${hue}, ${sat}%, ${bright}%)`;
     }
     case "gold": {

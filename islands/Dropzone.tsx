@@ -59,7 +59,6 @@ const STYLE_OPTIONS = [
   { name: "Retro", value: "retro" },
   { name: "Shades", value: "shades" },
   { name: "Geometric", value: "geometric" },
-  { name: "Gradient", value: "gradient" },
 ];
 
 const PRESET_OPTIONS = [
