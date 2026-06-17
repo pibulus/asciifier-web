@@ -16,6 +16,7 @@ export class SoundEngine {
   }
 
   resume() {
+    if (!this.audioContext) this.init();
     if (this.audioContext?.state === "suspended") {
       this.audioContext.resume();
     }

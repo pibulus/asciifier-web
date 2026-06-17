@@ -217,6 +217,42 @@ export default function ArciiArcade() {
         .animate-pulse-soft {
           animation: pulse-soft 2s infinite ease-in-out;
         }
+
+        /* Fullscreen responsive styles */
+        .game-container:fullscreen {
+          background-color: #0F172A !important;
+          padding: 1.5rem !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: center !important;
+          align-items: center !important;
+          overflow-y: auto !important;
+        }
+        .game-container:fullscreen > div {
+          width: 100% !important;
+          max-width: 1100px !important;
+          margin: auto !important;
+        }
+
+        /* Webkit support */
+        .game-container:-webkit-full-screen {
+          background-color: #0F172A !important;
+          padding: 1.5rem !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: center !important;
+          align-items: center !important;
+          overflow-y: auto !important;
+        }
+        .game-container:-webkit-full-screen > div {
+          width: 100% !important;
+          max-width: 1100px !important;
+          margin: auto !important;
+        }
         `}
       </style>
     </div>
@@ -260,6 +296,36 @@ function TetrisGame() {
   const [level, setLevel] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+
+  const consoleRef = useRef<HTMLDivElement>(null);
+  const [_isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(
+        globalThis.document?.fullscreenElement === consoleRef.current,
+      );
+    };
+    globalThis.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      globalThis.removeEventListener(
+        "fullscreenchange",
+        handleFullscreenChange,
+      );
+    };
+  }, []);
+
+  const toggleFullscreen = () => {
+    sounds.click();
+    if (!consoleRef.current) return;
+    if (!globalThis.document?.fullscreenElement) {
+      consoleRef.current.requestFullscreen().catch((err) => {
+        console.error("Fullscreen error:", err);
+      });
+    } else {
+      globalThis.document.exitFullscreen();
+    }
+  };
 
   const boardRef = useRef(board);
   boardRef.current = board;
@@ -315,6 +381,7 @@ function TetrisGame() {
   };
 
   const startGame = () => {
+    sounds.resume();
     sounds.click();
     const cleanBoard = Array(ROWS).fill(null).map(() => Array(COLS).fill("."));
     setBoard(cleanBoard);
@@ -573,169 +640,247 @@ function TetrisGame() {
   };
 
   return (
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Tetris screen (2 columns) */}
-      <div
-        class="md:col-span-2 border-4 rounded-3xl overflow-hidden shadow-brutal bg-black flex flex-col relative"
-        style="border-color: var(--color-border, #0A0A0A)"
-      >
+    <div
+      ref={consoleRef}
+      class="game-container rounded-3xl p-1 md:p-4 transition-all"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Tetris screen (2 columns) */}
         <div
-          class="px-4 py-2 bg-gray-900 border-b-4 flex items-center justify-between"
+          class="md:col-span-2 border-4 rounded-3xl overflow-hidden shadow-brutal bg-black flex flex-col relative"
           style="border-color: var(--color-border, #0A0A0A)"
         >
-          <div class="flex space-x-1.5">
-            <span class="w-3 h-3 rounded-full bg-red-500"></span>
-            <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
-            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-          </div>
-          <span class="text-xs font-mono text-[#00FF41] opacity-75">
-            ~/arcade/tetris.sh
-          </span>
-          <div class="text-xs font-mono text-gray-500">LEVEL: {level}</div>
-        </div>
-
-        <div class="relative flex-1 p-2 md:p-4 flex items-center justify-center min-h-[360px] max-h-[440px] select-none bg-black overflow-hidden crt-screen">
-          <div class="absolute inset-0 scanlines pointer-events-none z-10">
-          </div>
-          {renderScreen()}
-
-          {isGameOver && (
-            <div class="absolute inset-0 bg-black bg-opacity-90 z-20 flex flex-col items-center justify-center font-mono space-y-4 text-center p-6">
-              <div class="text-red-500 text-2xl font-black tracking-widest animate-bounce">
-                ⚠️ STACK OVERFLOW
-              </div>
-              <p class="text-gray-400 text-xs">
-                Game Over! Score:{" "}
-                <span class="text-yellow-400 font-bold">{score}</span>
-              </p>
+          <div
+            class="px-4 py-2 bg-gray-900 border-b-4 flex items-center justify-between"
+            style="border-color: var(--color-border, #0A0A0A)"
+          >
+            <div class="flex space-x-1.5">
               <button
                 type="button"
-                onClick={startGame}
-                class="px-5 py-2 border-3 rounded-xl font-bold text-xs bg-red-500 text-white shadow-brutal hover:scale-105 transition-transform"
-                style="border-color: var(--color-border, #0A0A0A)"
-              >
-                PLAY AGAIN
-              </button>
+                onClick={handleQuit}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleQuit();
+                }}
+                class="w-3 h-3 rounded-full bg-red-500 hover:scale-125 transition-transform cursor-pointer"
+                title="Quit Game"
+                aria-label="Quit Game"
+              />
+              <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  toggleFullscreen();
+                }}
+                class="w-3 h-3 rounded-full bg-green-500 hover:scale-125 transition-transform cursor-pointer"
+                title="Toggle Full Screen"
+                aria-label="Toggle Full Screen"
+              />
             </div>
-          )}
+            <span class="text-xs font-mono text-[#00FF41] opacity-75">
+              ~/arcade/tetris.sh
+            </span>
+            <div class="text-xs font-mono text-gray-500">LEVEL: {level}</div>
+          </div>
+
+          <div class="relative flex-1 p-2 md:p-4 flex items-center justify-center min-h-[360px] max-h-[440px] select-none bg-black overflow-hidden crt-screen">
+            <div class="absolute inset-0 scanlines pointer-events-none z-10">
+            </div>
+            {renderScreen()}
+
+            {isGameOver && (
+              <div class="absolute inset-0 bg-black bg-opacity-90 z-20 flex flex-col items-center justify-center font-mono space-y-4 text-center p-6">
+                <div class="text-red-500 text-2xl font-black tracking-widest animate-bounce">
+                  ⚠️ STACK OVERFLOW
+                </div>
+                <p class="text-gray-400 text-xs">
+                  Game Over! Score:{" "}
+                  <span class="text-yellow-400 font-bold">{score}</span>
+                </p>
+                <button
+                  type="button"
+                  onClick={startGame}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    startGame();
+                  }}
+                  class="px-5 py-2 border-3 rounded-xl font-bold text-xs bg-red-500 text-white shadow-brutal hover:scale-105 transition-transform"
+                  style="border-color: var(--color-border, #0A0A0A)"
+                >
+                  PLAY AGAIN
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div
+            class="px-4 py-3 bg-gray-900 border-t-4 flex items-center justify-between font-mono text-xs text-[#00FF41]"
+            style="border-color: var(--color-border, #0A0A0A)"
+          >
+            <div>
+              SCORE: <span class="text-yellow-400 font-bold">{score}</span>
+            </div>
+            <div>
+              LINES: <span class="text-yellow-400 font-bold">{lines}</span>
+            </div>
+            {isPlaying && (
+              <button
+                type="button"
+                onClick={handleQuit}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleQuit();
+                }}
+                class="text-red-400 hover:text-red-300 font-bold border border-red-500 px-2 py-0.5 rounded text-[10px]"
+              >
+                QUIT
+              </button>
+            )}
+          </div>
         </div>
 
+        {/* Tetris Controller (1 column) */}
         <div
-          class="px-4 py-3 bg-gray-900 border-t-4 flex items-center justify-between font-mono text-xs text-[#00FF41]"
+          class="border-4 rounded-3xl p-5 bg-white shadow-brutal flex flex-col justify-between space-y-4"
           style="border-color: var(--color-border, #0A0A0A)"
         >
-          <div>
-            SCORE: <span class="text-yellow-400 font-bold">{score}</span>
+          <div class="space-y-3">
+            <h3 class="font-mono font-bold text-lg text-gray-900 border-b-2 pb-1.5">
+              TETROMINO PAD
+            </h3>
+            <p class="text-[11px] font-mono text-gray-500 leading-normal">
+              Steer with{" "}
+              <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
+                A/D
+              </span>{" "}
+              or Left/Right. Rotate with{" "}
+              <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
+                W
+              </span>
+              /Up. Soft drop with{" "}
+              <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
+                S
+              </span>
+              /Down. Hard drop with{" "}
+              <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
+                SPACE
+              </span>
+              .
+            </p>
           </div>
-          <div>
-            LINES: <span class="text-yellow-400 font-bold">{lines}</span>
+
+          {/* Gameboy-style Tactile Controls */}
+          <div class="flex flex-col items-center gap-4 py-2 select-none">
+            <div class="flex items-center justify-between gap-6 w-full max-w-[280px] mx-auto">
+              {/* Left: Classic D-Pad Cross */}
+              <div
+                class="relative w-24 h-24 flex items-center justify-center bg-gray-200 rounded-full border-3 shadow-inner"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                {/* LEFT button */}
+                <button
+                  type="button"
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    movePiece(-1, 0);
+                  }}
+                  onClick={() => movePiece(-1, 0)}
+                  disabled={!isPlaying}
+                  aria-label="Move Left"
+                  class="absolute left-0 w-8 h-8 bg-gray-800 text-white disabled:bg-gray-300 disabled:text-gray-500 border-2 border-black rounded-l flex items-center justify-center active:scale-90 font-bold text-xs"
+                >
+                  ◀
+                </button>
+                {/* RIGHT button */}
+                <button
+                  type="button"
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    movePiece(1, 0);
+                  }}
+                  onClick={() => movePiece(1, 0)}
+                  disabled={!isPlaying}
+                  aria-label="Move Right"
+                  class="absolute right-0 w-8 h-8 bg-gray-800 text-white disabled:bg-gray-300 disabled:text-gray-500 border-2 border-black rounded-r flex items-center justify-center active:scale-90 font-bold text-xs"
+                >
+                  ▶
+                </button>
+                {/* DOWN button (Soft Drop) */}
+                <button
+                  type="button"
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    movePiece(0, 1);
+                  }}
+                  onClick={() => movePiece(0, 1)}
+                  disabled={!isPlaying}
+                  aria-label="Soft Drop"
+                  class="absolute bottom-0 w-8 h-8 bg-gray-800 text-white disabled:bg-gray-300 disabled:text-gray-500 border-2 border-black rounded-b flex items-center justify-center active:scale-90 font-bold text-xs"
+                >
+                  ▼
+                </button>
+                <div class="w-8 h-8 bg-gray-800 border-x-2 border-black"></div>
+              </div>
+
+              {/* Right: Gameboy A/B Action Buttons */}
+              <div class="flex gap-3 items-center">
+                <div class="flex flex-col items-center">
+                  <button
+                    type="button"
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      hardDrop();
+                    }}
+                    onClick={hardDrop}
+                    disabled={!isPlaying}
+                    aria-label="Hard Drop"
+                    class="w-10 h-10 bg-red-500 hover:bg-red-400 disabled:bg-gray-300 border-3 border-black rounded-full flex items-center justify-center shadow active:scale-90 text-white font-black text-[10px]"
+                  >
+                    B
+                  </button>
+                  <span class="text-[8px] font-mono font-bold mt-1 text-gray-400">
+                    DROP
+                  </span>
+                </div>
+                <div class="flex flex-col items-center -mt-4">
+                  <button
+                    type="button"
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      rotatePiece();
+                    }}
+                    onClick={rotatePiece}
+                    disabled={!isPlaying}
+                    aria-label="Rotate"
+                    class="w-12 h-12 bg-red-600 hover:bg-red-500 disabled:bg-gray-300 border-3 border-black rounded-full flex items-center justify-center shadow active:scale-90 text-white font-black text-xs"
+                  >
+                    A
+                  </button>
+                  <span class="text-[8px] font-mono font-bold mt-1 text-gray-400">
+                    ROTATE
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-          {isPlaying && (
+
+          {!isPlaying && (
             <button
               type="button"
-              onClick={handleQuit}
-              class="text-red-400 hover:text-red-300 font-bold border border-red-500 px-2 py-0.5 rounded text-[10px]"
+              onClick={startGame}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                startGame();
+              }}
+              class="w-full py-3.5 border-4 rounded-2xl font-mono font-black text-sm shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all bg-yellow-400 text-black"
+              style="border-color: var(--color-border, #0A0A0A)"
             >
-              QUIT
+              {isGameOver ? "RETRY MISSION 🔁" : "START MISSION 🎮"}
             </button>
           )}
         </div>
-      </div>
-
-      {/* Tetris Controller (1 column) */}
-      <div
-        class="border-4 rounded-3xl p-5 bg-white shadow-brutal flex flex-col justify-between space-y-4"
-        style="border-color: var(--color-border, #0A0A0A)"
-      >
-        <div class="space-y-3">
-          <h3 class="font-mono font-bold text-lg text-gray-900 border-b-2 pb-1.5">
-            TETROMINO PAD
-          </h3>
-          <p class="text-[11px] font-mono text-gray-500 leading-normal">
-            Steer with{" "}
-            <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
-              A/D
-            </span>{" "}
-            or Left/Right. Rotate with{" "}
-            <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
-              W
-            </span>
-            /Up. Soft drop with{" "}
-            <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
-              S
-            </span>
-            /Down. Hard drop with{" "}
-            <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
-              SPACE
-            </span>
-            .
-          </p>
-        </div>
-
-        {/* Controller grid */}
-        <div class="flex flex-col items-center gap-2 py-2">
-          {/* Rotate UP */}
-          <button
-            type="button"
-            onClick={rotatePiece}
-            disabled={!isPlaying}
-            class="px-5 py-2.5 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
-            style="border-color: var(--color-border, #0A0A0A)"
-          >
-            ROTATE ▲
-          </button>
-
-          <div class="flex gap-4">
-            <button
-              type="button"
-              onClick={() => movePiece(-1, 0)}
-              disabled={!isPlaying}
-              class="w-14 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              ◀
-            </button>
-            <button
-              type="button"
-              onClick={() => movePiece(0, 1)}
-              disabled={!isPlaying}
-              class="w-14 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              ▼
-            </button>
-            <button
-              type="button"
-              onClick={() => movePiece(1, 0)}
-              disabled={!isPlaying}
-              class="w-14 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              ▶
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={hardDrop}
-            disabled={!isPlaying}
-            class="w-full mt-1.5 py-2.5 bg-gray-900 text-[#00FF41] hover:bg-gray-800 disabled:bg-gray-300 disabled:text-gray-500 border-3 font-mono font-bold text-xs rounded-xl flex items-center justify-center transition-all active:scale-[0.98]"
-            style="border-color: var(--color-border, #0A0A0A)"
-          >
-            SPACE: HARD DROP ⚡
-          </button>
-        </div>
-
-        {!isPlaying && (
-          <button
-            type="button"
-            onClick={startGame}
-            class="w-full py-3.5 border-4 rounded-2xl font-mono font-black text-sm shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all bg-yellow-400 text-black"
-            style="border-color: var(--color-border, #0A0A0A)"
-          >
-            {isGameOver ? "RETRY MISSION 🔁" : "START MISSION 🎮"}
-          </button>
-        )}
       </div>
     </div>
   );
@@ -759,6 +904,36 @@ function SnakeGame() {
   const [highScore, setHighScore] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+
+  const consoleRef = useRef<HTMLDivElement>(null);
+  const [_isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(
+        globalThis.document?.fullscreenElement === consoleRef.current,
+      );
+    };
+    globalThis.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      globalThis.removeEventListener(
+        "fullscreenchange",
+        handleFullscreenChange,
+      );
+    };
+  }, []);
+
+  const toggleFullscreen = () => {
+    sounds.click();
+    if (!consoleRef.current) return;
+    if (!globalThis.document?.fullscreenElement) {
+      consoleRef.current.requestFullscreen().catch((err) => {
+        console.error("Fullscreen error:", err);
+      });
+    } else {
+      globalThis.document.exitFullscreen();
+    }
+  };
 
   const directionRef = useRef(direction);
   directionRef.current = direction;
@@ -837,6 +1012,7 @@ function SnakeGame() {
 
   // Start / Reset
   const startGame = () => {
+    sounds.resume();
     sounds.click();
     const initialSnake = [
       { x: 5, y: 8 },
@@ -917,6 +1093,7 @@ function SnakeGame() {
   };
 
   const steer = (dir: { x: number; y: number }) => {
+    sounds.resume();
     if (!isPlaying || isGameOver) return;
     const currentDir = directionRef.current;
     if (dir.x !== 0 && currentDir.x !== 0) return; // Prevent 180 horizontal
@@ -977,167 +1154,221 @@ function SnakeGame() {
   };
 
   return (
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Screen & Left Controls */}
-      <div
-        class="md:col-span-2 border-4 rounded-3xl overflow-hidden shadow-brutal bg-black flex flex-col relative"
-        style="border-color: var(--color-border, #0A0A0A)"
-      >
-        {/* Terminal Header */}
+    <div
+      ref={consoleRef}
+      class="game-container rounded-3xl p-1 md:p-4 transition-all"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Screen & Left Controls */}
         <div
-          class="px-4 py-2 bg-gray-900 border-b-4 flex items-center justify-between"
+          class="md:col-span-2 border-4 rounded-3xl overflow-hidden shadow-brutal bg-black flex flex-col relative"
           style="border-color: var(--color-border, #0A0A0A)"
         >
-          <div class="flex space-x-1.5">
-            <span class="w-3 h-3 rounded-full bg-red-500"></span>
-            <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
-            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-          </div>
-          <span class="text-xs font-mono text-[#00FF41] opacity-75">
-            ~/arcade/snake.sh
-          </span>
-          <div class="text-xs font-mono text-gray-500">GRID: 28x16</div>
-        </div>
-
-        {/* The Screen */}
-        <div class="relative flex-1 p-4 flex items-center justify-center min-h-[300px] select-none bg-black overflow-hidden crt-screen">
-          {/* Curving scanlines effect */}
-          <div class="absolute inset-0 scanlines pointer-events-none z-10">
-          </div>
-          {renderScreen()}
-
-          {/* Game Over Modal Overlaid */}
-          {isGameOver && (
-            <div class="absolute inset-0 bg-black bg-opacity-85 z-20 flex flex-col items-center justify-center font-mono space-y-4 text-center p-6">
-              <div class="text-red-500 text-2xl font-black tracking-widest animate-bounce">
-                ⚠️ GAME OVER
-              </div>
-              <p class="text-gray-400 text-xs">
-                You crashed! Score:{" "}
-                <span class="text-yellow-400 font-bold">{score}</span>
-              </p>
+          {/* Terminal Header */}
+          <div
+            class="px-4 py-2 bg-gray-900 border-b-4 flex items-center justify-between"
+            style="border-color: var(--color-border, #0A0A0A)"
+          >
+            <div class="flex space-x-1.5">
               <button
                 type="button"
-                onClick={startGame}
-                class="px-5 py-2 border-3 rounded-xl font-bold text-xs bg-red-500 text-white shadow-brutal hover:scale-105 transition-transform"
-                style="border-color: var(--color-border, #0A0A0A)"
-              >
-                PLAY AGAIN
-              </button>
+                onClick={handleGameOver}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleGameOver();
+                }}
+                class="w-3 h-3 rounded-full bg-red-500 hover:scale-125 transition-transform cursor-pointer"
+                title="Quit Game"
+                aria-label="Quit Game"
+              />
+              <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  toggleFullscreen();
+                }}
+                class="w-3 h-3 rounded-full bg-green-500 hover:scale-125 transition-transform cursor-pointer"
+                title="Toggle Full Screen"
+                aria-label="Toggle Full Screen"
+              />
             </div>
-          )}
+            <span class="text-xs font-mono text-[#00FF41] opacity-75">
+              ~/arcade/snake.sh
+            </span>
+            <div class="text-xs font-mono text-gray-500">GRID: 28x16</div>
+          </div>
+
+          {/* The Screen */}
+          <div class="relative flex-1 p-4 flex items-center justify-center min-h-[300px] select-none bg-black overflow-hidden crt-screen">
+            {/* Curving scanlines effect */}
+            <div class="absolute inset-0 scanlines pointer-events-none z-10">
+            </div>
+            {renderScreen()}
+
+            {/* Game Over Modal Overlaid */}
+            {isGameOver && (
+              <div class="absolute inset-0 bg-black bg-opacity-85 z-20 flex flex-col items-center justify-center font-mono space-y-4 text-center p-6">
+                <div class="text-red-500 text-2xl font-black tracking-widest animate-bounce">
+                  ⚠️ GAME OVER
+                </div>
+                <p class="text-gray-400 text-xs">
+                  You crashed! Score:{" "}
+                  <span class="text-yellow-400 font-bold">{score}</span>
+                </p>
+                <button
+                  type="button"
+                  onClick={startGame}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    startGame();
+                  }}
+                  class="px-5 py-2 border-3 rounded-xl font-bold text-xs bg-red-500 text-white shadow-brutal hover:scale-105 transition-transform"
+                  style="border-color: var(--color-border, #0A0A0A)"
+                >
+                  PLAY AGAIN
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Dashboard Bar */}
+          <div
+            class="px-4 py-3 bg-gray-900 border-t-4 flex items-center justify-between font-mono text-xs text-[#00FF41]"
+            style="border-color: var(--color-border, #0A0A0A)"
+          >
+            <div>
+              SCORE: <span class="text-yellow-400 font-bold">{score}</span>
+            </div>
+            <div>
+              HIGH: <span class="text-yellow-400 font-bold">{highScore}</span>
+            </div>
+            {isPlaying && (
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.click();
+                  handleGameOver();
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  sounds.click();
+                  handleGameOver();
+                }}
+                class="text-red-400 hover:text-red-300 font-bold border border-red-500 px-2 py-0.5 rounded text-[10px]"
+              >
+                QUIT
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Dashboard Bar */}
+        {/* Controller Pad (Right Column) */}
         <div
-          class="px-4 py-3 bg-gray-900 border-t-4 flex items-center justify-between font-mono text-xs text-[#00FF41]"
+          class="border-4 rounded-3xl p-6 bg-white shadow-brutal flex flex-col justify-between space-y-6"
           style="border-color: var(--color-border, #0A0A0A)"
         >
-          <div>
-            SCORE: <span class="text-yellow-400 font-bold">{score}</span>
+          <div class="space-y-4">
+            <h3 class="font-mono font-bold text-lg text-gray-900 border-b-2 pb-2">
+              CONTROLLER
+            </h3>
+            <p class="text-xs font-mono text-gray-500 leading-relaxed">
+              Use{" "}
+              <span class="bg-gray-100 px-1.5 py-0.5 rounded border font-bold">
+                W A S D
+              </span>{" "}
+              or arrow keys on your keyboard, or the touch controls below.
+            </p>
           </div>
-          <div>
-            HIGH: <span class="text-yellow-400 font-bold">{highScore}</span>
+
+          {/* Tactile D-pad */}
+          <div class="flex justify-center py-4">
+            <div
+              class="relative w-40 h-40 bg-gray-200 rounded-full border-4 shadow-brutal flex items-center justify-center select-none"
+              style="border-color: var(--color-border, #0A0A0A)"
+            >
+              {/* UP button */}
+              <button
+                type="button"
+                onClick={() => steer({ x: 0, y: -1 })}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  steer({ x: 0, y: -1 });
+                }}
+                disabled={!isPlaying}
+                aria-label="Steer Up"
+                class="absolute top-1 w-12 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                ▲
+              </button>
+              {/* DOWN button */}
+              <button
+                type="button"
+                onClick={() => steer({ x: 0, y: 1 })}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  steer({ x: 0, y: 1 });
+                }}
+                disabled={!isPlaying}
+                aria-label="Steer Down"
+                class="absolute bottom-1 w-12 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                ▼
+              </button>
+              {/* LEFT button */}
+              <button
+                type="button"
+                onClick={() => steer({ x: -1, y: 0 })}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  steer({ x: -1, y: 0 });
+                }}
+                disabled={!isPlaying}
+                aria-label="Steer Left"
+                class="absolute left-1 w-12 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                ◀
+              </button>
+              {/* RIGHT button */}
+              <button
+                type="button"
+                onClick={() => steer({ x: 1, y: 0 })}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  steer({ x: 1, y: 0 });
+                }}
+                disabled={!isPlaying}
+                aria-label="Steer Right"
+                class="absolute right-1 w-12 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                ▶
+              </button>
+              <div class="w-8 h-8 rounded-full bg-gray-700 border-2 border-black">
+              </div>
+            </div>
           </div>
-          {isPlaying && (
+
+          {/* Start Game buttons */}
+          {!isPlaying && (
             <button
               type="button"
-              onClick={() => {
-                sounds.click();
-                handleGameOver();
+              onClick={startGame}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                startGame();
               }}
-              class="text-red-400 hover:text-red-300 font-bold border border-red-500 px-2 py-0.5 rounded text-[10px]"
+              class="w-full py-4 border-4 rounded-2xl font-mono font-black text-sm shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all bg-yellow-400 text-black"
+              style="border-color: var(--color-border, #0A0A0A)"
             >
-              QUIT
+              {isGameOver ? "RETRY MISSION 🔁" : "START MISSION 🎮"}
             </button>
           )}
         </div>
-      </div>
-
-      {/* Controller Pad (Right Column) */}
-      <div
-        class="border-4 rounded-3xl p-6 bg-white shadow-brutal flex flex-col justify-between space-y-6"
-        style="border-color: var(--color-border, #0A0A0A)"
-      >
-        <div class="space-y-4">
-          <h3 class="font-mono font-bold text-lg text-gray-900 border-b-2 pb-2">
-            CONTROLLER
-          </h3>
-          <p class="text-xs font-mono text-gray-500 leading-relaxed">
-            Use{" "}
-            <span class="bg-gray-100 px-1.5 py-0.5 rounded border font-bold">
-              W A S D
-            </span>{" "}
-            or arrow keys on your keyboard, or the touch controls below.
-          </p>
-        </div>
-
-        {/* Tactile D-pad */}
-        <div class="flex justify-center py-4">
-          <div
-            class="relative w-40 h-40 bg-gray-200 rounded-full border-4 shadow-brutal flex items-center justify-center select-none"
-            style="border-color: var(--color-border, #0A0A0A)"
-          >
-            {/* UP button */}
-            <button
-              type="button"
-              onClick={() => steer({ x: 0, y: -1 })}
-              disabled={!isPlaying}
-              aria-label="Steer Up"
-              class="absolute top-1 w-12 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              ▲
-            </button>
-            {/* DOWN button */}
-            <button
-              type="button"
-              onClick={() => steer({ x: 0, y: 1 })}
-              disabled={!isPlaying}
-              aria-label="Steer Down"
-              class="absolute bottom-1 w-12 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              ▼
-            </button>
-            {/* LEFT button */}
-            <button
-              type="button"
-              onClick={() => steer({ x: -1, y: 0 })}
-              disabled={!isPlaying}
-              aria-label="Steer Left"
-              class="absolute left-1 w-12 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              ◀
-            </button>
-            {/* RIGHT button */}
-            <button
-              type="button"
-              onClick={() => steer({ x: 1, y: 0 })}
-              disabled={!isPlaying}
-              aria-label="Steer Right"
-              class="absolute right-1 w-12 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              ▶
-            </button>
-            <div class="w-8 h-8 rounded-full bg-gray-700 border-2 border-black">
-            </div>
-          </div>
-        </div>
-
-        {/* Start Game buttons */}
-        {!isPlaying && (
-          <button
-            type="button"
-            onClick={startGame}
-            class="w-full py-4 border-4 rounded-2xl font-mono font-black text-sm shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all bg-yellow-400 text-black"
-            style="border-color: var(--color-border, #0A0A0A)"
-          >
-            {isGameOver ? "RETRY MISSION 🔁" : "START MISSION 🎮"}
-          </button>
-        )}
       </div>
     </div>
   );
@@ -1157,6 +1388,36 @@ function GameOfLife() {
   const [speed, setSpeed] = useState(150); // ms per generation
   const [generation, setGeneration] = useState(0);
 
+  const consoleRef = useRef<HTMLDivElement>(null);
+  const [_isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(
+        globalThis.document?.fullscreenElement === consoleRef.current,
+      );
+    };
+    globalThis.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      globalThis.removeEventListener(
+        "fullscreenchange",
+        handleFullscreenChange,
+      );
+    };
+  }, []);
+
+  const toggleFullscreen = () => {
+    sounds.click();
+    if (!consoleRef.current) return;
+    if (!globalThis.document?.fullscreenElement) {
+      consoleRef.current.requestFullscreen().catch((err) => {
+        console.error("Fullscreen error:", err);
+      });
+    } else {
+      globalThis.document.exitFullscreen();
+    }
+  };
+
   const isRunningRef = useRef(isRunning);
   isRunningRef.current = isRunning;
 
@@ -1165,6 +1426,7 @@ function GameOfLife() {
 
   // Toggle cell on click
   const toggleCell = (r: number, c: number) => {
+    sounds.resume();
     sounds.toggle();
     const newGrid = grid.map((row, rIdx) =>
       row.map((val, cIdx) => (rIdx === r && cIdx === c ? !val : val))
@@ -1231,16 +1493,19 @@ function GameOfLife() {
 
   // Command handlers
   const handleStartStop = () => {
+    sounds.resume();
     sounds.click();
     setIsRunning(!isRunning);
   };
 
   const handleStep = () => {
+    sounds.resume();
     sounds.click();
     computeNextGeneration();
   };
 
   const handleClear = () => {
+    sounds.resume();
     sounds.click();
     setIsRunning(false);
     setGrid(Array(ROWS).fill(null).map(() => Array(COLS).fill(false)));
@@ -1248,6 +1513,7 @@ function GameOfLife() {
   };
 
   const handleRandomize = () => {
+    sounds.resume();
     sounds.success();
     setIsRunning(false);
     const randomized = Array(ROWS).fill(null).map(() =>
@@ -1259,6 +1525,7 @@ function GameOfLife() {
 
   // Pattern Loaders
   const loadPreset = (presetKey: keyof typeof PRESETS) => {
+    sounds.resume();
     sounds.success();
     setIsRunning(false);
     const newGrid = Array(ROWS).fill(null).map(() => Array(COLS).fill(false));
@@ -1278,186 +1545,247 @@ function GameOfLife() {
   };
 
   return (
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      {/* Game board & screen */}
-      <div
-        class="lg:col-span-3 border-4 rounded-3xl overflow-hidden shadow-brutal bg-black flex flex-col relative"
-        style="border-color: var(--color-border, #0A0A0A)"
-      >
-        {/* Header */}
+    <div
+      ref={consoleRef}
+      class="game-container rounded-3xl p-1 md:p-4 transition-all"
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Game board & screen */}
         <div
-          class="px-4 py-2 bg-gray-900 border-b-4 flex items-center justify-between"
+          class="lg:col-span-3 border-4 rounded-3xl overflow-hidden shadow-brutal bg-black flex flex-col relative"
           style="border-color: var(--color-border, #0A0A0A)"
         >
-          <div class="flex space-x-1.5">
-            <span class="w-3 h-3 rounded-full bg-red-500"></span>
-            <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
-            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-          </div>
-          <span class="text-xs font-mono text-[#00FF41] opacity-75">
-            ~/arcade/game-of-life.sh
-          </span>
-          <div class="text-xs font-mono text-gray-500">
-            GEN: <span class="text-white font-bold">{generation}</span>
-          </div>
-        </div>
-
-        {/* Conway Grid Screen */}
-        <div class="relative p-2 sm:p-4 min-h-[340px] select-none bg-black overflow-auto crt-screen flex items-center justify-center">
-          <div class="absolute inset-0 scanlines pointer-events-none z-10">
-          </div>
-          <div class="grid grid-cols-40 gap-[1px] bg-gray-950 p-1 rounded-lg border border-gray-800">
-            {grid.map((row, rIdx) =>
-              row.map((cell, cIdx) => (
-                <div
-                  key={`${rIdx}-${cIdx}`}
-                  onClick={() => toggleCell(rIdx, cIdx)}
-                  class={`w-[7px] h-[7px] sm:w-[10px] sm:h-[10px] md:w-[13px] md:h-[13px] transition-colors duration-75 cursor-pointer rounded-sm ${
-                    cell
-                      ? "bg-[#00FF41] shadow-[0_0_6px_#00FF41]"
-                      : "bg-gray-900 hover:bg-gray-800"
-                  }`}
-                  style={cell ? "background-color: #00FF41;" : ""}
-                />
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Dashboard Bar */}
-        <div
-          class="px-4 py-3 bg-gray-900 border-t-4 flex flex-wrap items-center justify-between gap-3 font-mono text-xs text-[#00FF41]"
-          style="border-color: var(--color-border, #0A0A0A)"
-        >
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleStartStop}
-              class={`px-3 py-1 border rounded font-bold transition-all text-black ${
-                isRunning
-                  ? "bg-red-400 hover:bg-red-300"
-                  : "bg-green-400 hover:bg-green-300"
-              }`}
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              {isRunning ? "⏹️ PAUSE" : "▶️ RUN"}
-            </button>
-            <button
-              type="button"
-              onClick={handleStep}
-              disabled={isRunning}
-              class="px-3 py-1 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed text-black border rounded font-bold"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              ⏩ STEP
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              class="px-3 py-1 bg-gray-300 hover:bg-gray-200 text-black border rounded font-bold"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              🧹 CLEAR
-            </button>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <span>SPEED:</span>
-            <input
-              type="range"
-              min="50"
-              max="600"
-              step="20"
-              value={speed}
-              onChange={(e) => {
-                const val = parseInt((e.target as HTMLInputElement).value, 10);
-                setSpeed(val);
-                sounds.slide(Math.floor((600 - val) / 5.5));
-              }}
-              class="w-20 md:w-28 accent-[#00FF41]"
-            />
-            <span class="w-12 text-right">{speed}ms</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Control panel (Right Column) */}
-      <div
-        class="border-4 rounded-3xl p-5 bg-white shadow-brutal flex flex-col justify-between space-y-4"
-        style="border-color: var(--color-border, #0A0A0A)"
-      >
-        <div class="space-y-4">
-          <h3 class="font-mono font-bold text-lg text-gray-900 border-b-2 pb-2">
-            CELL LIFE LAB
-          </h3>
-          <p class="text-xs font-mono text-gray-500 leading-relaxed">
-            Click on cells in the grid to flip their state between alive and
-            dead. Start the simulation to watch them evolve based on Conway's
-            Rules.
-          </p>
-        </div>
-
-        {/* Presets and options */}
-        <div class="space-y-3">
-          <h4 class="font-mono text-xs font-bold text-gray-700 uppercase tracking-wider">
-            🔬 ECOLOGICAL PRESETS
-          </h4>
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => loadPreset("glider")}
-              class="px-2.5 py-2 text-left font-mono text-xs font-bold border-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all hover:scale-[1.02]"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              🚀 Glider
-            </button>
-            <button
-              type="button"
-              onClick={() => loadPreset("pulsar")}
-              class="px-2.5 py-2 text-left font-mono text-xs font-bold border-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all hover:scale-[1.02]"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              💥 Pulsar
-            </button>
-            <button
-              type="button"
-              onClick={() => loadPreset("beacon")}
-              class="px-2.5 py-2 text-left font-mono text-xs font-bold border-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all hover:scale-[1.02]"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              📟 Beacon
-            </button>
-            <button
-              type="button"
-              onClick={() => loadPreset("gosper")}
-              class="px-2.5 py-2 text-left font-mono text-xs font-bold border-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all hover:scale-[1.02]"
-              style="border-color: var(--color-border, #0A0A0A)"
-            >
-              🔫 Glider Gun
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleRandomize}
-            class="w-full mt-2 py-3 border-4 rounded-2xl font-mono font-black text-xs shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all bg-yellow-400 text-black flex items-center justify-center gap-2"
+          {/* Header */}
+          <div
+            class="px-4 py-2 bg-gray-900 border-b-4 flex items-center justify-between"
             style="border-color: var(--color-border, #0A0A0A)"
           >
-            <span>🎲 RANDOM POPULATION</span>
-          </button>
+            <div class="flex space-x-1.5">
+              <button
+                type="button"
+                onClick={handleClear}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleClear();
+                }}
+                class="w-3 h-3 rounded-full bg-red-500 hover:scale-125 transition-transform cursor-pointer"
+                title="Clear Board"
+                aria-label="Clear Board"
+              />
+              <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  toggleFullscreen();
+                }}
+                class="w-3 h-3 rounded-full bg-green-500 hover:scale-125 transition-transform cursor-pointer"
+                title="Toggle Full Screen"
+                aria-label="Toggle Full Screen"
+              />
+            </div>
+            <span class="text-xs font-mono text-[#00FF41] opacity-75">
+              ~/arcade/game-of-life.sh
+            </span>
+            <div class="text-xs font-mono text-gray-500">
+              GEN: <span class="text-white font-bold">{generation}</span>
+            </div>
+          </div>
+
+          {/* Conway Grid Screen */}
+          <div class="relative p-2 sm:p-4 min-h-[340px] select-none bg-black overflow-auto crt-screen flex items-center justify-center">
+            <div class="absolute inset-0 scanlines pointer-events-none z-10">
+            </div>
+            <div class="grid grid-cols-40 gap-[1px] bg-gray-950 p-1 rounded-lg border border-gray-800">
+              {grid.map((row, rIdx) =>
+                row.map((cell, cIdx) => (
+                  <div
+                    key={`${rIdx}-${cIdx}`}
+                    onClick={() => toggleCell(rIdx, cIdx)}
+                    class={`w-[7px] h-[7px] sm:w-[10px] sm:h-[10px] md:w-[13px] md:h-[13px] transition-colors duration-75 cursor-pointer rounded-sm ${
+                      cell
+                        ? "bg-[#00FF41] shadow-[0_0_6px_#00FF41]"
+                        : "bg-gray-900 hover:bg-gray-800"
+                    }`}
+                    style={cell ? "background-color: #00FF41;" : ""}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Dashboard Bar */}
+          <div
+            class="px-4 py-3 bg-gray-900 border-t-4 flex flex-wrap items-center justify-between gap-3 font-mono text-xs text-[#00FF41]"
+            style="border-color: var(--color-border, #0A0A0A)"
+          >
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleStartStop}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleStartStop();
+                }}
+                class={`px-3 py-1 border rounded font-bold transition-all text-black ${
+                  isRunning
+                    ? "bg-red-400 hover:bg-red-300"
+                    : "bg-green-400 hover:bg-green-300"
+                }`}
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                {isRunning ? "⏹️ PAUSE" : "▶️ RUN"}
+              </button>
+              <button
+                type="button"
+                onClick={handleStep}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleStep();
+                }}
+                disabled={isRunning}
+                class="px-3 py-1 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed text-black border rounded font-bold"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                ⏩ STEP
+              </button>
+              <button
+                type="button"
+                onClick={handleClear}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleClear();
+                }}
+                class="px-3 py-1 bg-gray-300 hover:bg-gray-200 text-black border rounded font-bold"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                🧹 CLEAR
+              </button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span>SPEED:</span>
+              <input
+                type="range"
+                min="50"
+                max="600"
+                step="20"
+                value={speed}
+                onChange={(e) => {
+                  const val = parseInt(
+                    (e.target as HTMLInputElement).value,
+                    10,
+                  );
+                  setSpeed(val);
+                  sounds.slide(Math.floor((600 - val) / 5.5));
+                }}
+                class="w-20 md:w-28 accent-[#00FF41]"
+              />
+              <span class="w-12 text-right">{speed}ms</span>
+            </div>
+          </div>
         </div>
 
-        <div class="border-t border-gray-200 pt-3">
-          <h4 class="font-mono text-[10px] font-bold text-gray-400 uppercase">
-            THE LAWS:
-          </h4>
-          <ul class="list-disc pl-4 font-mono text-[9px] text-gray-500 space-y-1 mt-1 leading-normal">
-            <li>Any live cell with 2 or 3 live neighbours survives.</li>
-            <li>
-              Any dead cell with exactly 3 live neighbours becomes a live cell.
-            </li>
-            <li>All other live cells die in the next generation.</li>
-          </ul>
+        {/* Control panel (Right Column) */}
+        <div
+          class="border-4 rounded-3xl p-5 bg-white shadow-brutal flex flex-col justify-between space-y-4"
+          style="border-color: var(--color-border, #0A0A0A)"
+        >
+          <div class="space-y-4">
+            <h3 class="font-mono font-bold text-lg text-gray-900 border-b-2 pb-2">
+              CELL LIFE LAB
+            </h3>
+            <p class="text-xs font-mono text-gray-500 leading-relaxed">
+              Click on cells in the grid to flip their state between alive and
+              dead. Start the simulation to watch them evolve based on Conway's
+              Rules.
+            </p>
+          </div>
+
+          {/* Presets and options */}
+          <div class="space-y-3">
+            <h4 class="font-mono text-xs font-bold text-gray-700 uppercase tracking-wider">
+              🔬 ECOLOGICAL PRESETS
+            </h4>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => loadPreset("glider")}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  loadPreset("glider");
+                }}
+                class="px-2.5 py-2 text-left font-mono text-xs font-bold border-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all hover:scale-[1.02]"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                🚀 Glider
+              </button>
+              <button
+                type="button"
+                onClick={() => loadPreset("pulsar")}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  loadPreset("pulsar");
+                }}
+                class="px-2.5 py-2 text-left font-mono text-xs font-bold border-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all hover:scale-[1.02]"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                💥 Pulsar
+              </button>
+              <button
+                type="button"
+                onClick={() => loadPreset("beacon")}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  loadPreset("beacon");
+                }}
+                class="px-2.5 py-2 text-left font-mono text-xs font-bold border-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all hover:scale-[1.02]"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                📟 Beacon
+              </button>
+              <button
+                type="button"
+                onClick={() => loadPreset("gosper")}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  loadPreset("gosper");
+                }}
+                class="px-2.5 py-2 text-left font-mono text-xs font-bold border-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all hover:scale-[1.02]"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                🔫 Glider Gun
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleRandomize}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                handleRandomize();
+              }}
+              class="w-full mt-2 py-3 border-4 rounded-2xl font-mono font-black text-xs shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all bg-yellow-400 text-black flex items-center justify-center gap-2"
+              style="border-color: var(--color-border, #0A0A0A)"
+            >
+              <span>🎲 RANDOM POPULATION</span>
+            </button>
+          </div>
+
+          <div class="border-t border-gray-200 pt-3">
+            <h4 class="font-mono text-[10px] font-bold text-gray-400 uppercase">
+              THE LAWS:
+            </h4>
+            <ul class="list-disc pl-4 font-mono text-[9px] text-gray-500 space-y-1 mt-1 leading-normal">
+              <li>Any live cell with 2 or 3 live neighbours survives.</li>
+              <li>
+                Any dead cell with exactly 3 live neighbours becomes a live
+                cell.
+              </li>
+              <li>All other live cells die in the next generation.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
