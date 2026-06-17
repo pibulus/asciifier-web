@@ -27,6 +27,14 @@ const FIGLET_FONTS = [
   { name: "Banner", value: "Banner" },
   { name: "Block", value: "Block" },
   { name: "Big", value: "Big" },
+  { name: "Bubble", value: "Bubble" },
+  { name: "Graffiti", value: "Graffiti" },
+  { name: "Ogre", value: "Ogre" },
+  { name: "Script", value: "Script" },
+  { name: "Isometric1", value: "Isometric1" },
+  { name: "Isometric2", value: "Isometric2" },
+  { name: "Alligator", value: "Alligator" },
+  { name: "Alphabet", value: "Alphabet" },
 ];
 
 // Border styles for ASCII art

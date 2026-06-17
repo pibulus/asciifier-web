@@ -399,7 +399,7 @@ export default function Dropzone() {
 
           {/* Drop Zone */}
           <div
-            class={`relative border-4 md:border-8 border-dashed transition-all duration-300 rounded-xl p-12 md:p-16 lg:p-24 cursor-pointer group ${
+            class={`relative border-4 md:border-8 border-dashed transition-all duration-300 rounded-xl p-6 sm:p-12 md:p-16 lg:p-24 cursor-pointer group ${
               isDragging
                 ? "scale-105 shadow-brutal-lg rotate-1"
                 : "hover:scale-105 hover:rotate-2 shadow-brutal hover:shadow-brutal-lg"
@@ -435,7 +435,7 @@ export default function Dropzone() {
                 {isDragging ? "Yeah! Drop it!" : "Drop zone"}
               </h3>
               <p
-                class="opacity-70 text-base sm:text-sm font-mono"
+                class="opacity-70 text-xs sm:text-sm font-mono"
                 style="color: var(--color-text, #0A0A0A)"
               >
                 JPG PNG GIF WebP • 10MB max

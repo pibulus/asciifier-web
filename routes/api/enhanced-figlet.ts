@@ -74,6 +74,11 @@ const VALID_EFFECTS = new Set([
   "vaporwave",
   "neon",
   "poison",
+  "vampire",
+  "ice",
+  "forest",
+  "gold",
+  "candy",
 ]);
 
 const VALID_BORDERS = new Set([
@@ -375,6 +380,51 @@ function getEffectColor(
       const poisonSat = 90 + Math.sin(x * 0.5) * 10;
       const poisonBright = 45 + (poisonProgress * 20);
       return `hsl(${poisonHue}, ${poisonSat}%, ${poisonBright}%)`;
+    }
+
+    case "vampire": {
+      // Deep blood red with subtle charcoal shading
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 0;
+      const sat = 90 + Math.sin(progress * 6) * 10;
+      const bright = 20 + Math.sin(progress * 8) * 25;
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
+
+    case "ice": {
+      // Arctic ice cyan/blue gradient into bright frozen whites
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 190 + Math.sin(progress * 4) * 20;
+      const sat = 80 - progress * 40;
+      const bright = 75 + progress * 20;
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
+
+    case "forest": {
+      // Moss green to fluorescent nature chartreuse
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 90 + progress * 40;
+      const sat = 75 + Math.sin(progress * 6) * 15;
+      const bright = 40 + progress * 20;
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
+
+    case "gold": {
+      // Shimmering metallic gold
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 42 + Math.sin(progress * 5) * 5;
+      const sat = 100;
+      const bright = 45 + Math.sin(progress * 8) * 15;
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
+
+    case "candy": {
+      // Electric hot pink to bubblegum
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 330 + Math.sin(progress * 6) * 15;
+      const sat = 100;
+      const bright = 55 + progress * 25;
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
     }
 
     case "none":

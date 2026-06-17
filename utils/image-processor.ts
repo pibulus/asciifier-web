@@ -52,16 +52,23 @@ export class ImageProcessor {
   ): { width: number; height: number } {
     // Default to 80 chars wide if not specified
     targetWidth = targetWidth || 80;
-    maxHeight = maxHeight || 40;
 
     // Account for character aspect ratio (characters are ~2:1 height:width)
     const aspectRatio = originalWidth / originalHeight;
-    let newHeight = Math.floor(targetWidth / aspectRatio * 0.5);
+    let newHeight = Math.floor((targetWidth / aspectRatio) * 0.5);
 
-    // Clamp to max height
-    newHeight = Math.max(1, Math.min(newHeight, maxHeight));
-    if (newHeight === maxHeight) {
-      targetWidth = Math.floor(newHeight * aspectRatio * 2);
+    // Clamp to max height only if specified, otherwise use a safe large threshold
+    if (maxHeight !== undefined) {
+      newHeight = Math.max(1, Math.min(newHeight, maxHeight));
+      if (newHeight === maxHeight) {
+        targetWidth = Math.floor(newHeight * aspectRatio * 2);
+      }
+    } else {
+      const defaultMaxHeight = 400; // Let width slider values up to 200 display fully!
+      newHeight = Math.max(1, Math.min(newHeight, defaultMaxHeight));
+      if (newHeight === defaultMaxHeight) {
+        targetWidth = Math.floor(newHeight * aspectRatio * 2);
+      }
     }
 
     return { width: Math.max(1, targetWidth), height: newHeight };

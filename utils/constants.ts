@@ -22,6 +22,11 @@ export const COLOR_EFFECTS = [
   { name: "Neon", value: "neon" },
   { name: "Poison", value: "poison" },
   { name: "Angel", value: "angel" },
+  { name: "Vampire", value: "vampire" },
+  { name: "Ice", value: "ice" },
+  { name: "Forest", value: "forest" },
+  { name: "Gold", value: "gold" },
+  { name: "Candy", value: "candy" },
 ];
 
 // Visual effects for ASCII art display - CSS filter combinations

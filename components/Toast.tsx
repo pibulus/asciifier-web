@@ -41,7 +41,11 @@ export function Toast(
     >
       <div
         class="px-6 py-4 border-4 rounded-2xl shadow-brutal font-mono font-bold text-center"
-        style={`background-color: ${bgColor}; border-color: var(--color-border, #0A0A0A); color: var(--color-base, #FAF9F6);`}
+        style={`background-color: ${bgColor}; border-color: var(--color-border, #0A0A0A); color: ${
+          type === "success"
+            ? "var(--color-border, #0A0A0A)"
+            : "var(--color-base, #FAF9F6)"
+        };`}
       >
         <div class="flex items-center justify-between gap-4">
           <span class="flex-1 text-sm sm:text-base">{message}</span>

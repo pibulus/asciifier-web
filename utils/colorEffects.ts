@@ -89,6 +89,41 @@ export function getEffectColor(
       const bright = 45 + (progress * 20);
       return `hsl(${hue}, ${sat}%, ${bright}%)`;
     }
+    case "vampire": {
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 0; // Deep red
+      const sat = 90 + Math.sin(progress * 6) * 10;
+      const bright = 20 + Math.sin(progress * 8) * 25; // Darker crimson to charcoal shimmer
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
+    case "ice": {
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 190 + Math.sin(progress * 4) * 20; // 170 to 210 (cyan-blue)
+      const sat = 80 - progress * 40; // Whitening effect
+      const bright = 75 + progress * 20; // Soft bright ice
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
+    case "forest": {
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 90 + progress * 40; // 90 to 130
+      const sat = 75 + Math.sin(progress * 6) * 15;
+      const bright = 40 + progress * 20;
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
+    case "gold": {
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 42 + Math.sin(progress * 5) * 5; // Gold hue
+      const sat = 100;
+      const bright = 45 + Math.sin(progress * 8) * 15; // Shimmering gold brightness
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
+    case "candy": {
+      const progress = (x + y) / (safeLineWidth + safeTotalLines);
+      const hue = 330 + Math.sin(progress * 6) * 15; // Hot pink range
+      const sat = 100;
+      const bright = 55 + progress * 25; // Bright bubblegum
+      return `hsl(${hue}, ${sat}%, ${bright}%)`;
+    }
     default:
       return "#00FF41";
   }

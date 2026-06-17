@@ -62,14 +62,14 @@ export default function ThanksPage() {
   const celebrationDisplay = (
     <pre
       class="font-mono text-center overflow-x-auto"
-      style="color: var(--color-text, #0A0A0A); line-height: 1.1;"
+      style="color: var(--color-text, #0A0A0A); line-height: 1.1; font-size: clamp(0.25rem, 1.2vw, 0.95rem);"
       dangerouslySetInnerHTML={{ __html: celebrationArt }}
     />
   );
 
   return (
     <div
-      class="min-h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden"
+      class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden"
       style="background: var(--color-base-gradient, var(--color-base, #FAF9F6))"
     >
       {/* Confetti particles */}
@@ -103,7 +103,7 @@ export default function ThanksPage() {
       <div class="max-w-4xl w-full">
         {/* Celebration ASCII */}
         <div
-          class="mb-12 p-8 border-8 rounded-3xl shadow-brutal-xl animate-pop-in"
+          class="mb-6 sm:mb-12 p-4 sm:p-8 border-4 sm:border-8 rounded-2xl sm:rounded-3xl shadow-brutal-xl animate-pop-in"
           style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-secondary, #FFE5B4)"
         >
           {celebrationDisplay}
@@ -111,24 +111,24 @@ export default function ThanksPage() {
 
         {/* Message */}
         <div
-          class="mb-8 p-8 border-4 rounded-2xl shadow-brutal animate-slide-up"
+          class="mb-6 sm:mb-8 p-4 sm:p-8 border-3 sm:border-4 rounded-2xl shadow-brutal animate-slide-up"
           style="border-color: var(--color-border, #0A0A0A); background-color: var(--color-base, #FAF9F6); animation-delay: 0.2s;"
         >
           <h2
-            class="text-3xl font-bold mb-4"
+            class="text-2xl sm:text-3xl font-bold mb-4"
             style="color: var(--color-text, #0A0A0A)"
           >
             You're a legend! 🙌
           </h2>
           <p
-            class="text-lg font-mono mb-4"
+            class="text-base sm:text-lg font-mono mb-4"
             style="color: var(--color-text, #0A0A0A)"
           >
             Your support keeps this tool alive and free for everyone. No ads, no
             subscriptions, no bullshit - just pure ASCII magic.
           </p>
           <p
-            class="text-md font-mono opacity-80"
+            class="text-sm sm:text-md font-mono opacity-80"
             style="color: var(--color-text, #0A0A0A)"
           >
             Made with care (and caffeine) by Pablo
@@ -137,7 +137,7 @@ export default function ThanksPage() {
 
         {/* Gift: Premium ASCII Art Collection */}
         <div
-          class="mb-8 p-6 border-4 rounded-2xl shadow-brutal animate-slide-up"
+          class="mb-6 sm:mb-8 p-4 sm:p-6 border-3 sm:border-4 rounded-2xl shadow-brutal animate-slide-up"
           style="border-color: var(--color-accent, #FF69B4); background-color: var(--color-secondary, #FFE5B4); animation-delay: 0.4s;"
         >
           <h3

@@ -10,6 +10,7 @@ import {
   downloadPNG,
   downloadText,
 } from "../utils/exportUtils.ts";
+import { sounds } from "../utils/sounds.ts";
 
 /**
  * Get CSS filter string for visual effects
@@ -83,13 +84,22 @@ export function TerminalDisplay({
   visualEffect = "none",
 }: TerminalDisplayProps) {
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+  const [zoom, setZoom] = useState(100);
+  const [wrapLines, setWrapLines] = useState(false);
+
+  const customStyle =
+    `color: #00FF41; line-height: 1.3; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; font-weight: 900; font-size: calc(${
+      zoom * 0.01
+    } * clamp(0.35rem, 1.1vw, 1rem)); white-space: ${
+      wrapLines ? "pre-wrap" : "pre"
+    }; word-break: ${wrapLines ? "break-all" : "normal"}; ${
+      getVisualEffectStyle(visualEffect)
+    }`;
 
   const htmlDisplay = (
     <pre
-      class="ascii-display font-mono text-[0.5rem] sm:text-xs md:text-sm lg:text-base opacity-85"
-      style={`color: #00FF41; line-height: 1.3; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; font-weight: 900; ${
-        getVisualEffectStyle(visualEffect)
-      }`}
+      class="ascii-display font-mono opacity-85"
+      style={customStyle}
       dangerouslySetInnerHTML={{ __html: htmlContent || "" }}
     />
   );
@@ -123,10 +133,10 @@ export function TerminalDisplay({
     >
       {/* Terminal Menu Bar */}
       <div
-        class="px-4 py-3 border-b-4 flex items-center justify-between"
+        class="px-4 py-3 border-b-4 flex items-center justify-between gap-2"
         style="background-color: rgba(0,0,0,0.3); border-color: var(--color-border, #0A0A0A)"
       >
-        <div class="flex space-x-2">
+        <div class="flex space-x-2 flex-shrink-0">
           <div
             class="w-3 h-3 bg-red-500 rounded-full hover:scale-125 transition-transform cursor-pointer"
             title="Close (jk)"
@@ -143,16 +153,78 @@ export function TerminalDisplay({
           >
           </div>
         </div>
-        <div class="flex items-center gap-3">
-          <span class="text-xs font-mono opacity-60" style="color: #00FF41">
+        <div class="flex items-center gap-2 sm:gap-3 overflow-hidden">
+          <span
+            class="text-[10px] sm:text-xs font-mono opacity-60 truncate max-w-[80px] sm:max-w-none"
+            style="color: #00FF41"
+          >
             {terminalPath}
           </span>
+          {/* Zoom and Wrap Controls */}
+          {hasContent && (
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+              {/* Wrap lines */}
+              <button
+                type="button"
+                onClick={() => {
+                  sounds.click();
+                  setWrapLines(!wrapLines);
+                }}
+                class="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-mono border rounded hover:bg-[#00FF41] hover:text-black transition-colors"
+                style={`color: #00FF41; border-color: ${
+                  wrapLines ? "#00FF41" : "rgba(0, 255, 65, 0.3)"
+                }; background-color: ${
+                  wrapLines ? "rgba(0, 255, 65, 0.15)" : "transparent"
+                };`}
+                title="Toggle Word Wrap"
+              >
+                WRAP:{wrapLines ? "ON" : "OFF"}
+              </button>
+
+              {/* Zoom group */}
+              <div
+                class="flex items-center border rounded"
+                style="border-color: rgba(0, 255, 65, 0.3);"
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    sounds.click();
+                    setZoom((z) => Math.max(30, z - 10));
+                  }}
+                  class="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-mono hover:bg-[#00FF41] hover:text-black transition-colors rounded-l"
+                  style="color: #00FF41; border-right: 1px solid rgba(0, 255, 65, 0.3);"
+                  title="Zoom Out"
+                >
+                  A-
+                </button>
+                <span
+                  class="px-1 text-[8px] sm:text-[9px] font-mono text-center min-w-[28px]"
+                  style="color: #00FF41;"
+                >
+                  {zoom}%
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    sounds.click();
+                    setZoom((z) => Math.min(250, z + 10));
+                  }}
+                  class="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-mono hover:bg-[#00FF41] hover:text-black transition-colors rounded-r"
+                  style="color: #00FF41; border-left: 1px solid rgba(0, 255, 65, 0.3);"
+                  title="Zoom In"
+                >
+                  A+
+                </button>
+              </div>
+            </div>
+          )}
           {/* Shuffle button in menu bar (gallery mode) */}
           {showShuffleButton && onShuffle && hasContent && (
             <button
               type="button"
               onClick={onShuffle}
-              class="px-4 py-2 text-xl font-mono font-bold transition-all hover:scale-125 active:scale-95 opacity-80 hover:opacity-100 rounded-lg border-2"
+              class="px-2 py-0.5 text-xs font-mono font-bold transition-all hover:scale-110 active:scale-95 opacity-80 hover:opacity-100 rounded border"
               style="color: #00FF41; border-color: rgba(0, 255, 65, 0.3); background-color: rgba(0, 255, 65, 0.05);"
               title="Get a random ASCII art"
             >
@@ -183,10 +255,8 @@ export function TerminalDisplay({
           : content
           ? (
             <pre
-              class="ascii-display font-mono text-[0.5rem] sm:text-xs md:text-sm lg:text-base opacity-85"
-              style={`color: #00FF41; line-height: 1.3; white-space: pre; margin: 0; padding: 0; display: block; text-align: left; text-indent: 0; font-weight: 900; ${
-                getVisualEffectStyle(visualEffect)
-              }`}
+              class="ascii-display font-mono opacity-85"
+              style={customStyle}
             >
               {content}
             </pre>
@@ -308,25 +378,7 @@ export function TerminalDisplay({
           animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Dropdown open animation - light bounce */
-        @keyframes dropdownOpen {
-          0% {
-            opacity: 0;
-            transform: translateY(-8px) scale(0.95);
-          }
-          60% {
-            opacity: 1;
-            transform: translateY(2px) scale(1.01);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
 
-        .animate-dropdown-open {
-          animation: dropdownOpen 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
 
         /* Brutal Shadows - Chunky and bold */
         .shadow-brutal {

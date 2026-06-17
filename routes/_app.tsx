@@ -110,6 +110,7 @@ export default function App({ Component }: PageProps) {
         {/* Real grain texture using noise image */}
         <div
           id="grain-layer"
+          class="animate-grain"
           style={{
             position: "fixed",
             top: 0,

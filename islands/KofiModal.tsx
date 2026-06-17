@@ -98,7 +98,7 @@ export function KofiModal({
         >
           {/* Header */}
           <div
-            class="p-6 border-4 border-b-0 rounded-t-3xl"
+            class="p-6 border-4 border-b-0 rounded-t-2xl sm:rounded-t-3xl"
             style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A)"
           >
             <div class="flex items-start justify-between mb-2">
@@ -111,7 +111,7 @@ export function KofiModal({
               <button
                 type="button"
                 onClick={closeKofiModal}
-                class="text-3xl leading-none font-bold transition-transform hover:scale-110"
+                class="p-2 -mr-2 -mt-2 text-3xl leading-none font-bold transition-transform hover:scale-110"
                 style="color: var(--color-text, #0A0A0A)"
                 aria-label="Close"
               >
@@ -128,7 +128,7 @@ export function KofiModal({
 
           {/* Ko-fi Embed */}
           <div
-            class="border-4 rounded-b-3xl overflow-hidden shadow-brutal-xl"
+            class="border-4 rounded-b-2xl sm:rounded-b-3xl overflow-hidden shadow-brutal-xl"
             style="background-color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
           >
             <iframe

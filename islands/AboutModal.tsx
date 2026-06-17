@@ -86,7 +86,7 @@ export function AboutModal() {
               <button
                 type="button"
                 onClick={closeAboutModal}
-                class="text-2xl sm:text-3xl leading-none font-bold transition-transform hover:scale-110"
+                class="p-2 -mr-2 -mt-2 text-2xl sm:text-3xl leading-none font-bold transition-transform hover:scale-110"
                 style="color: var(--color-text, #0A0A0A)"
                 aria-label="Close about dialog"
               >

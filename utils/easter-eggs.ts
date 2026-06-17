@@ -3,14 +3,14 @@
 
 export class EasterEggEngine {
   private konamiSequence = [
-    "ArrowUp",
-    "ArrowUp",
-    "ArrowDown",
-    "ArrowDown",
-    "ArrowLeft",
-    "ArrowRight",
-    "ArrowLeft",
-    "ArrowRight",
+    "arrowup",
+    "arrowup",
+    "arrowdown",
+    "arrowdown",
+    "arrowleft",
+    "arrowright",
+    "arrowleft",
+    "arrowright",
     "b",
     "a",
   ];
@@ -63,10 +63,11 @@ export class EasterEggEngine {
   }
 
   triggerSecretMode() {
-    // Add rainbow background animation
+    // Add rainbow background animation and add active class
     document.body.style.animation = "rainbow-bg 5s linear infinite";
+    document.body.classList.add("secret-mode");
 
-    // Add CSS for rainbow effect
+    // Add CSS for rainbow effect and wiggle
     const style = document.createElement("style");
     style.textContent = `
       @keyframes rainbow-bg {
@@ -77,8 +78,13 @@ export class EasterEggEngine {
         100% { background: linear-gradient(45deg, #F9E79F, #FFE5B4); }
       }
 
+      @keyframes secret-wiggle {
+        0%, 100% { transform: rotate(-1.5deg); }
+        50% { transform: rotate(1.5deg); }
+      }
+
       .secret-mode * {
-        animation: wiggle 0.5s ease-in-out infinite !important;
+        animation: secret-wiggle 0.3s ease-in-out infinite !important;
       }
     `;
     document.head.appendChild(style);
@@ -89,6 +95,7 @@ export class EasterEggEngine {
     // Reset after 10 seconds
     setTimeout(() => {
       document.body.style.animation = "";
+      document.body.classList.remove("secret-mode");
       style.remove();
       this.activated = false;
     }, 10000);

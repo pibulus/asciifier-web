@@ -10,18 +10,17 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
     sounds.click();
     activeTab.value = tab;
   };
-
   return (
-    <div class="flex mt-4 sm:mt-6">
+    <div class="flex w-full sm:w-auto">
       <div
-        class="flex border-3 sm:border-4 rounded-lg overflow-hidden shadow-brutal"
+        class="flex w-full sm:w-auto border-3 sm:border-4 rounded-xl overflow-hidden shadow-brutal"
         style="border-color: var(--color-border, #0A0A0A)"
       >
         <button
           type="button"
           onClick={() => handleTabChange("image")}
           aria-label="Switch to image to ASCII converter"
-          class={`px-4 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-sm sm:text-sm md:text-base transition-all duration-200 ${
+          class={`flex-1 sm:flex-none px-2 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-xs sm:text-sm md:text-base transition-all duration-200 ${
             activeTab.value === "image"
               ? "shadow-brutal-inset"
               : "hover:scale-105 shadow-brutal-sm"
@@ -43,7 +42,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
           type="button"
           onClick={() => handleTabChange("text")}
           aria-label="Switch to text to ASCII converter"
-          class={`px-4 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-sm sm:text-sm md:text-base transition-all duration-200 ${
+          class={`flex-1 sm:flex-none px-2 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-xs sm:text-sm md:text-base transition-all duration-200 ${
             activeTab.value === "text"
               ? "shadow-brutal-inset"
               : "hover:scale-105 shadow-brutal-sm"
@@ -65,7 +64,7 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
           type="button"
           onClick={() => handleTabChange("gallery")}
           aria-label="Switch to ASCII art gallery"
-          class={`px-4 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-sm sm:text-sm md:text-base transition-all duration-200 ${
+          class={`flex-1 sm:flex-none px-2 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-xs sm:text-sm md:text-base transition-all duration-200 ${
             activeTab.value === "gallery"
               ? "shadow-brutal-inset"
               : "hover:scale-105 shadow-brutal-sm"
