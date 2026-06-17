@@ -48,19 +48,31 @@ export async function copyToClipboard(
 
     // Try modern clipboard API with both formats
     if (navigator.clipboard && navigator.clipboard.write && htmlToCopy) {
-      const clipboardItem = new ClipboardItem({
-        "text/plain": new Blob([textToCopy], { type: "text/plain" }),
-        "text/html": new Blob([htmlToCopy], { type: "text/html" }),
-      });
-      await navigator.clipboard.write([clipboardItem]);
-    } else {
+      try {
+        const clipboardItem = new ClipboardItem({
+          "text/plain": new Blob([textToCopy], { type: "text/plain" }),
+          "text/html": new Blob([htmlToCopy], { type: "text/html" }),
+        });
+        await navigator.clipboard.write([clipboardItem]);
+      } catch (err) {
+        console.warn("Rich copy failed, falling back to plain text:", err);
+        if (navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(textToCopy);
+        } else {
+          throw err;
+        }
+      }
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
       // Fallback for older browsers - just plain text
       await navigator.clipboard.writeText(textToCopy);
+    } else {
+      throw new Error("No clipboard API support");
     }
 
     sounds.copy();
     return true;
-  } catch {
+  } catch (err) {
+    console.error("Clipboard copy failed entirely:", err);
     sounds.error();
     alert("Copy failed. Try again.");
     return false;
