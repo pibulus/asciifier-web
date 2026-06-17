@@ -88,6 +88,11 @@ export default function Dropzone() {
   const colorMode = useSignal<string>("none"); // "none", "color", or "rainbow"
   const invertBrightness = useSignal(false);
 
+  const [isLiveCamera, setIsLiveCamera] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const animationFrameIdRef = useRef<number | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const processor = useRef(new ImageProcessor());
@@ -110,6 +115,12 @@ export default function Dropzone() {
       if (updateTimeoutRef.current) {
         clearTimeout(updateTimeoutRef.current);
         updateTimeoutRef.current = null;
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+      if (animationFrameIdRef.current) {
+        cancelAnimationFrame(animationFrameIdRef.current);
       }
     };
   }, []);
@@ -286,9 +297,80 @@ export default function Dropzone() {
     }
   };
 
+  const startCamera = async () => {
+    sounds.click();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 640, height: 480, facingMode: "user" },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play();
+          setIsLiveCamera(true);
+          setImageLoaded(true);
+          tickCamera();
+        };
+      }
+    } catch (err) {
+      console.error("Camera access failed:", err);
+      showToast("Webcam access denied or unavailable.", "error");
+      sounds.error();
+    }
+  };
+
+  const tickCamera = () => {
+    if (!isMountedRef.current || !streamRef.current || !videoRef.current) {
+      return;
+    }
+
+    if (videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+      processVideoFrame(videoRef.current);
+    }
+
+    animationFrameIdRef.current = requestAnimationFrame(tickCamera);
+  };
+
+  const processVideoFrame = (video: HTMLVideoElement) => {
+    try {
+      const useColor = colorMode.value === "color";
+      const useRainbow = colorMode.value === "rainbow";
+
+      const options: ProcessOptions = {
+        width: charWidth.value,
+        style: selectedStyle.value,
+        useColor: useColor,
+        rainbow: useRainbow,
+        invert: invertBrightness.value,
+      };
+
+      const ascii = processor.current.processImage(video, options);
+      const formatted = processor.current.formatAscii(
+        ascii,
+        useColor || useRainbow,
+      );
+
+      setAsciiOutput(formatted);
+      setHtmlOutput(formatted);
+    } catch (err) {
+      console.error("Error processing video frame:", err);
+    }
+  };
+
   const handleReset = () => {
     processRequestRef.current++;
     sounds.click();
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    if (animationFrameIdRef.current) {
+      cancelAnimationFrame(animationFrameIdRef.current);
+      animationFrameIdRef.current = null;
+    }
+    setIsLiveCamera(false);
+
     setImageLoaded(false);
     setAsciiOutput("");
     setHtmlOutput("");
@@ -341,6 +423,16 @@ export default function Dropzone() {
 
   return (
     <div class="space-y-8">
+      {/* Hidden video element for live camera feed */}
+      <video
+        ref={videoRef}
+        autoplay
+        playsinline
+        muted
+        class="hidden"
+        style="width: 0; height: 0; display: none;"
+      />
+
       {/* Empty State / Drop Zone */}
       {!imageLoaded && (
         <div class="text-center space-y-6">
@@ -433,6 +525,19 @@ export default function Dropzone() {
             </div>
           </div>
 
+          {/* Webcam Scrying Mirror Button */}
+          <div class="flex justify-center pt-2">
+            <button
+              type="button"
+              onClick={startCamera}
+              class="px-6 py-4 border-4 rounded-2xl font-mono font-black text-sm md:text-base shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all active:scale-95 animate-pulse-soft flex items-center gap-3"
+              style="background-color: var(--color-secondary, #FFE5B4); color: var(--color-text, #0A0A0A); border-color: var(--color-border, #0A0A0A);"
+            >
+              <span class="text-2xl animate-spin">🔮</span>
+              <span>WEBCAM SCRYING MIRROR</span>
+            </button>
+          </div>
+
           {/* Camera Capture Button (Mobile-only) */}
           {isMobile && (
             <div class="flex flex-col gap-3 items-stretch justify-center">
@@ -465,7 +570,22 @@ export default function Dropzone() {
 
       {/* Image Loaded State - Output First! */}
       {imageLoaded && (
-        <div class="space-y-6 md:space-y-8">
+        <div class="space-y-6 md:space-y-8 flex flex-col">
+          {/* Live scrying mirror indicator */}
+          {isLiveCamera && (
+            <div
+              class="flex items-center gap-2 px-3 py-1.5 border-3 rounded-xl font-mono text-xs font-bold animate-pulse-soft max-w-max self-start"
+              style="background-color: var(--color-secondary, #FFE5B4); border-color: var(--color-border, #0A0A0A); color: var(--color-text, #0A0A0A); position: relative;"
+            >
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping absolute">
+              </span>
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+              <span class="ml-1 uppercase tracking-wide">
+                🔮 LIVE SCRYING MIRROR ACTIVE
+              </span>
+            </div>
+          )}
+
           {/* ASCII Output - Priority #1! */}
           <TerminalDisplay
             content={asciiOutput.replace(/<[^>]*>/g, "")}
@@ -592,7 +712,7 @@ export default function Dropzone() {
                 class="px-6 py-3 md:px-8 md:py-4 border-4 rounded-2xl font-mono font-black text-sm md:text-base shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all active:scale-95"
                 style="background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6); border-color: var(--color-border, #0A0A0A)"
               >
-                NEW IMAGE
+                {isLiveCamera ? "STOP STREAM" : "NEW IMAGE"}
               </button>
             </div>
 

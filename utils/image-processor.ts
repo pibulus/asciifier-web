@@ -96,13 +96,20 @@ export class ImageProcessor {
   }
 
   processImage(
-    img: HTMLImageElement,
+    img: HTMLImageElement | HTMLVideoElement,
     options: ProcessOptions = {},
   ): string[][] {
+    const originalWidth = (img instanceof HTMLVideoElement)
+      ? img.videoWidth
+      : img.width;
+    const originalHeight = (img instanceof HTMLVideoElement)
+      ? img.videoHeight
+      : img.height;
+
     const { width: targetWidth, height: targetHeight } = this
       .calculateOptimalSize(
-        img.width,
-        img.height,
+        originalWidth,
+        originalHeight,
         options.width,
         options.height,
       );
