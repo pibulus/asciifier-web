@@ -6,6 +6,7 @@ import { KofiButton } from "../islands/KofiModal.tsx";
 import { AboutLink, AboutModal } from "../islands/AboutModal.tsx";
 import { WelcomeModal } from "../islands/WelcomeModal.tsx";
 import WelcomeChecker from "../islands/WelcomeChecker.tsx";
+import { HistoryLink, HistoryModal } from "../islands/HistoryModal.tsx";
 
 export default function Home() {
   const activeTab = useSignal("image");
@@ -23,6 +24,8 @@ export default function Home() {
 
       {/* About modal (opened by footer link) */}
       <AboutModal />
+      {/* History/Lore modal (opened by footer link) */}
+      <HistoryModal />
       {/* Floating Theme Button */}
       <div class="fixed top-4 right-4 z-50">
         <ThemeIsland />
@@ -73,6 +76,7 @@ export default function Home() {
         <div class="max-w-4xl mx-auto px-4">
           <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <AboutLink label="Made by Pablo 🎸" />
+            <HistoryLink label="📜 ASCII Lore & History" />
             <KofiButton size="sm" label="☕ Support" />
           </div>
         </div>
