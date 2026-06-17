@@ -77,6 +77,28 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
           <span class="hidden sm:inline md:hidden">GALLERY</span>
           <span class="hidden md:inline">🎨 GALLERY</span>
         </button>
+        <div
+          class="w-0.5"
+          style="background-color: var(--color-border, #0A0A0A)"
+        >
+        </div>
+        <button
+          type="button"
+          onClick={() => handleTabChange("arcade")}
+          aria-label="Switch to retro ASCII arcade"
+          class={`flex-1 sm:flex-none px-2 py-3 sm:px-4 sm:py-3 md:px-6 md:py-3 font-mono font-bold text-xs sm:text-sm md:text-base transition-all duration-200 ${
+            activeTab.value === "arcade"
+              ? "shadow-brutal-inset"
+              : "hover:scale-105 shadow-brutal-sm"
+          }`}
+          style={activeTab.value === "arcade"
+            ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6);"
+            : "background-color: rgba(250, 249, 246, 0.3); color: var(--color-text, #0A0A0A);"}
+        >
+          <span class="sm:hidden">🕹️ PLAY</span>
+          <span class="hidden sm:inline md:hidden">PLAY</span>
+          <span class="hidden md:inline">🕹️ RETRO PLAY</span>
+        </button>
       </div>
 
       <style>

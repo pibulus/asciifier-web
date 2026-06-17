@@ -47,6 +47,7 @@ asciifier-web/
 │   ├── Dropzone.tsx               # Image upload/paste/camera conversion
 │   ├── TextToAscii.tsx            # Text controls and Figlet API caller
 │   ├── AsciiGallery.tsx           # Museum/category/search UI
+│   ├── ArciiArcade.tsx            # Retro ASCII Arcade games (Snake, Conway's Game of Life)
 │   ├── TabsIsland.tsx             # Active tab content
 │   ├── TabSwitcher.tsx            # Tab buttons
 │   ├── ThemeIsland.tsx            # Theme picker

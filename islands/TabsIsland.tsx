@@ -2,6 +2,7 @@ import { Signal } from "@preact/signals";
 import Dropzone from "./Dropzone.tsx";
 import TextToAscii from "./TextToAscii.tsx";
 import AsciiGallery from "./AsciiGallery.tsx";
+import ArciiArcade from "./ArciiArcade.tsx";
 
 interface TabsIslandProps {
   activeTab: Signal<string>;
@@ -14,7 +15,9 @@ export default function TabsIsland({ activeTab }: TabsIslandProps) {
         ? <Dropzone />
         : activeTab.value === "text"
         ? <TextToAscii />
-        : <AsciiGallery />}
+        : activeTab.value === "gallery"
+        ? <AsciiGallery />
+        : <ArciiArcade />}
     </div>
   );
 }
