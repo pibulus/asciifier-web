@@ -5,7 +5,7 @@ import { sounds } from "../utils/sounds.ts";
 // ARCII ARCADE - Retro ASCII Games (Snake & Game of Life)
 // ===================================================================
 
-type GameType = "snake" | "life";
+type GameType = "snake" | "life" | "tetris";
 
 // Conway's Game of Life Preset patterns
 const PRESETS = {
@@ -170,10 +170,26 @@ export default function ArciiArcade() {
           >
             🦠 CONWAY
           </button>
+          <div class="w-0.5 bg-black"></div>
+          <button
+            type="button"
+            onClick={() => selectGame("tetris")}
+            class={`px-4 py-2 font-mono font-bold text-sm transition-all ${
+              activeGame === "tetris"
+                ? "bg-yellow-400 text-black shadow-inner"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            🧱 TETRIS
+          </button>
         </div>
       </div>
 
-      {activeGame === "snake" ? <SnakeGame /> : <GameOfLife />}
+      {activeGame === "snake"
+        ? <SnakeGame />
+        : activeGame === "life"
+        ? <GameOfLife />
+        : <TetrisGame />}
 
       <style>
         {`
@@ -203,6 +219,524 @@ export default function ArciiArcade() {
         }
         `}
       </style>
+    </div>
+  );
+}
+
+// ===================================================================
+// TETRIS GAME ISLAND
+// ===================================================================
+const TETROMINOES = {
+  I: { shape: [[1, 1, 1, 1]], char: "▒" },
+  O: { shape: [[1, 1], [1, 1]], char: "█" },
+  T: { shape: [[0, 1, 0], [1, 1, 1]], char: "▓" },
+  S: { shape: [[0, 1, 1], [1, 1, 0]], char: "▞" },
+  Z: { shape: [[1, 1, 0], [0, 1, 1]], char: "▚" },
+  J: { shape: [[1, 0, 0], [1, 1, 1]], char: "▜" },
+  L: { shape: [[0, 0, 1], [1, 1, 1]], char: "▛" },
+};
+
+type PieceType = keyof typeof TETROMINOES;
+const PIECE_TYPES: PieceType[] = ["I", "O", "T", "S", "Z", "J", "L"];
+
+function TetrisGame() {
+  const COLS = 10;
+  const ROWS = 20;
+
+  const [board, setBoard] = useState<string[][]>(() =>
+    Array(ROWS).fill(null).map(() => Array(COLS).fill("."))
+  );
+  const [currentPiece, setCurrentPiece] = useState<
+    {
+      shape: number[][];
+      char: string;
+      x: number;
+      y: number;
+    } | null
+  >(null);
+
+  const [score, setScore] = useState(0);
+  const [lines, setLines] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
+
+  const boardRef = useRef(board);
+  boardRef.current = board;
+  const currentPieceRef = useRef(currentPiece);
+  currentPieceRef.current = currentPiece;
+
+  // Spawning random piece
+  const spawnPiece = (currentBoard: string[][]) => {
+    const type = PIECE_TYPES[Math.floor(Math.random() * PIECE_TYPES.length)];
+    const proto = TETROMINOES[type];
+    const newPiece = {
+      shape: proto.shape,
+      char: proto.char,
+      x: Math.floor((COLS - proto.shape[0].length) / 2),
+      y: 0,
+    };
+
+    // Check spawn collision
+    if (checkCollision(newPiece, 0, 0, currentBoard)) {
+      sounds.error();
+      setIsGameOver(true);
+      setIsPlaying(false);
+      setCurrentPiece(null);
+    } else {
+      setCurrentPiece(newPiece);
+    }
+  };
+
+  const checkCollision = (
+    piece: { shape: number[][]; x: number; y: number },
+    offsetX: number,
+    offsetY: number,
+    currentBoard: string[][],
+  ): boolean => {
+    for (let r = 0; r < piece.shape.length; r++) {
+      for (let c = 0; c < piece.shape[r].length; c++) {
+        if (piece.shape[r][c]) {
+          const targetX = piece.x + c + offsetX;
+          const targetY = piece.y + r + offsetY;
+
+          // Out of horizontal bounds
+          if (targetX < 0 || targetX >= COLS) return true;
+          // Out of vertical bounds
+          if (targetY >= ROWS) return true;
+          // Target cell already occupied
+          if (targetY >= 0 && currentBoard[targetY][targetX] !== ".") {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  const startGame = () => {
+    sounds.click();
+    const cleanBoard = Array(ROWS).fill(null).map(() => Array(COLS).fill("."));
+    setBoard(cleanBoard);
+    setScore(0);
+    setLines(0);
+    setLevel(1);
+    setIsGameOver(false);
+    setIsPlaying(true);
+    spawnPiece(cleanBoard);
+  };
+
+  const movePiece = (dirX: number, dirY: number) => {
+    const piece = currentPieceRef.current;
+    if (!piece || !isPlaying || isGameOver) return false;
+
+    if (!checkCollision(piece, dirX, dirY, boardRef.current)) {
+      setCurrentPiece({
+        ...piece,
+        x: piece.x + dirX,
+        y: piece.y + dirY,
+      });
+      if (dirX !== 0 || dirY > 0) sounds.toggle();
+      return true;
+    }
+    return false;
+  };
+
+  const rotatePiece = () => {
+    const piece = currentPieceRef.current;
+    if (!piece || !isPlaying || isGameOver) return;
+
+    // Transpose and reverse rows for clockwise rotation
+    const N = piece.shape.length;
+    const M = piece.shape[0].length;
+    const rotatedShape: number[][] = Array(M).fill(null).map(() =>
+      Array(N).fill(0)
+    );
+
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < M; c++) {
+        rotatedShape[c][N - 1 - r] = piece.shape[r][c];
+      }
+    }
+
+    const rotatedPiece = {
+      ...piece,
+      shape: rotatedShape,
+    };
+
+    // Kick piece if it collides on rotate
+    let offsetX = 0;
+    if (checkCollision(rotatedPiece, 0, 0, boardRef.current)) {
+      if (!checkCollision(rotatedPiece, -1, 0, boardRef.current)) offsetX = -1;
+      else if (!checkCollision(rotatedPiece, 1, 0, boardRef.current)) {
+        offsetX = 1;
+      } else if (!checkCollision(rotatedPiece, -2, 0, boardRef.current)) {
+        offsetX = -2;
+      } else if (!checkCollision(rotatedPiece, 2, 0, boardRef.current)) {
+        offsetX = 2;
+      } else return; // Can't rotate
+    }
+
+    sounds.click();
+    setCurrentPiece({
+      ...rotatedPiece,
+      x: rotatedPiece.x + offsetX,
+    });
+  };
+
+  const hardDrop = () => {
+    const piece = currentPieceRef.current;
+    if (!piece || !isPlaying || isGameOver) return;
+
+    let dropDistance = 0;
+    while (!checkCollision(piece, 0, dropDistance + 1, boardRef.current)) {
+      dropDistance++;
+    }
+
+    sounds.drop();
+    const finalPiece = {
+      ...piece,
+      y: piece.y + dropDistance,
+    };
+    lockPiece(finalPiece);
+  };
+
+  const lockPiece = (
+    piece: { shape: number[][]; char: string; x: number; y: number },
+  ) => {
+    const nextBoard = boardRef.current.map((row) => [...row]);
+
+    // Copy piece shape to board
+    for (let r = 0; r < piece.shape.length; r++) {
+      for (let c = 0; c < piece.shape[r].length; c++) {
+        if (piece.shape[r][c]) {
+          const targetY = piece.y + r;
+          if (targetY >= 0 && targetY < ROWS) {
+            nextBoard[targetY][piece.x + c] = piece.char;
+          }
+        }
+      }
+    }
+
+    // Clear complete lines
+    let clearedLinesCount = 0;
+    const filteredBoard = nextBoard.filter((row) => {
+      const isLineComplete = row.every((cell) => cell !== ".");
+      if (isLineComplete) clearedLinesCount++;
+      return !isLineComplete;
+    });
+
+    // Add empty lines at the top
+    while (filteredBoard.length < ROWS) {
+      filteredBoard.unshift(Array(COLS).fill("."));
+    }
+
+    if (clearedLinesCount > 0) {
+      sounds.success();
+      setLines((prevLines) => {
+        const nextLines = prevLines + clearedLinesCount;
+        setLevel(Math.floor(nextLines / 10) + 1);
+        return nextLines;
+      });
+
+      // Score weight: single = 100, double = 300, triple = 500, tetris = 800
+      const scoreTable = [0, 100, 300, 500, 800];
+      setScore((s) => s + (scoreTable[clearedLinesCount] || 800) * level);
+    }
+
+    setBoard(filteredBoard);
+    spawnPiece(filteredBoard);
+  };
+
+  // Level speed selection
+  const getSpeed = () => {
+    return Math.max(80, 700 - (level - 1) * 65);
+  };
+
+  // Keyboard controls
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isPlaying || isGameOver) return;
+
+      switch (e.key) {
+        case "ArrowLeft":
+        case "a":
+        case "A":
+          movePiece(-1, 0);
+          e.preventDefault();
+          break;
+        case "ArrowRight":
+        case "d":
+        case "D":
+          movePiece(1, 0);
+          e.preventDefault();
+          break;
+        case "ArrowDown":
+        case "s":
+        case "S":
+          movePiece(0, 1);
+          e.preventDefault();
+          break;
+        case "ArrowUp":
+        case "w":
+        case "W":
+          rotatePiece();
+          e.preventDefault();
+          break;
+        case " ":
+          hardDrop();
+          e.preventDefault();
+          break;
+        default:
+          return;
+      }
+    };
+
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
+  }, [isPlaying, isGameOver]);
+
+  // Tick interval for gravity
+  useEffect(() => {
+    if (!isPlaying || isGameOver) return;
+
+    const interval = setInterval(() => {
+      const piece = currentPieceRef.current;
+      if (!piece) return;
+
+      if (!checkCollision(piece, 0, 1, boardRef.current)) {
+        setCurrentPiece({
+          ...piece,
+          y: piece.y + 1,
+        });
+      } else {
+        lockPiece(piece);
+      }
+    }, getSpeed());
+
+    return () => clearInterval(interval);
+  }, [isPlaying, isGameOver, level]);
+
+  const handleQuit = () => {
+    sounds.error();
+    setIsGameOver(true);
+    setIsPlaying(false);
+  };
+
+  const renderScreen = () => {
+    if (!isPlaying && !isGameOver) {
+      return (
+        <div class="h-full flex flex-col items-center justify-center text-center font-mono space-y-4 p-4">
+          <div class="text-[#00FF41] text-3xl font-black tracking-widest animate-pulse-soft">
+            🧱 TETRIS.TXT
+          </div>
+          <p class="text-xs text-gray-400 max-w-xs leading-relaxed">
+            Move and rotate falling blocks to clear horizontal lines. Build your
+            stack carefully!
+          </p>
+          <button
+            type="button"
+            onClick={startGame}
+            class="px-5 py-2.5 border-3 rounded-xl font-bold text-xs shadow-brutal bg-yellow-400 text-black transition-all hover:scale-105"
+            style="border-color: var(--color-border, #0A0A0A)"
+          >
+            START MISSION
+          </button>
+        </div>
+      );
+    }
+
+    // Grid clone to overlay current falling piece
+    const renderGrid = board.map((row) => [...row]);
+    const piece = currentPiece;
+
+    if (piece) {
+      for (let r = 0; r < piece.shape.length; r++) {
+        for (let c = 0; c < piece.shape[r].length; c++) {
+          if (piece.shape[r][c]) {
+            const targetY = piece.y + r;
+            if (targetY >= 0 && targetY < ROWS) {
+              renderGrid[targetY][piece.x + c] = piece.char;
+            }
+          }
+        }
+      }
+    }
+
+    return (
+      <div class="font-mono text-center py-1 select-none">
+        <pre class="inline-block text-left text-xs sm:text-sm md:text-base leading-none tracking-wider text-[#00FF41]">
+          {renderGrid.map((row) => row.join(" ")).join("\n")}
+        </pre>
+      </div>
+    );
+  };
+
+  return (
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Tetris screen (2 columns) */}
+      <div
+        class="md:col-span-2 border-4 rounded-3xl overflow-hidden shadow-brutal bg-black flex flex-col relative"
+        style="border-color: var(--color-border, #0A0A0A)"
+      >
+        <div
+          class="px-4 py-2 bg-gray-900 border-b-4 flex items-center justify-between"
+          style="border-color: var(--color-border, #0A0A0A)"
+        >
+          <div class="flex space-x-1.5">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+          </div>
+          <span class="text-xs font-mono text-[#00FF41] opacity-75">
+            ~/arcade/tetris.sh
+          </span>
+          <div class="text-xs font-mono text-gray-500">LEVEL: {level}</div>
+        </div>
+
+        <div class="relative flex-1 p-2 md:p-4 flex items-center justify-center min-h-[360px] max-h-[440px] select-none bg-black overflow-hidden crt-screen">
+          <div class="absolute inset-0 scanlines pointer-events-none z-10">
+          </div>
+          {renderScreen()}
+
+          {isGameOver && (
+            <div class="absolute inset-0 bg-black bg-opacity-90 z-20 flex flex-col items-center justify-center font-mono space-y-4 text-center p-6">
+              <div class="text-red-500 text-2xl font-black tracking-widest animate-bounce">
+                ⚠️ STACK OVERFLOW
+              </div>
+              <p class="text-gray-400 text-xs">
+                Game Over! Score:{" "}
+                <span class="text-yellow-400 font-bold">{score}</span>
+              </p>
+              <button
+                type="button"
+                onClick={startGame}
+                class="px-5 py-2 border-3 rounded-xl font-bold text-xs bg-red-500 text-white shadow-brutal hover:scale-105 transition-transform"
+                style="border-color: var(--color-border, #0A0A0A)"
+              >
+                PLAY AGAIN
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div
+          class="px-4 py-3 bg-gray-900 border-t-4 flex items-center justify-between font-mono text-xs text-[#00FF41]"
+          style="border-color: var(--color-border, #0A0A0A)"
+        >
+          <div>
+            SCORE: <span class="text-yellow-400 font-bold">{score}</span>
+          </div>
+          <div>
+            LINES: <span class="text-yellow-400 font-bold">{lines}</span>
+          </div>
+          {isPlaying && (
+            <button
+              type="button"
+              onClick={handleQuit}
+              class="text-red-400 hover:text-red-300 font-bold border border-red-500 px-2 py-0.5 rounded text-[10px]"
+            >
+              QUIT
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Tetris Controller (1 column) */}
+      <div
+        class="border-4 rounded-3xl p-5 bg-white shadow-brutal flex flex-col justify-between space-y-4"
+        style="border-color: var(--color-border, #0A0A0A)"
+      >
+        <div class="space-y-3">
+          <h3 class="font-mono font-bold text-lg text-gray-900 border-b-2 pb-1.5">
+            TETROMINO PAD
+          </h3>
+          <p class="text-[11px] font-mono text-gray-500 leading-normal">
+            Steer with{" "}
+            <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
+              A/D
+            </span>{" "}
+            or Left/Right. Rotate with{" "}
+            <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
+              W
+            </span>
+            /Up. Soft drop with{" "}
+            <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
+              S
+            </span>
+            /Down. Hard drop with{" "}
+            <span class="bg-gray-100 px-1 py-0.5 rounded border font-bold">
+              SPACE
+            </span>
+            .
+          </p>
+        </div>
+
+        {/* Controller grid */}
+        <div class="flex flex-col items-center gap-2 py-2">
+          {/* Rotate UP */}
+          <button
+            type="button"
+            onClick={rotatePiece}
+            disabled={!isPlaying}
+            class="px-5 py-2.5 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
+            style="border-color: var(--color-border, #0A0A0A)"
+          >
+            ROTATE ▲
+          </button>
+
+          <div class="flex gap-4">
+            <button
+              type="button"
+              onClick={() => movePiece(-1, 0)}
+              disabled={!isPlaying}
+              class="w-14 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
+              style="border-color: var(--color-border, #0A0A0A)"
+            >
+              ◀
+            </button>
+            <button
+              type="button"
+              onClick={() => movePiece(0, 1)}
+              disabled={!isPlaying}
+              class="w-14 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
+              style="border-color: var(--color-border, #0A0A0A)"
+            >
+              ▼
+            </button>
+            <button
+              type="button"
+              onClick={() => movePiece(1, 0)}
+              disabled={!isPlaying}
+              class="w-14 h-12 bg-yellow-400 hover:bg-yellow-300 disabled:bg-gray-300 border-3 font-bold rounded-xl flex items-center justify-center transition-all active:scale-90"
+              style="border-color: var(--color-border, #0A0A0A)"
+            >
+              ▶
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={hardDrop}
+            disabled={!isPlaying}
+            class="w-full mt-1.5 py-2.5 bg-gray-900 text-[#00FF41] hover:bg-gray-800 disabled:bg-gray-300 disabled:text-gray-500 border-3 font-mono font-bold text-xs rounded-xl flex items-center justify-center transition-all active:scale-[0.98]"
+            style="border-color: var(--color-border, #0A0A0A)"
+          >
+            SPACE: HARD DROP ⚡
+          </button>
+        </div>
+
+        {!isPlaying && (
+          <button
+            type="button"
+            onClick={startGame}
+            class="w-full py-3.5 border-4 rounded-2xl font-mono font-black text-sm shadow-brutal hover:shadow-brutal-lg hover:-translate-y-1 transition-all bg-yellow-400 text-black"
+            style="border-color: var(--color-border, #0A0A0A)"
+          >
+            {isGameOver ? "RETRY MISSION 🔁" : "START MISSION 🎮"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
