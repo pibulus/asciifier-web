@@ -45,16 +45,6 @@ export class ThemeSystem {
     this.currentTheme = defaultTheme || config.themes[0];
   }
 
-  // Get all available themes
-  getThemes(): Theme[] {
-    return this.config.themes;
-  }
-
-  // Get current active theme
-  getCurrentTheme(): Theme {
-    return this.currentTheme;
-  }
-
   // Set a specific theme
   setTheme(themeName: string): Theme {
     const theme = this.config.themes.find((t) => t.name === themeName);
@@ -168,20 +158,6 @@ export class ThemeSystem {
   getRandomTheme(): Theme {
     const randomIndex = Math.floor(Math.random() * this.config.themes.length);
     return this.config.themes[randomIndex];
-  }
-
-  // Cycle to next theme
-  cycleTheme(): Theme {
-    const currentIndex = this.config.themes.findIndex((t) =>
-      t.name === this.currentTheme.name
-    );
-    const nextIndex = (currentIndex + 1) % this.config.themes.length;
-    const nextTheme = this.config.themes[nextIndex];
-
-    this.currentTheme = nextTheme;
-    this.applyTheme(nextTheme);
-    this.notifyListeners(nextTheme);
-    return nextTheme;
   }
 
   // Subscribe to theme changes
@@ -577,8 +553,4 @@ export class RandomThemeGenerator {
 // Export convenience functions
 export function createThemeSystem(config: ThemeSystemConfig): ThemeSystem {
   return new ThemeSystem(config);
-}
-
-export function generateRandomTheme(mode: "light" | "dark" = "light"): Theme {
-  return RandomThemeGenerator.generateHarmonicTheme(mode);
 }

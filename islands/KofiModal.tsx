@@ -87,13 +87,16 @@ export function KofiModal({
     <>
       {/* Backdrop */}
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);"
+        class="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto px-3 sm:px-4"
+        style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); padding-top: max(1rem, env(safe-area-inset-top)); padding-bottom: max(1rem, env(safe-area-inset-bottom));"
         onClick={closeKofiModal}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
       >
         {/* Modal */}
         <div
-          class="relative w-full max-w-2xl animate-modal-in"
+          class="relative w-full max-w-2xl my-auto animate-modal-in"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -133,7 +136,7 @@ export function KofiModal({
           >
             <iframe
               src={`https://ko-fi.com/${kofiUsername}/?hidefeed=true&widget=true&embed=true`}
-              style="border: none; width: 100%; height: 600px; background: transparent;"
+              style="border: none; width: 100%; height: min(600px, calc(100dvh - 15rem)); min-height: 320px; background: transparent;"
               title="Ko-fi donation"
             />
           </div>
@@ -144,7 +147,7 @@ export function KofiModal({
               class="text-xs font-mono opacity-60"
               style="color: var(--color-text, #0A0A0A)"
             >
-              Press ESC or click outside to close
+              Tap outside or press ESC to close
             </p>
           </div>
         </div>

@@ -9,7 +9,7 @@ import { escapeHtml } from "./html.ts";
  * Calculate HSL color for a specific position in ASCII art
  * based on the selected color effect
  */
-export function getEffectColor(
+function getEffectColor(
   effect: string,
   x: number,
   y: number,

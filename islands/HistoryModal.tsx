@@ -68,7 +68,7 @@ export function HistoryModal() {
       >
         {/* Modal Window */}
         <div
-          class="relative w-full max-w-4xl max-h-[92vh] overflow-hidden animate-modal-in"
+          class="relative w-full max-w-4xl max-h-[92dvh] overflow-hidden animate-modal-in"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}

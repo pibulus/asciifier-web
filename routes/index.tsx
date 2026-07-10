@@ -3,7 +3,7 @@ import TabSwitcher from "../islands/TabSwitcher.tsx";
 import TabsIsland from "../islands/TabsIsland.tsx";
 import ThemeIsland from "../islands/ThemeIsland.tsx";
 import { KofiButton } from "../islands/KofiModal.tsx";
-import { AboutLink, AboutModal } from "../islands/AboutModal.tsx";
+import { AboutLink } from "../islands/AboutModal.tsx";
 import { WelcomeModal } from "../islands/WelcomeModal.tsx";
 import WelcomeChecker from "../islands/WelcomeChecker.tsx";
 import { HistoryLink, HistoryModal } from "../islands/HistoryModal.tsx";
@@ -22,12 +22,12 @@ export default function Home() {
       {/* First-visit welcome modal */}
       <WelcomeModal />
 
-      {/* About modal (opened by footer link) */}
-      <AboutModal />
+      {/* About modal itself is mounted globally in _app.tsx */}
       {/* History/Lore modal (opened by footer link) */}
       <HistoryModal />
       {/* Floating Theme Button */}
-      <div class="fixed top-4 right-4 z-50">
+      {/* z-40 keeps the theme chip below z-50 modal backdrops */}
+      <div class="fixed top-4 right-4 z-40">
         <ThemeIsland />
       </div>
 

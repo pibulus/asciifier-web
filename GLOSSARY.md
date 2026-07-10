@@ -23,10 +23,9 @@
   ASCII with optional border and color effect HTML.
 - `GET /api/random-ascii-art` - `routes/api/random-ascii-art.ts`; random local
   museum sample or source-only archive link card.
-- `GET /api/joke` - `routes/api/joke.ts`; small legacy text endpoint.
 
-There is no current `/api/figlet`, `/api/colorize`, or `/api/image-to-ascii`
-route.
+There is no current `/api/figlet`, `/api/colorize`, `/api/image-to-ascii`, or
+`/api/joke` route.
 
 ## Islands
 
@@ -41,7 +40,9 @@ route.
 - `ThemeIsland` - theme picker.
 - `WelcomeChecker` - first-visit welcome state check.
 - `WelcomeModal` - welcome modal and auto-type trigger.
-- `AboutModal` / `AboutLink` - about dialog and footer opener.
+- `AboutModal` / `AboutLink` - about dialog and footer opener (modal mounts
+  globally in `_app.tsx`).
+- `HistoryModal` / `HistoryLink` - ASCII lore/history dialog and footer opener.
 - `KofiModal` / `KofiButton` - support modal and CTA.
 - `ThanksPage` - support thank-you page UI.
 
@@ -51,7 +52,6 @@ route.
   button, TXT export, and PNG export.
 - `MagicDropdown` - shared dropdown selector used by text/image/museum controls.
 - `Toast` / `ToastContainer` / `showToast` - global toast system.
-- `Button` - small shared styled button.
 
 ## Utilities
 
@@ -65,7 +65,6 @@ route.
 - `character-sets.ts` - character ramps/styles for image conversion.
 - `analytics.ts` - optional PostHog wrapper; no text/image contents tracked.
 - `html.ts` - HTML escaping helper.
-- `share.ts` - share helpers.
 - `sounds.ts` - UI sound engine.
 - `simple-typewriter.js` - typewriter sound helper.
 - `easter-eggs.ts` - small hidden UI extras.

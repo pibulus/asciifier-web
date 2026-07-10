@@ -104,23 +104,6 @@ export class SoundEngine {
     this.playTone(400, 0.2, "sawtooth");
     setTimeout(() => this.playTone(200, 0.3, "sawtooth"), 100);
   }
-
-  // Easter egg: play a little melody
-  playMelody() {
-    const notes = [
-      { freq: 523, delay: 0 }, // C
-      { freq: 587, delay: 200 }, // D
-      { freq: 659, delay: 400 }, // E
-      { freq: 523, delay: 600 }, // C
-      { freq: 659, delay: 800 }, // E
-      { freq: 784, delay: 1000 }, // G
-      { freq: 784, delay: 1200 }, // G
-    ];
-
-    notes.forEach((note) => {
-      setTimeout(() => this.playTone(note.freq, 0.2, "sine"), note.delay);
-    });
-  }
 }
 
 // Singleton instance

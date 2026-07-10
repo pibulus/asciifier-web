@@ -103,10 +103,6 @@ html::-webkit-scrollbar-thumb:hover {
 
 /* Custom utilities */
 @layer utilities {
-  .text-shadow-brutal {
-    text-shadow: 2px 2px 0px var(--color-border);
-  }
-
   .ascii-display {
     font-family: "JetBrains Mono", "Courier New", monospace;
     letter-spacing: 0;
@@ -116,38 +112,11 @@ html::-webkit-scrollbar-thumb:hover {
     overflow-wrap: normal;
   }
 
-  /* Smooth scrolling */
-  .smooth-scroll {
-    scroll-behavior: smooth;
-  }
-
-  /* Juicy button shadow - subtle but classy */
-  .shadow-juicy {
-    box-shadow: 3px 3px 0 var(--color-border, #0a0a0a);
-  }
-
-  /* Wavy title animation - subtle wave effect */
-  .wavy-title span {
-    display: inline-block;
-    animation: wave 3s ease-in-out infinite;
-    animation-delay: calc(var(--char-index) * 0.1s);
-  }
-
   /* Wavy dropzone title - more engaging wave */
   .wavy-dropzone-title span span {
     display: inline-block;
     animation: dropzoneWave 2.5s ease-in-out infinite;
     animation-delay: calc(var(--char-index) * 0.08s);
-  }
-
-  @keyframes wave {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-8px);
-    }
   }
 
   @keyframes dropzoneWave {

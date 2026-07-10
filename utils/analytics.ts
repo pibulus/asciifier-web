@@ -53,7 +53,10 @@ class AnalyticsService {
     const key = env?.POSTHOG_KEY;
     const host = env?.POSTHOG_HOST || "https://app.posthog.com";
 
-    if (!key) {
+    // Only accept real PostHog project keys ("phc_...") — anything else
+    // (e.g. a personal "phx_" key leaking in from the shell env) would just
+    // 401-spam the console on every page load.
+    if (!key || !key.startsWith("phc_")) {
       // Silently disable analytics - no warnings needed for local dev
       this.isInitialized = true;
       return;
@@ -143,15 +146,6 @@ class AnalyticsService {
   trackRandomAscii(category?: string) {
     this.trackEvent("random_ascii_viewed", {
       category: category || "mixed",
-      timestamp: Date.now(),
-    });
-  }
-
-  // Error Tracking
-  trackError(errorType: string, context: AnalyticsProperties = {}) {
-    this.trackEvent("error_occurred", {
-      error_type: errorType,
-      context,
       timestamp: Date.now(),
     });
   }

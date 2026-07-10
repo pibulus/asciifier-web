@@ -51,6 +51,9 @@ interface FigletFunction {
 
 type FigletModule = FigletFunction & { default?: FigletFunction };
 
+// Populated on first request; figlet's bundled font list never changes at runtime.
+let cachedFonts: string[] | null = null;
+
 interface BorderChars {
   tl: string;
   tr: string;
@@ -126,8 +129,10 @@ export const handler = async (
       const figletModule = await import("figlet") as unknown as FigletModule;
       const figlet = figletModule.default || figletModule;
 
-      // Get all available fonts dynamically from figlet
-      const availableFonts = figlet.fontsSync ? figlet.fontsSync() : [];
+      // Font list is static per process — scan it once, not per request
+      // (fontsSync re-reads the whole bundled font directory each call).
+      cachedFonts ??= figlet.fontsSync ? figlet.fontsSync() : [];
+      const availableFonts = cachedFonts;
 
       // Validate and fallback font - check if requested font exists
       const safeFont = availableFonts.includes(font) ? font : "Standard";

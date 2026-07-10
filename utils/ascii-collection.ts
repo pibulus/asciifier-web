@@ -421,20 +421,6 @@ export const asciiCollection: AsciiArt[] = [
 ];
 
 // Get a random ASCII art piece
-export function getRandomAscii(): AsciiArt {
-  const randomIndex = Math.floor(Math.random() * asciiCollection.length);
-  return asciiCollection[randomIndex];
-}
-
-// Get ASCII art by category
-export function getAsciiByCategory(category: string): AsciiArt[] {
-  return asciiCollection.filter((art) => art.category === category);
-}
-
-export function getAsciiBySourceCategory(sourceCategory: string): AsciiArt[] {
-  return asciiCollection.filter((art) => art.sourceCategory === sourceCategory);
-}
-
 export function searchAsciiCollection(
   sourceCategory: string,
   query: string,
@@ -463,6 +449,3 @@ export function searchAsciiCollection(
 }
 
 // Get all categories
-export function getCategories(): string[] {
-  return [...new Set(asciiCollection.map((art) => art.category))];
-}

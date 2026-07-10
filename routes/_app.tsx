@@ -1,3 +1,4 @@
+// deno-lint-ignore-file react-no-danger
 import { type PageProps } from "$fresh/server.ts";
 import { KofiModal } from "../islands/KofiModal.tsx";
 import { AboutModal } from "../islands/AboutModal.tsx";
@@ -103,8 +104,12 @@ export default function App({ Component }: PageProps) {
         {/* Styles */}
         <link rel="stylesheet" href="/styles.css" />
 
-        {/* Analytics env vars */}
-        <script>{analyticsEnvScript}</script>
+        {
+          /* Analytics env vars — must be raw HTML: a JSX text child gets
+            entity-escaped by Preact, which turns the JSON quotes into
+            &quot; and breaks the script */
+        }
+        <script dangerouslySetInnerHTML={{ __html: analyticsEnvScript }} />
       </head>
       <body>
         {/* Real grain texture using noise image */}
@@ -165,7 +170,7 @@ export default function App({ Component }: PageProps) {
         <AboutModal />
 
         {/* Service Worker Registration */}
-        <script>{serviceWorkerScript}</script>
+        <script dangerouslySetInnerHTML={{ __html: serviceWorkerScript }} />
       </body>
     </html>
   );

@@ -28,9 +28,6 @@ The current architecture is:
 - Deployment: Deno Deploy through `.github/workflows/deploy.yml`.
 - Local port: `8001`.
 
-`lolcatjs` is still listed as a dependency, but the active browser color effects
-are custom HSL span generation, not a `/api/colorize` route.
-
 ## Source Map
 
 ```text
@@ -41,8 +38,7 @@ asciifier-web/
 │   ├── thanks.tsx                 # Ko-fi/support thank-you route
 │   └── api/
 │       ├── enhanced-figlet.ts     # Text -> Figlet ASCII API
-│       ├── random-ascii-art.ts    # Museum/local collection API
-│       └── joke.ts                # Legacy joke endpoint
+│       └── random-ascii-art.ts    # Museum/local collection API
 ├── islands/
 │   ├── Dropzone.tsx               # Image upload/paste/camera conversion
 │   ├── TextToAscii.tsx            # Text controls and Figlet API caller
@@ -59,8 +55,7 @@ asciifier-web/
 ├── components/
 │   ├── TerminalDisplay.tsx        # Shared terminal output and export controls
 │   ├── MagicDropdown.tsx          # Shared dropdown control
-│   ├── Toast.tsx                  # Toast store/container
-│   └── Button.tsx                 # Small shared button
+│   └── Toast.tsx                  # Toast store/container
 ├── utils/
 │   ├── ascii-collection.ts        # Local museum starter art
 │   ├── constants.ts               # Shared dropdown options/categories
