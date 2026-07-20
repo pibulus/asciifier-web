@@ -9,7 +9,8 @@
     "dev": "PORT=8001 deno run -A --env-file=.env --watch=static/,routes/,islands/,components/,utils/,theme-system/ dev.ts",
     "build": "deno run -A dev.ts build",
     "preview": "deno run -A main.ts",
-    "update": "deno run -A -r https://fresh.deno.dev/update ."
+    "update": "deno run -A -r https://fresh.deno.dev/update .",
+    "css": "deno run -A npm:tailwindcss@3.4.1 -c tailwind.config.ts -i static/styles.src.css -o static/styles.css --minify"
   },
   "lint": {
     "rules": {
@@ -45,3 +46,4 @@
     "app": "asciifier"
   }
 }
+
