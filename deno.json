@@ -30,7 +30,8 @@
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
     "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
     "$std/": "https://deno.land/std@0.216.0/",
-    "tailwindcss": "npm:tailwindcss@^3.4.0",
+    "tailwindcss": "npm:tailwindcss@3.4.1",
+    "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "figlet": "npm:figlet@^1.7.0",
     "html-to-image": "npm:html-to-image@^1.11.11",
     "posthog-js": "npm:posthog-js@^1.246.0"
@@ -38,5 +39,9 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
+  },
+  "deploy": {
+    "org": "pibulus",
+    "app": "asciifier"
   }
 }
