@@ -1,7 +1,12 @@
 // Asciifier Service Worker v2.0
 // Enables offline functionality and PWA features
 
-const CACHE_NAME = "asciifier-v2";
+// BUMP THIS on any deploy that touches an unhashed asset (styles.css, icons).
+// They're served cache-first, so installed-PWA users keep the old copy until
+// the cache name changes. styles.css is precompiled and committed here, so it
+// changes often — v2 shipped 2025-10-05 and the CSS moved on 2026-07-20,
+// meaning installed users were stale for months.
+const CACHE_NAME = "asciifier-v3";
 const urlsToCache = [
   "/styles.css",
   "/manifest.json",
