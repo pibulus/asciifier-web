@@ -2,8 +2,6 @@ name: Deploy
 on:
   push:
     branches: main
-  pull_request:
-    branches: main
 
 jobs:
   deploy:
@@ -11,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write # Needed for auth with Deno Deploy
       contents: read # Needed to clone the repository
 
     steps:
@@ -26,9 +23,11 @@ jobs:
       - name: Build step
         run: "deno task build"
 
+      # Classic Deno Deploy (deployctl + OIDC) died 2026-07-20. The new
+      # platform deploys via the `deno deploy` CLI; org/app come from the
+      # "deploy" block in deno.json, auth from DENO_DEPLOY_TOKEN (repo
+      # secret, console.deno.com token).
       - name: Upload to Deno Deploy
-        uses: denoland/deployctl@v1
-        with:
-          project: "asciifier"
-          entrypoint: "main.ts"
-          root: "."
+        run: deno deploy --prod --non-interactive
+        env:
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
