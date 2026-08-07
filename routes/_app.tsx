@@ -33,7 +33,12 @@ export default function App({ Component }: PageProps) {
     <html lang="en">
       <head>
         <meta charset="utf-8" />
-        <script defer src="https://fleetcount.pibulus.deno.net/beacon.js" data-site="asciifier.pibulus.deno.net"></script>
+        <script
+          defer
+          src="https://fleetcount.pibulus.deno.net/beacon.js"
+          data-site="asciifier.pibulus.deno.net"
+        >
+        </script>
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -65,13 +70,13 @@ export default function App({ Component }: PageProps) {
         <meta property="og:url" content="https://asciifier.app" />
         <meta
           property="og:image"
-          content="https://asciifier.app/asciifier-logo.png"
+          content="https://asciifier.app/og-card.png"
         />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta
           property="og:image:alt"
-          content="ASCIIFIER - Turn anything into text art"
+          content="The ASCIIFIER machine — ASCIIFIER in dotted pink-gradient figlet on a black CRT screen"
         />
 
         {/* Twitter Card */}
@@ -83,11 +88,11 @@ export default function App({ Component }: PageProps) {
         />
         <meta
           name="twitter:image"
-          content="https://asciifier.app/asciifier-logo.png"
+          content="https://asciifier.app/og-card.png"
         />
         <meta
           name="twitter:image:alt"
-          content="ASCIIFIER - Turn anything into text art"
+          content="The ASCIIFIER machine — ASCIIFIER in dotted pink-gradient figlet on a black CRT screen"
         />
 
         {/* PWA Manifest */}
