@@ -1,5 +1,6 @@
 // deno-lint-ignore-file react-no-danger
 import { type PageProps } from "$fresh/server.ts";
+import { asset } from "$fresh/runtime.ts";
 import { KofiModal } from "../islands/KofiModal.tsx";
 import { AboutModal } from "../islands/AboutModal.tsx";
 import { ToastContainer } from "../components/Toast.tsx";
@@ -108,7 +109,7 @@ export default function App({ Component }: PageProps) {
         />
 
         {/* Styles */}
-        <link rel="stylesheet" href="/styles.css" />
+        <link rel="stylesheet" href={asset("/styles.css")} />
 
         {
           /* Analytics env vars — must be raw HTML: a JSX text child gets
