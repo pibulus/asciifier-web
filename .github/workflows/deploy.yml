@@ -26,8 +26,11 @@ jobs:
       # Classic Deno Deploy (deployctl + OIDC) died 2026-07-20. The new
       # platform deploys via the `deno deploy` CLI; org/app come from the
       # "deploy" block in deno.json, auth from DENO_DEPLOY_TOKEN (repo
-      # secret, console.deno.com token).
+      # secret, console.deno.com token). --no-wait because the CLI's
+      # build-watcher hangs without a TTY ("Top-level await promise never
+      # resolved", jsr @deno/deploy 0.0.9904) — the build itself completes
+      # server-side either way.
       - name: Upload to Deno Deploy
-        run: deno deploy --prod --non-interactive
+        run: deno deploy --prod --non-interactive --no-wait
         env:
           DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
