@@ -6,14 +6,15 @@
 // the cache name changes. styles.css is precompiled and committed here, so it
 // changes often — v2 shipped 2025-10-05 and the CSS moved on 2026-07-20,
 // meaning installed users were stale for months.
-const CACHE_NAME = "asciifier-v3";
+const CACHE_NAME = "asciifier-v4";
 const urlsToCache = [
   "/styles.css",
   "/manifest.json",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png",
-  "/icons/icon-maskable-512x512.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/icon-512-maskable.png",
   "/favicon.ico",
+  "/favicon.svg",
 ];
 
 // Install event - cache essential files
