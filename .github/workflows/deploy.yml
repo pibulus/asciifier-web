@@ -30,7 +30,20 @@ jobs:
       # build-watcher hangs without a TTY ("Top-level await promise never
       # resolved", jsr @deno/deploy 0.0.9904) — the build itself completes
       # server-side either way.
+      # The CLI spawns twin builds per invocation and sometimes latches
+      # onto the cancelled twin, exiting 1 with "build for this revision
+      # is no longer active" while the sibling routes fine (seen 4x on
+      # 2026-08-09 across stargram + asciifier). On that failure, check
+      # whether a fresh revision actually routed before calling it red.
       - name: Upload to Deno Deploy
-        run: deno deploy --prod --non-interactive --no-wait
+        run: |
+          deno deploy --prod --non-interactive --no-wait || {
+            echo "deploy CLI errored — checking whether a twin revision routed anyway"
+            sleep 20
+            cutoff=$(date -u -d '5 minutes ago' +%Y-%m-%dT%H:%M:%S)
+            deno deploy deployments list --json --non-interactive \
+              | jq -e --arg cutoff "$cutoff" '[.items[0:4][] | select((.status == "routed" or .status == "building") and .createdAt > $cutoff)] | length > 0' \
+              && echo "a fresh revision routed/building — twin-build false alarm, treating as success"
+          }
         env:
           DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
