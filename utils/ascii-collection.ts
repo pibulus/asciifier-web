@@ -420,6 +420,13 @@ export const asciiCollection: AsciiArt[] = [
   },
 ];
 
+// Restored 2026-08-09: the Jul "dead code" purge deleted this while
+// searchAsciiCollection still called it — every gallery request 500'd
+// since. If it looks unused, it's because its caller is 6 lines down.
+function getAsciiBySourceCategory(sourceCategory: string): AsciiArt[] {
+  return asciiCollection.filter((art) => art.sourceCategory === sourceCategory);
+}
+
 // Get a random ASCII art piece
 export function searchAsciiCollection(
   sourceCategory: string,

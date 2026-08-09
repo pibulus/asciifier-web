@@ -40,8 +40,8 @@ export default function TextToAscii() {
   const generationRequestRef = useRef(0);
 
   // Track timeouts for cleanup
-  const autoTypeTimeoutRef = useRef<number | null>(null);
-  const wiggleTimeoutRef = useRef<number | null>(null);
+  const autoTypeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wiggleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Initialize analytics and typewriter sounds on mount
   useEffect(() => {
@@ -355,6 +355,7 @@ export default function TextToAscii() {
             "ascii-art"}
           showShuffleButton={false}
           terminalPath="~/output/text-art.txt"
+          typeReveal
         />
       </div>
 

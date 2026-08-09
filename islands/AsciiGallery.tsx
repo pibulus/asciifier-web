@@ -40,7 +40,7 @@ export default function AsciiGallery() {
 
   // Track if component is mounted to prevent state updates after unmount
   const isMountedRef = useRef(true);
-  const shuffleTimeoutRef = useRef<number | null>(null);
+  const shuffleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fetchRequestRef = useRef(0);
 
   const selectedCategoryConfig =
@@ -262,6 +262,7 @@ export default function AsciiGallery() {
           showShuffleButton={Boolean(currentArt) && !currentSourceOnly}
           showExportButtons={Boolean(currentArt) && !currentSourceOnly}
           terminalPath="~/gallery/ascii-art.txt"
+          typeReveal
           visualEffect={selectedEffect}
         />
       </div>

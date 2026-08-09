@@ -97,8 +97,24 @@ function getEffectColor(
 }
 
 /**
+ * Round hsl components to coarse steps so neighbouring characters land on
+ * the same color and merge into one span. 8° of hue on a text glyph is
+ * imperceptible; the DOM difference is 10x fewer nodes on image conversions.
+ */
+function quantizeColor(color: string): string {
+  return color.replace(
+    /hsl\(([\d.-]+),\s*([\d.-]+)%,\s*([\d.-]+)%\)/,
+    (_m, h, s, l) =>
+      `hsl(${Math.round(Number(h) / 8) * 8}, ${
+        Math.round(Number(s) / 4) * 4
+      }%, ${Math.round(Number(l) / 4) * 4}%)`,
+  );
+}
+
+/**
  * Apply a color effect to ASCII art text
- * Returns HTML with colored spans for each line
+ * Returns HTML with colored spans — one span per same-color RUN, not per
+ * character (a 150x80 image used to emit 10,000+ span nodes).
  */
 export function applyColorToArt(art: string, effect: string): string {
   if (effect === "none" || !art) {
@@ -113,17 +129,35 @@ export function applyColorToArt(art: string, effect: string): string {
     const line = lines[y];
 
     let colorizedLine = "";
+    let runColor: string | null = null;
+    let runText = "";
+
+    const flush = () => {
+      if (!runText) return;
+      colorizedLine += runColor === null
+        ? runText
+        : `<span style="color: ${runColor};">${escapeHtml(runText)}</span>`;
+      runText = "";
+    };
+
     for (let x = 0; x < line.length; x++) {
       const char = line[x];
       if (char === " ") {
-        colorizedLine += " ";
-      } else {
-        const color = getEffectColor(effect, x, y, widestLine, lines.length);
-        colorizedLine += `<span style="color: ${color};">${
-          escapeHtml(char)
-        }</span>`;
+        // Spaces carry no glyph, so they extend whatever run is open
+        // instead of breaking it.
+        runText += " ";
+        continue;
       }
+      const color = quantizeColor(
+        getEffectColor(effect, x, y, widestLine, lines.length),
+      );
+      if (color !== runColor) {
+        flush();
+        runColor = color;
+      }
+      runText += char;
     }
+    flush();
 
     colorizedLines.push(colorizedLine);
   }
