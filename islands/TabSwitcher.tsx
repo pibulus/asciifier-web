@@ -29,9 +29,9 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
             ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6);"
             : "background-color: rgba(250, 249, 246, 0.3); color: var(--color-text, #0A0A0A);"}
         >
-          <span class="sm:hidden">📸 IMAGE</span>
+          <span class="sm:hidden">IMAGE</span>
           <span class="hidden sm:inline md:hidden">IMAGE</span>
-          <span class="hidden md:inline">📸 IMAGE → ASCII</span>
+          <span class="hidden md:inline">IMAGE → ASCII</span>
         </button>
         <div
           class="w-0.5"
@@ -51,9 +51,9 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
             ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6);"
             : "background-color: rgba(250, 249, 246, 0.3); color: var(--color-text, #0A0A0A);"}
         >
-          <span class="sm:hidden">✨ TEXT</span>
+          <span class="sm:hidden">TEXT</span>
           <span class="hidden sm:inline md:hidden">TEXT</span>
-          <span class="hidden md:inline">✨ TEXT → ASCII</span>
+          <span class="hidden md:inline">TEXT → ASCII</span>
         </button>
         <div
           class="w-0.5"
@@ -73,9 +73,9 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
             ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6);"
             : "background-color: rgba(250, 249, 246, 0.3); color: var(--color-text, #0A0A0A);"}
         >
-          <span class="sm:hidden">🎨 GALLERY</span>
+          <span class="sm:hidden">GALLERY</span>
           <span class="hidden sm:inline md:hidden">GALLERY</span>
-          <span class="hidden md:inline">🎨 GALLERY</span>
+          <span class="hidden md:inline">GALLERY</span>
         </button>
         <div
           class="w-0.5"
@@ -95,9 +95,9 @@ export default function TabSwitcher({ activeTab }: TabSwitcherProps) {
             ? "background-color: var(--color-accent, #FF69B4); color: var(--color-base, #FAF9F6);"
             : "background-color: rgba(250, 249, 246, 0.3); color: var(--color-text, #0A0A0A);"}
         >
-          <span class="sm:hidden">🕹️ PLAY</span>
+          <span class="sm:hidden">PLAY</span>
           <span class="hidden sm:inline md:hidden">PLAY</span>
-          <span class="hidden md:inline">🕹️ RETRO PLAY</span>
+          <span class="hidden md:inline">RETRO PLAY</span>
         </button>
       </div>
 
