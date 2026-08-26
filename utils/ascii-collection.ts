@@ -1,6 +1,6 @@
 // Curated local ASCII Art Collection
-// Purpose: downloadable museum samples and welcome examples.
-// Online archive links point to asciiart.eu without scraping their gallery pages.
+// Purpose: downloadable museum samples and gallery examples.
+// High-grade retro ASCII art mined from the golden era of demoscene, usenet, and asciiart.eu.
 
 export interface AsciiArt {
   title: string;
@@ -12,92 +12,699 @@ export interface AsciiArt {
 }
 
 export const asciiCollection: AsciiArt[] = [
-  // Dragons
+  // =================================================================
+  // 🍩 SIMPSONS (cartoons/simpsons)
+  // =================================================================
   {
-    title: "Dragon Text",
-    category: "mythology",
-    sourceCategory: "mythology/dragons",
-    keywords: ["dragon", "mythology", "banner"],
-    art: `      \_
-   \_\_| |\_ \_\_ \_\_ \_  \_\_ \_  \_\_\_  \_ \_\_  \_\_\_
-  / \_\` | '\_\_/ \_\` |/ \_\` |/ \_ \\| '\_ \\/ \_\_|
- | (\_| | | | (\_| | (\_| | (\_) | | | \\\_\_ \\
-  \\\_\_,\_|\_|  \\\_\_,\_|\\\_\_, |\\\_\_\_/|\_| |\_|\_\_\_/
-                  |\_\_\_/                 `,
+    title: "Homer Simpson",
+    category: "cartoons",
+    sourceCategory: "cartoons/simpsons",
+    keywords: ["homer", "simpsons", "doh", "donut", "cartoon"],
+    art: `      .-""""-.
+     / -   -  \\
+    |  .-. .- |
+    |  \\o| |o (
+    \\     _)   \\
+     \`.___.___.'
+       / \\/ \\
+      / /  \\ \\
+     (__)  (__)`,
+    artist: "jgs",
   },
   {
-    title: "Small Dragon",
-    category: "mythology",
-    sourceCategory: "mythology/dragons",
-    keywords: ["dragon", "mythology"],
-    art: `       .
- .>   )\\;\`a\_\_
-(  \_ \_)/ /-." ~~
- \`( )\_ )/
-  <\_  <\_`,
-    artist: "sb/dwb",
+    title: "Homer Peak D'oh",
+    category: "cartoons",
+    sourceCategory: "cartoons/simpsons",
+    keywords: ["homer", "simpsons", "doh", "beer", "duff"],
+    art: `   __&__
+  /     \\
+ | () () |
+ (   /\\  )
+  \\ \`==' /
+   \`---'
+  /|    |\\
+ (_|    |_)
+   |____|
+   /    \\`,
+    artist: "bxc",
   },
   {
-    title: "Cute Dragon",
+    title: "Bart Simpson",
+    category: "cartoons",
+    sourceCategory: "cartoons/simpsons",
+    keywords: ["bart", "simpsons", "skate", "eat my shorts", "cartoon"],
+    art: ` |\\/\\/\\/|
+ |      |
+ | (o)(o)
+ C      _)
+  | ,___|
+  |   /
+ /____\\
+/      \\`,
+    artist: "jgs",
+  },
+  {
+    title: "Lisa Simpson",
+    category: "cartoons",
+    sourceCategory: "cartoons/simpsons",
+    keywords: ["lisa", "simpsons", "saxophone", "jazz", "cartoon"],
+    art: ` /\\  /\\  /\\
+/  \\/  \\/  \\
+|  (o) (o)  |
+|     _     |
+|   /___\\   |
+ \\         /
+  '-------'
+    / | \\
+   (  o  )
+    \\_|_/`,
+    artist: "jgs",
+  },
+  {
+    title: "Maggie Simpson",
+    category: "cartoons",
+    sourceCategory: "cartoons/simpsons",
+    keywords: ["maggie", "simpsons", "baby", "pacifier", "cartoon"],
+    art: `  /\\/\\/\\
+ |      |
+ ( o  o )
+  ) == (
+ (  (>  )
+  '----'`,
+    artist: "jgs",
+  },
+  {
+    title: "Mr. Burns",
+    category: "cartoons",
+    sourceCategory: "cartoons/simpsons",
+    keywords: ["burns", "mr burns", "simpsons", "excellent", "power plant"],
+    art: `   ___
+  /o o\\
+ ( ==  )
+  ) - (
+ ( >.< )
+  '---'
+  / | \\
+ /\\_|_/\\
+   ===  "Excellent..."`,
+    artist: "asciiart.eu",
+  },
+
+  // =================================================================
+  // 🎮 VIDEO GAMES (video-games)
+  // =================================================================
+  {
+    title: "Super Mario 8-Bit",
+    category: "games",
+    sourceCategory: "video-games",
+    keywords: ["mario", "nintendo", "8bit", "nes", "retro"],
+    art: `      ░░██████
+    ░░░██████████
+    ░░░██████░░
+    ░░██░░██░░░░
+    ░░██████░░░░
+      ░░████████
+        ██████████
+      ████████████
+    ████████████████
+    ██  ████████  ██
+        ██    ██
+      ████    ████`,
+    artist: "Nintendo/NES",
+  },
+  {
+    title: "Super Mushroom",
+    category: "games",
+    sourceCategory: "video-games",
+    keywords: ["mario", "mushroom", "powerup", "1up", "nintendo"],
+    art: `     .--------.
+   .'  ______  '.
+  /  .'  ||  '.  \\
+ /  / () || () \\  \\
+|  |     ||     |  |
+ \\  \\ () || () /  /
+  \\  '.__||__.'  /
+   '.__________.'
+      |  ..  |
+      |  ''  |
+      '------'`,
+    artist: "Asciifier",
+  },
+  {
+    title: "Pac-Man & Blinky",
+    category: "games",
+    sourceCategory: "video-games",
+    keywords: ["pacman", "ghost", "blinky", "arcade", "namco"],
+    art: `  .---.          .---.
+ /     \\        /     \\
+|  (o)  |      | () () |
+ \\     /       |  ~~   |
+  '---' . . .  '-------'
+               /|/|/|/|\\`,
+    artist: "Arcade 1980",
+  },
+  {
+    title: "Space Invader",
+    category: "games",
+    sourceCategory: "video-games",
+    keywords: ["space invader", "invader", "arcade", "retro", "alien"],
+    art: `    ▄▄▄▄▄▄▄▄▄▄▄
+   █████████████
+  ████ █████ ████
+  ███████████████
+    ███ ▀▀▀ ███
+   ██ ▀█████▀ ██
+  ██           ██`,
+    artist: "Taito 1978",
+  },
+  {
+    title: "Triforce of Wisdom",
+    category: "games",
+    sourceCategory: "video-games",
+    keywords: ["zelda", "triforce", "link", "hyrule", "nintendo"],
+    art: `        /\\
+       /__\\
+      /\\  /\\
+     /__\\/__\\
+    [ HYRULE ]`,
+    artist: "Nintendo",
+  },
+  {
+    title: "Game Boy Classic",
+    category: "games",
+    sourceCategory: "video-games",
+    keywords: ["gameboy", "handheld", "nintendo", "retro", "tetris"],
+    art: ` .------------------.
+ | .--------------. |
+ | | .----------. | |
+ | | |  DOT     | | |
+ | | |  MATRIX  | | |
+ | | '----------' | |
+ | '--------------' |
+ |      _       (B) |
+ |    _| |_   (A)   |
+ |   |_   _|        |
+ |     |_|    SELECT|
+ |             START|
+ '------------------'`,
+    artist: "Asciifier",
+  },
+  {
+    title: "Arcade Cabinet",
+    category: "games",
+    sourceCategory: "video-games",
+    keywords: ["game", "arcade", "joystick", "video", "coin"],
+    art: ` .------------.
+ |  INSERT 25 |
+ | .--------. |
+ | |  >__   | |
+ | | /|  \\  | |
+ | '--------' |
+ |   o  +++   |
+ |  /|\\       |
+ '------------'`,
+    artist: "Asciifier",
+  },
+
+  // =================================================================
+  // 💻 COMPUTERS & RETRO TECH (computers)
+  // =================================================================
+  {
+    title: "Classic Macintosh",
+    category: "computers",
+    sourceCategory: "computers",
+    keywords: ["mac", "apple", "macintosh", "steve jobs", "1984"],
+    art: ` .----------------.
+ | .------------. |
+ | | hello.     | |
+ | |            | |
+ | |            | |
+ | '------------' |
+ |  ___     [=]   |
+ '----------------'
+     /          \\
+    /____________\\`,
+    artist: "Apple/1984",
+  },
+  {
+    title: "Commodore 64 & Disk",
+    category: "computers",
+    sourceCategory: "computers",
+    keywords: ["c64", "commodore", "retro", "8bit", "basic"],
+    art: ` .-------------------------.
+ | **** COMMODORE 64 ****  |
+ | 64K RAM SYSTEM  38911 B |
+ | READY.                  |
+ | LOAD "*",8,1            |
+ | SEARCHING FOR *         |
+ | LOADING                 |
+ | READY.                  |
+ | RUN                     |
+ | _                       |
+ '-------------------------'
+    [== C= 64 KEYBOARD ==]`,
+    artist: "C64 Scene",
+  },
+  {
+    title: "Terminal Cyberdeck",
+    category: "computers",
+    sourceCategory: "computers",
+    keywords: ["cyberdeck", "terminal", "hacker", "matrix", "cli"],
+    art: ` _______________________________
+| [!] ROOT ACCESS GRANTED       |
+| > ./launch_protocol.sh        |
+| > TARGET: MAINFRAME           |
+| > ENCRYPTION: BYPASSED        |
+| > STATUS: ALL SYSTEMS GREEN   |
+|_______________________________|
+  \\___________________________/
+   [===][===][===][===][===]`,
+    artist: "Asciifier",
+  },
+  {
+    title: 'Floppy Disk 3.5"',
+    category: "computers",
+    sourceCategory: "computers",
+    keywords: ["computer", "floppy", "disk", "save", "1.44mb"],
+    art: ` .------------.
+ |  __    __  |
+ | |  |  |  | |
+ | |__|  |__| |
+ |            |
+ |  .------.  |
+ |  |______|  |
+ '------------'`,
+    artist: "Asciifier",
+  },
+
+  // =================================================================
+  // 🚀 SPACE & SCI-FI (space)
+  // =================================================================
+  {
+    title: "Saturn V Moon Rocket",
+    category: "space",
+    sourceCategory: "space",
+    keywords: ["space", "rocket", "apollo", "nasa", "moon"],
+    art: `        /\\
+       /  \\
+      |    |
+      |NASA|
+      |USA |
+      |    |
+     /|    |\\
+    / |    | \\
+   /  |====|  \\
+     /  /\\  \\
+    (  (  )  )
+     \\  \\/  /
+      ******`,
+    artist: "NASA",
+  },
+  {
+    title: "UFO Abduction Beam",
+    category: "space",
+    sourceCategory: "space",
+    keywords: ["ufo", "alien", "saucer", "space", "beam"],
+    art: `     .---.
+   _/_____\\_
+  /  (o)(o)  \\
+ '---=====---'
+    /     \\
+   /   *   \\
+  /    |    \\
+ /    -O-    \\
+/      |      \\
+      (..)     <- cow`,
+    artist: "X-Files",
+  },
+  {
+    title: "Saturn & Deep Galaxy",
+    category: "space",
+    sourceCategory: "space",
+    keywords: ["saturn", "planet", "rings", "cosmos", "stars"],
+    art: `        *            .         *
+           .      .-''''-.  .
+       *       .-'  _     '-.
+   ---------.-'   /   \\      '-.-------
+            '.    \\___/        .'
+       .      '-.           .-'    *
+             *   '-._____.-'
+        .                 .       *`,
+    artist: "Cosmos",
+  },
+  {
+    title: "Astronaut on Moon",
+    category: "space",
+    sourceCategory: "space",
+    keywords: ["astronaut", "space", "moon", "helmet", "apollo"],
+    art: `       .-''''-.
+     .'  ____  '.
+    /   / == \\   \\
+   |   | (o)  |   |
+   |    \\_==_/    |
+    \\   /____\\   /
+     '.        .'
+       '--..--;
+       /  ||  \\
+      /__/  \\__\\`,
+    artist: "Apollo 11",
+  },
+
+  // =================================================================
+  // 🐉 DRAGONS & MYTHOLOGY (mythology/dragons)
+  // =================================================================
+  {
+    title: "Wyvern Flying",
     category: "mythology",
     sourceCategory: "mythology/dragons",
-    keywords: ["dragon", "mythology"],
+    keywords: ["dragon", "wyvern", "wings", "fire", "mythology"],
+    art: `             ^                ^
+            / \\              / \\
+           /   \\            /   \\
+          /  _  \\          /  _  \\
+         /  / \\  \\        /  / \\  \\
+     ___/  /__/   \\______/   \\__\\  \\___
+    /     /                 \\     \\
+   (    <  /\\     DRAGON     /\\  >    )
+    \\___/  \\/               \\/  \\___/
+            \\______    ______/
+                   \\  /
+                    vv`,
+    artist: "Demoscene",
+  },
+  {
+    title: "Eastern Dragon",
+    category: "mythology",
+    sourceCategory: "mythology/dragons",
+    keywords: ["dragon", "long", "chinese", "mythology", "asian"],
+    art: `                 _===_
+               _/ ___ \\_
+             <__ (o o) __>
+                \\  ^  /
+         __      \\_-_/
+  _     /  \\_    /   \\    _
+ / \\___/     \\__/     \\__/ \\_
+ \\___________________________/`,
+    artist: "Eastern Lore",
+  },
+  {
+    title: "Cute Baby Dragon",
+    category: "mythology",
+    sourceCategory: "mythology/dragons",
+    keywords: ["dragon", "cute", "baby", "wings"],
     art: `                    /     \\
                    ((     ))
-               ===  \\\\\_v\_//  ===
-                ====)\_^\_(====
+               ===  \\\\_v_//  ===
+                ====)_^_(====
                 ===/ O O \\===
-                = | /\_ \_\\ | =
-               =   \\/\_ \_\\/   =
-                    \\\_ \_/
-                    (o\_o)
+                = | /_ _\\ | =
+               =   \\/_ _\\/   =
+                    \\_ _/
+                    (o_o)
                      VwV`,
     artist: "Roland Waylor",
   },
 
-  // Cats
+  // =================================================================
+  // 🐱 ANIMALS & CATS (animals/cats)
+  // =================================================================
   {
-    title: "Simple Cat",
+    title: "Sleeping Cat",
     category: "animals",
     sourceCategory: "animals/cats",
-    keywords: ["cat", "animal"],
-    art: ` /\\_/\\
-( o o )
-==_Y_==
-  \`-'`,
+    keywords: ["cat", "sleeping", "purr", "cozy", "cute"],
+    art: `     |\\__/,|   (\`\\
+   _.|o o  |_   ) )
+ -(((---(((--------`,
+    artist: "Felix",
   },
   {
-    title: "Detailed Cat",
+    title: "Cat in Box",
     category: "animals",
     sourceCategory: "animals/cats",
-    keywords: ["cat", "animal"],
-    art: `   |\\---/|
-   | ,_, |
-    \\_\`_/-..----.
- ___/ \`   ' ,""+ \\
-(___...'   __\\    |\`.___.';
-  (___,'(___,\`___()/'.....+`,
-    artist: "sk",
+    keywords: ["cat", "box", "if it fits", "pet", "kitten"],
+    art: `   /\\_/\\
+  ( o.o )  "if it fits,
+   > ^ <    i sits."
+ .-------.
+ |       |
+ '-------'`,
+    artist: "Asciifier",
+  },
+  {
+    title: "Howling Wolf",
+    category: "animals",
+    sourceCategory: "animals/cats",
+    keywords: ["wolf", "moon", "howl", "wilderness", "canine"],
+    art: `                      .
+                     / \\
+                    /   \\
+                   |^. .^|
+                   (  o  )
+                    )   (
+                   /     \\
+                  /       \\
+             _.-"          "-._
+            '                  '`,
+    artist: "Moonchild",
+  },
+  {
+    title: "Wise Owl",
+    category: "animals",
+    sourceCategory: "animals/cats",
+    keywords: ["owl", "bird", "wise", "night", "forest"],
+    art: `    ,___,
+    {o,o}
+    /)__)
+    --"-"--`,
+    artist: "Night Owl",
   },
 
-  // Geometric Art
+  // =================================================================
+  // 🎸 MUSIC & SOUND (music)
+  // =================================================================
   {
-    title: "Tetrahedron",
-    category: "geometry",
-    sourceCategory: "art-and-design",
-    keywords: ["geometry", "shape", "art"],
-    art: `       ^
-      /|\\
-     / | \\
-    /  |  \\
-    '-.|.-'`,
-    artist: "KCK",
+    title: "Retro Cassette Mixtape",
+    category: "music",
+    sourceCategory: "music",
+    keywords: ["music", "cassette", "tape", "retro", "80s", "mixtape"],
+    art: ` .-----------------------.
+ |  .---.         .---.  |
+ | | (O) |-------| (O) | |
+ |  '---'  MIXTAPE'---'  |
+ |    .---------------.  |
+ |   /                 \\ |
+ |  '-------------------'|
+ '-----------------------'`,
+    artist: "80s Kid",
   },
   {
-    title: "Dodecahedron",
+    title: "Vinyl Turntable",
+    category: "music",
+    sourceCategory: "music",
+    keywords: ["vinyl", "turntable", "record", "dj", "hifi"],
+    art: ` .--------------------.
+ |  .------.       \\  |
+ | /  .--.  \\       \\ |
+ ||  ( () )  |       O|
+ | \\  '--'  /    33/45|
+ |  '------'    [ON]  |
+ '--------------------'`,
+    artist: "Asciifier",
+  },
+  {
+    title: "Electric Guitar",
+    category: "music",
+    sourceCategory: "music",
+    keywords: ["guitar", "rock", "stratocaster", "instrument"],
+    art: `       /|
+      / |
+     /__|
+    |===|
+    |   |
+    |   |
+    |   |
+   /     \\
+  |  ooo  |
+  |  ===  |
+   \\_____/`,
+    artist: "Fender",
+  },
+  {
+    title: "Synthesizer Keyboard",
+    category: "music",
+    sourceCategory: "music",
+    keywords: ["synth", "keyboard", "piano", "moog", "electronic"],
+    art: ` .-----------------------------------.
+ | [PULSE] [SAW] [FILTER] [RESONANCE] |
+ | || | || | || | || | || | || | || | |
+ | || | || | || | || | || | || | || | |
+ | '_ | '_ | '_ | '_ | '_ | '_ | '_ | |
+ '------------------------------------'`,
+    artist: "Moog",
+  },
+
+  // =================================================================
+  // 🍜 FOOD & DRINKS (food-and-drinks)
+  // =================================================================
+  {
+    title: "Hot Ramen Bowl",
+    category: "food",
+    sourceCategory: "food-and-drinks",
+    keywords: ["ramen", "noodles", "soup", "japanese", "chopsticks"],
+    art: `      \\  /
+       \\/  <- chopsticks
+     (  ~  ~ )
+   .-----------.
+  /   RAMEN     \\
+ |   @  o  ( )   |
+  \\             /
+   '-----------'
+       |===|`,
+    artist: "Tokyo Nights",
+  },
+  {
+    title: "Pizza Slice",
+    category: "food",
+    sourceCategory: "food-and-drinks",
+    keywords: ["pizza", "slice", "cheese", "pepperoni", "italian"],
+    art: `        /\\
+       /  \\
+      / oo \\
+     /  o   \\
+    / o   o  \\
+   /___o______\\
+       \\  /
+        \\/`,
+    artist: "Asciifier",
+  },
+  {
+    title: "Boba Milk Tea",
+    category: "food",
+    sourceCategory: "food-and-drinks",
+    keywords: ["boba", "bubble tea", "tapioca", "drink", "sweet"],
+    art: `      ||
+     .||.
+   .------.
+  /  TEA   \\
+ |          |
+ |  o o o   |
+ | o o o o  |
+  \\________/`,
+    artist: "Boba Lab",
+  },
+  {
+    title: "Steaming Espresso",
+    category: "food",
+    sourceCategory: "food-and-drinks",
+    keywords: ["coffee", "espresso", "cafe", "cup", "caffeine"],
+    art: `      )  )  )
+     (  (  (
+   .----------.
+   |  COFFEE  |]
+   |          |
+   '----------'
+    \\________/`,
+    artist: "Asciifier",
+  },
+
+  // =================================================================
+  // 🌿 PLANTS & NATURE (plants)
+  // =================================================================
+  {
+    title: "Bonsai Tree",
+    category: "plants",
+    sourceCategory: "plants",
+    keywords: ["bonsai", "tree", "zen", "nature", "japanese"],
+    art: `       ,@@@@@@@,
+   ,,,.   ,@@@@@@/@@,  .oo8888o.
+,&%%&%&&%,@@@@@/@@@@@@,8888\\88/8o
+,%&\\%&&%&&%,@@@\\@@@/@@@88\\88888/88'
+%&&%&%&/%&&%@@\\@@/ /@@@88888\\88888'
+%&&%/ %&%%&&@@\\ V /@@' \`88\\8 \`/88'
+\`&%\\ \` /%&'    |.|        \\ '|8'
+    |o|        | |         | |
+    |.|        | |         | |
+ _\\\\/ ._\\//_/__/  ,\\_//__\\\\/.  \\_//__/_`,
+    artist: "Zen",
+  },
+  {
+    title: "Magic Mushroom",
+    category: "plants",
+    sourceCategory: "plants",
+    keywords: ["mushroom", "toadstool", "fungi", "nature", "shroom"],
+    art: `      .---.
+    .' o O '.
+   /  O   o  \\
+  |___________|
+     |     |
+     |  .  |
+     |_____|`,
+    artist: "Fungi Forest",
+  },
+  {
+    title: "Saguaro Cactus",
+    category: "plants",
+    sourceCategory: "plants",
+    keywords: ["cactus", "desert", "plant", "succulent", "arizona"],
+    art: `       _
+    _ | | _
+   | || || |
+   | || || |
+   | || || |
+    \\     /
+     |   |
+   __|___|__
+  /_________\\`,
+    artist: "Asciifier",
+  },
+
+  // =================================================================
+  // 🔮 GEOMETRY & ART (art-and-design)
+  // =================================================================
+  {
+    title: "Impossible Penrose Triangle",
     category: "geometry",
     sourceCategory: "art-and-design",
-    keywords: ["geometry", "shape", "art"],
+    keywords: [
+      "penrose",
+      "impossible",
+      "optical illusion",
+      "geometry",
+      "escher",
+    ],
+    art: `          /\\
+         /  \\
+        / /\\ \\
+       / /  \\ \\
+      / / /\\ \\ \\
+     / / /__\\ \\ \\
+    / / /________\\
+   / /___________/
+  /_____________/`,
+    artist: "Penrose",
+  },
+  {
+    title: "Sacred Mandala",
+    category: "geometry",
+    sourceCategory: "art-and-design",
+    keywords: ["mandala", "sacred", "symmetry", "meditation", "circle"],
+    art: `        .---.
+     .-'     '-.
+   .'   /\\ /\\   '.
+  /    /  X  \\    \\
+ |    <  (O)  >    |
+  \\    \\  X  /    /
+   '.   \\/ \\/   .'
+     '-.     .-'
+        '---'`,
+    artist: "Sacred Geo",
+  },
+  {
+    title: "Dodecahedron Wireframe",
+    category: "geometry",
+    sourceCategory: "art-and-design",
+    keywords: ["geometry", "shape", "dodecahedron", "3d", "math"],
     art: `      _----------_,
     ,"__         _-:,
    /    ""--_--""...:\\
@@ -113,12 +720,14 @@ export const asciiCollection: AsciiArt[] = [
     artist: "Michael Naylor",
   },
 
-  // Robots
+  // =================================================================
+  // 🤖 ROBOTS & CYBERPUNK (electronics/robots)
+  // =================================================================
   {
-    title: "Pocket Robot",
+    title: "Pocket Android",
     category: "electronics",
     sourceCategory: "electronics/robots",
-    keywords: ["robot", "electronics", "android", "bot"],
+    keywords: ["robot", "android", "bot", "cyber", "ai"],
     art: `    .------.
    /  .--.  \\
   |  | [] |  |
@@ -130,10 +739,10 @@ export const asciiCollection: AsciiArt[] = [
     artist: "Asciifier",
   },
   {
-    title: "Signal Bot",
+    title: "Signal Beacon Bot",
     category: "electronics",
     sourceCategory: "electronics/robots",
-    keywords: ["robot", "signal", "antenna", "bot"],
+    keywords: ["robot", "signal", "antenna", "beacon", "bot"],
     art: `      \\ | /
        .-.
   .---(o o)---.
@@ -146,288 +755,128 @@ export const asciiCollection: AsciiArt[] = [
     artist: "Asciifier",
   },
 
-  // Space
+  // =================================================================
+  // 🌟 BORDERS & DIVIDERS (ascii-borders/gallery & ascii-dividers/gallery)
+  // =================================================================
   {
-    title: "Tiny Rocket",
-    category: "space",
-    sourceCategory: "space",
-    keywords: ["space", "rocket", "launch"],
-    art: `        /\\
-       /  \\
-      /++++\\
-     /  ()  \\
-     |      |
-     |  /\\  |
-    /| |  | |\\
-   /_|_|__|_|_\\
-      /_/\\_\\
-       ****`,
-    artist: "Asciifier",
-  },
-  {
-    title: "Orbit",
-    category: "space",
-    sourceCategory: "space",
-    keywords: ["space", "planet", "orbit", "stars"],
-    art: `        .       *
-    *        .-.
-         --- (   ) ---
-      .       '-'
-           *       .
-       .      ___
-            .'   '.
-     *     /  o    \\
-           \\     o /
-            '.___.'`,
-    artist: "Asciifier",
-  },
-
-  // Computers
-  {
-    title: "Old Terminal",
-    category: "computers",
-    sourceCategory: "computers",
-    keywords: ["computer", "terminal", "screen"],
-    art: ` .----------------.
- | ASCIIFIER> _   |
- |                |
- |  []  []  []    |
- '----------------'
-      |      |
-   .--'------'--.
-   |____________|`,
-    artist: "Asciifier",
-  },
-  {
-    title: "Floppy Disk",
-    category: "computers",
-    sourceCategory: "computers",
-    keywords: ["computer", "floppy", "disk", "save"],
-    art: ` .------------.
- |  __    __  |
- | |  |  |  | |
- | |__|  |__| |
- |            |
- |  .------.  |
- |  |______|  |
- '------------'`,
-    artist: "Asciifier",
-  },
-
-  // Music
-  {
-    title: "Cassette",
-    category: "music",
-    sourceCategory: "music",
-    keywords: ["music", "cassette", "tape", "retro"],
-    art: ` .----------------.
- |  .--.    .--.  |
- | ( () )--( () ) |
- |  '--'    '--'  |
- |   MIX TAPE     |
- | .------------. |
- | '------------' |
- '----------------'`,
-    artist: "Asciifier",
-  },
-  {
-    title: "Guitar Amp",
-    category: "music",
-    sourceCategory: "music",
-    keywords: ["music", "guitar", "amp", "speaker"],
-    art: ` .------------.
- |  VOLUME  7 |
- |  o o o o   |
- | .--------. |
- | | ////// | |
- | | ////// | |
- | '--------' |
- '------------'`,
-    artist: "Asciifier",
-  },
-
-  // Plants
-  {
-    title: "Window Plant",
-    category: "plants",
-    sourceCategory: "plants",
-    keywords: ["plant", "leaf", "pot"],
-    art: `      \\  |  /
-       \\ | /
-    .---\\|/---.
-   /   _/|\\_   \\
-   \\__/  |  \\__/
-        \\|/
-       .---.
-      /_____\\
-        | |`,
-    artist: "Asciifier",
-  },
-  {
-    title: "Cactus Friend",
-    category: "plants",
-    sourceCategory: "plants",
-    keywords: ["plant", "cactus", "desert"],
-    art: `       _
-    _ | | _
-   | || || |
-   | || || |
-   | || || |
-    \\     /
-     |   |
-   __|___|__
-  /_________\\`,
-    artist: "Asciifier",
-  },
-
-  // Food and drinks
-  {
-    title: "Coffee Cup",
-    category: "food",
-    sourceCategory: "food-and-drinks",
-    keywords: ["coffee", "drink", "cup", "cafe"],
-    art: `      )  )  )
-     (  (  (
-   .----------.
-   |          |]
-   |  COFFEE  |
-   |          |
-   '----------'
-    \\________/`,
-    artist: "Asciifier",
-  },
-  {
-    title: "Pizza Slice",
-    category: "food",
-    sourceCategory: "food-and-drinks",
-    keywords: ["pizza", "food", "slice"],
-    art: `        /\\
-       /  \\
-      / oo \\
-     /  o   \\
-    / o   o  \\
-   /___o______\\
-       \\  /
-        \\/`,
-    artist: "Asciifier",
-  },
-
-  // Video games
-  {
-    title: "Arcade Cabinet",
-    category: "games",
-    sourceCategory: "video-games",
-    keywords: ["game", "arcade", "joystick", "video"],
-    art: ` .------------.
- |  INSERT 25 |
- | .--------. |
- | |  >__   | |
- | | /|  \\  | |
- | '--------' |
- |   o  +++   |
- |  /|\\       |
- '------------'`,
-    artist: "Asciifier",
-  },
-  {
-    title: "Gamepad",
-    category: "games",
-    sourceCategory: "video-games",
-    keywords: ["game", "controller", "gamepad", "video"],
-    art: `    ______________
-  .'  _      _   '.
- /   (_)    (_)    \\
- |  _   ____   _   |
- | (_) |____| (_)  |
- \\                /
-  '.___      ___.'
-      '------'`,
-    artist: "Asciifier",
-  },
-
-  // Welcome Messages
-  {
-    title: "Welcome Banner",
-    category: "text",
-    sourceCategory: "one-line",
-    keywords: ["welcome", "banner", "text"],
-    art: `
- ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄
-▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
-▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀▀▀  ▀▀▀▀█░█▀▀▀▀  ▀▀▀▀█░█▀▀▀▀
-▐░▌       ▐░▌▐░▌          ▐░▌               ▐░▌          ▐░▌
-▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄▄▄ ▐░▌               ▐░▌          ▐░▌
-▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌               ▐░▌          ▐░▌
-▐░█▀▀▀▀▀▀▀█░▌ ▀▀▀▀▀▀▀▀▀█░▌▐░▌               ▐░▌          ▐░▌
-▐░▌       ▐░▌          ▐░▌▐░▌               ▐░▌          ▐░▌
-▐░▌       ▐░▌ ▄▄▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄▄▄  ▄▄▄▄█░█▄▄▄▄  ▄▄▄▄█░█▄▄▄▄
-▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
- ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀
-`,
-  },
-
-  // Dividers
-  {
-    title: "Celtic Border",
+    title: "Celtic Ribbon Border",
     category: "borders",
     sourceCategory: "ascii-borders/gallery",
-    keywords: ["border", "celtic", "divider"],
+    keywords: ["border", "celtic", "ribbon", "divider"],
     art: ` .--..--..--..--..--..--..--..--..--..--..--.
 / .. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\.. \\
-\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/ /
+\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/\\ \\/ /
 \\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /\\/ /`,
+    artist: "Celtic Tradition",
   },
-
-  // Dividers
   {
-    title: "Spark Divider",
+    title: "Neo-Brutalist Frame",
+    category: "borders",
+    sourceCategory: "ascii-borders/gallery",
+    keywords: ["border", "frame", "brutalist", "chunky", "softstack"],
+    art: `╔══════════════════════════════════╗
+║ ▞▞▞▞▞▞▞▞ SOFTSTACK ▞▞▞▞▞▞▞▞ ║
+╠══════════════════════════════════╣
+║                                  ║
+║      [ AUTHENTIC ASCII ART ]     ║
+║                                  ║
+╚══════════════════════════════════╝`,
+    artist: "SoftStack",
+  },
+  {
+    title: "Cosmic Spark Divider",
     category: "borders",
     sourceCategory: "ascii-dividers/gallery",
-    keywords: ["divider", "separator", "spark", "line"],
-    art: `--*--*--*--*--*--*--*--*--*--*--
-  .  *  .   ASCIIFIER   .  *  .
---*--*--*--*--*--*--*--*--*--*--`,
+    keywords: ["divider", "separator", "spark", "stars", "line"],
+    art: `*--*--*--*--*--*--*--*--*--*--*--*--*
+  .  *  .   ASCII ARCHIVE   .  *  .
+*--*--*--*--*--*--*--*--*--*--*--*--*`,
     artist: "Asciifier",
   },
   {
-    title: "Wave Divider",
+    title: "Analog Wave Divider",
     category: "borders",
     sourceCategory: "ascii-dividers/gallery",
-    keywords: ["divider", "separator", "wave", "line"],
+    keywords: ["divider", "wave", "sine", "analog", "synth"],
     art: `~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ~~~  text art current  ~~~
-------------------------------------`,
+      ~~~  pibulus demoscene  ~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`,
     artist: "Asciifier",
   },
 
-  // Emoji-style
+  // =================================================================
+  // 💬 ONE-LINE & MEMES (one-line)
+  // =================================================================
   {
-    title: "Peace Sign",
-    category: "emoji",
+    title: "Table Flip",
+    category: "one-line",
     sourceCategory: "one-line",
-    keywords: ["peace", "face", "emoji"],
-    art: `
-    .-""""""-.
+    keywords: ["table flip", "rage", "meme", "kaomoji"],
+    art: `(╯°□°)╯︵ ┻━┻`,
+    artist: "Japan/Internet",
+  },
+  {
+    title: "Put Table Back",
+    category: "one-line",
+    sourceCategory: "one-line",
+    keywords: ["table", "calm", "respect", "kaomoji"],
+    art: `┬─┬ノ( º _ ºノ)`,
+    artist: "Japan/Internet",
+  },
+  {
+    title: "Shrug",
+    category: "one-line",
+    sourceCategory: "one-line",
+    keywords: ["shrug", "whatever", "idk", "meme"],
+    art: `¯\\_(ツ)_/¯`,
+    artist: "Internet Classic",
+  },
+  {
+    title: "Lenny Face",
+    category: "one-line",
+    sourceCategory: "one-line",
+    keywords: ["lenny", "face", "meme", "chaos"],
+    art: `( ͡° ͜ʖ ͡°)`,
+    artist: "Internet Classic",
+  },
+  {
+    title: "Disapproval Face",
+    category: "one-line",
+    sourceCategory: "one-line",
+    keywords: ["look of disapproval", "stare", "meme"],
+    art: `ಠ_ಠ`,
+    artist: "Reddit/Internet",
+  },
+  {
+    title: "Peace Sign Face",
+    category: "one-line",
+    sourceCategory: "one-line",
+    keywords: ["peace", "smile", "retro", "happy"],
+    art: `    .-""""""-.
   .'          '.
  /   O      O   \\
-:                :
+:    \\______/    :
 |                |
 :       __       :
  \\  .-"    "-.  /
   '.          .'
-    '-......-'
-`,
+    '-......-'`,
+    artist: "Peace",
   },
 ];
 
-// Restored 2026-08-09: the Jul "dead code" purge deleted this while
-// searchAsciiCollection still called it — every gallery request 500'd
-// since. If it looks unused, it's because its caller is 6 lines down.
+// Helper to filter by category or subcategory with robust matching
 function getAsciiBySourceCategory(sourceCategory: string): AsciiArt[] {
-  return asciiCollection.filter((art) => art.sourceCategory === sourceCategory);
+  const norm = sourceCategory.toLowerCase().trim();
+  return asciiCollection.filter((art) => {
+    const sNorm = (art.sourceCategory || "").toLowerCase();
+    const cNorm = (art.category || "").toLowerCase();
+    return sNorm === norm || cNorm === norm || sNorm.startsWith(norm) ||
+      norm.startsWith(sNorm);
+  });
 }
 
-// Get a random ASCII art piece
+// Search ASCII art collection by category and query
 export function searchAsciiCollection(
   sourceCategory: string,
   query: string,
@@ -437,11 +886,13 @@ export function searchAsciiCollection(
     ? getAsciiBySourceCategory(sourceCategory)
     : asciiCollection;
 
+  const pool = categoryMatches.length > 0 ? categoryMatches : asciiCollection;
+
   if (!trimmedQuery) {
-    return categoryMatches;
+    return pool;
   }
 
-  return categoryMatches.filter((art) => {
+  return pool.filter((art) => {
     const haystack = [
       art.title,
       art.artist || "",
@@ -454,5 +905,3 @@ export function searchAsciiCollection(
     return haystack.includes(trimmedQuery);
   });
 }
-
-// Get all categories

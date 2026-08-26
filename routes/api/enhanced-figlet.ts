@@ -174,13 +174,22 @@ export const handler = async (
 ${"─".repeat(limitedText.length + 2)}`;
     }
 
-    // Apply border if requested - using manual implementation for reliability
-    let borderedResult = result;
-    if (safeBorderStyle !== "none") {
-      // Manual border implementation that always works
-      const lines = result.split("\n");
-      const maxLength = Math.max(...lines.map((l) => l.length));
+    // Clean and normalize figlet output
+    const rawLines = result.replace(/\r/g, "").split("\n");
+    while (rawLines.length > 0 && rawLines[0].trim() === "") {
+      rawLines.shift();
+    }
+    while (rawLines.length > 0 && rawLines[rawLines.length - 1].trim() === "") {
+      rawLines.pop();
+    }
+    const cleanLines = rawLines.map((l) => l.trimEnd());
+    const maxLength = Math.max(1, ...cleanLines.map((l) => l.length));
+    const normalizedResult = cleanLines.map((l) => l.padEnd(maxLength, " "))
+      .join("\n");
 
+    // Apply border if requested - using manual implementation for reliability
+    let borderedResult = normalizedResult;
+    if (safeBorderStyle !== "none") {
       // Border characters based on style
       const borders: Record<string, BorderChars> = {
         "single": { tl: "┌", tr: "┐", bl: "└", br: "┘", h: "─", v: "│" },
@@ -195,7 +204,9 @@ ${"─".repeat(limitedText.length + 2)}`;
 
       borderedResult = [
         b.tl + horizontalBorder + b.tr,
-        ...lines.map((line) => b.v + " " + line.padEnd(maxLength) + " " + b.v),
+        ...cleanLines.map((line) =>
+          b.v + " " + line.padEnd(maxLength, " ") + " " + b.v
+        ),
         b.bl + horizontalBorder + b.br,
       ].join("\n");
     }

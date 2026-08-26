@@ -135,7 +135,8 @@ html::-webkit-scrollbar-thumb:hover {
 
 /* Dynamic film and CRT grain flicker */
 @keyframes grain-buzz {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0 0;
   }
   10% {

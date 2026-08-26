@@ -262,7 +262,6 @@ export default function AsciiGallery() {
           showShuffleButton={Boolean(currentArt) && !currentSourceOnly}
           showExportButtons={Boolean(currentArt) && !currentSourceOnly}
           terminalPath="~/gallery/ascii-art.txt"
-          typeReveal
           visualEffect={selectedEffect}
         />
       </div>

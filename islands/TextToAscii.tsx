@@ -355,7 +355,6 @@ export default function TextToAscii() {
             "ascii-art"}
           showShuffleButton={false}
           terminalPath="~/output/text-art.txt"
-          typeReveal
         />
       </div>
 

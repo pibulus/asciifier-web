@@ -1,5 +1,3 @@
-// deno-lint-ignore-file react-no-danger
-
 // ===================================================================
 // TYPED WRITER - Uses typed.js library with keyboard sounds
 // ===================================================================
